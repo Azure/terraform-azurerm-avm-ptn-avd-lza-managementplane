@@ -35,12 +35,14 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
-avmmakefile
+
+*.md.tmp
+*tfplan*
+.DS_Store
 README-generated.md
 avm.tflint.hcl
+avm.tflint.merged.hcl
 avm.tflint_example.hcl
-*tfplan*
-*.md.tmp
+avm.tflint_example.merged.hcl
+avmmakefile
 
-# MacOS
-.DS_Store
