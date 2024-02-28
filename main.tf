@@ -6,4 +6,5 @@ data "azurerm_resource_group" "parent" {
 resource "azurerm_resource_group" "this" {
   name     = var.name
   location = coalesce(var.location, local.resource_group_location)
+  tags     = var.tags
 }
