@@ -1,6 +1,5 @@
 locals {
   resource_group_location            = try(data.azurerm_resource_group.parent[0].location, null)
-
   role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
 }
 
@@ -19,8 +18,7 @@ locals {
   ]) : "${assoc.pe_key}-${assoc.asg_key}" => assoc }
 }
 
-
-# Define resource names
+# Define resource tags
 locals {
   tags = {
     cm-resource-parent = azurerm_virtual_desktop_host_pool.hostpool.id
