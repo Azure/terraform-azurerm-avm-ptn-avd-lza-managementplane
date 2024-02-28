@@ -3,55 +3,6 @@
 
 This deploys the module in its simplest form.
 
-
-```hcl
-terraform {
-  required_version = ">= 1.3.0"
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = ">= 3.7.0, < 4.0.0"
-    }
-  }
-}
-
-provider "azurerm" {
-  features {}
-}
-
-variable "enable_telemetry" {
-  type        = bool
-  default     = true
-  description = <<DESCRIPTION
-This variable controls whether or not telemetry is enabled for the module.
-For more information see <https://aka.ms/avm/telemetryinfo>.
-If it is set to false, then no telemetry will be collected.
-DESCRIPTION
-}
-
-# This ensures we have unique CAF compliant names for our resources.
-module "naming" {
-  source  = "Azure/naming/azurerm"
-  version = "0.4.0"
-}
-
-# This is required for resource modules
-resource "azurerm_resource_group" "this" {
-  name     = module.naming.resource_group.name_unique
-  location = "MYLOCATION" # TODO update with a real location, e.g. EastUS
-}
-
-# This is the module call
-module "MYMODULE" {
-  source = "../../"
-  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
-  # ...
-  enable_telemetry    = var.enable_telemetry
-  name                = "" # TODO update with module.naming.<RESOURCE_TYPE>.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-}
-```
-
 <!-- markdownlint-disable MD033 -->
 ## Requirements
 
@@ -61,11 +12,15 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.7.0, < 4.0.0)
 
+- <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0.0)
+
 ## Providers
 
 The following providers are used by this module:
 
 - <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (>= 3.7.0, < 4.0.0)
+
+- <a name="provider_random"></a> [random](#provider\_random) (>= 3.5.0, < 4.0.0)
 
 ## Resources
 
@@ -73,6 +28,7 @@ The following resources are used by this module:
 
 - [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
+- [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -159,7 +115,13 @@ Version:
 
 Source: Azure/naming/azurerm
 
-Version: 0.4.0
+Version: >= 0.3.0
+
+### <a name="module_regions"></a> [regions](#module\_regions)
+
+Source: Azure/regions/azurerm
+
+Version: >= 0.3.0
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

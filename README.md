@@ -12,14 +12,19 @@ Things to do:
 1. Configure federated identity credentials on the user assigned managed identity. Use the GitHub environment.
 1. Search and update TODOs within the code and remove the TODO comments once complete.
 
-Major version Zero (0.y.z) is for initial development. Anything MAY change at any time. A module SHOULD NOT be considered stable till at least it is major version one (1.0.0) or greater. Changes will always be via new versions being published and no changes will be made to existing published versions. For more details please go to <https://semver.org/>
+> [!IMPORTANT]
+> As the overall AVM framework is not GA (generally available) yet - the CI framework and test automation is not fully functional and implemented across all supported languages yet - breaking changes are expected, and additional customer feedback is yet to be gathered and incorporated. Hence, modules **MUST NOT** be published at version `1.0.0` or higher at this time.
+>
+> All module **MUST** be published as a pre-release version (e.g., `0.1.0`, `0.1.1`, `0.2.0`, etc.) until the AVM framework becomes GA.
+>
+> However, it is important to note that this **DOES NOT** mean that the modules cannot be consumed and utilized. They **CAN** be leveraged in all types of environments (dev, test, prod etc.). Consumers can treat them just like any other IaC module and raise issues or feature requests against them as they learn from the usage of the module. Consumers should also read the release notes for each version, if considering updating to a more recent version of a module to see if there are any considerations or breaking changes etc.
 
 <!-- markdownlint-disable MD033 -->
 ## Requirements
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.6.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.7.0)
 
 - <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) (>= 2.47.0, < 3.0.0)
 
@@ -51,6 +56,7 @@ The following resources are used by this module:
 - [azurerm_monitor_diagnostic_setting.this2](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
 - [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
 - [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
+- [azurerm_resource_group.TODO](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [azurerm_resource_group_template_deployment.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group_template_deployment) (resource)
 - [azurerm_role_assignment.role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
@@ -66,24 +72,15 @@ The following resources are used by this module:
 - [azuread_group.user_group](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/group) (data source)
 - [azuread_service_principal.spn](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/service_principal) (data source)
 - [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
+- [azurerm_resource_group.parent](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) (data source)
 - [azurerm_role_definition.power_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/role_definition) (data source)
 - [azurerm_role_definition.role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/role_definition) (data source)
 - [azurerm_subscription.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subscription) (data source)
-=======
-- [azurerm_TODO_the_resource_for_this_module.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/TODO_the_resource_for_this_module) (resource)
-- [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
-- [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
-- [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
-- [azurerm_resource_group_template_deployment.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group_template_deployment) (resource)
-- [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
-- [random_id.telem](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) (resource)
-- [azurerm_resource_group.parent](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
 
 The following input variables are required:
-
 
 ### <a name="input_description"></a> [description](#input\_description)
 
@@ -97,15 +94,9 @@ Description: The type of the AVD Host Pool. Valid values are 'Pooled' and 'Perso
 
 Type: `string`
 
-### <a name="input_location"></a> [location](#input\_location)
-
-Description: The Azure location where the resources will be deployed.
-
-Type: `string`
-
 ### <a name="input_name"></a> [name](#input\_name)
 
-Description: The name of the AVD Host Pool, Application Group or Workspace.
+Description: The name of the this resource.
 
 Type: `string`
 
@@ -137,15 +128,6 @@ Type: `string`
 
 The following input variables are optional (have default values):
 
-
-### <a name="input_day_of_week"></a> [day\_of\_week](#input\_day\_of\_week)
-
-Description: The day of the week to apply the schedule agent update. Value must be one of: 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', or 'Saturday'.
-
-Type: `string`
-
-Default: `"Sunday"`
-=======
 ### <a name="input_customer_managed_key"></a> [customer\_managed\_key](#input\_customer\_managed\_key)
 
 Description: Customer managed keys that should be associated with the resource.
@@ -163,6 +145,13 @@ object({
 
 Default: `{}`
 
+### <a name="input_day_of_week"></a> [day\_of\_week](#input\_day\_of\_week)
+
+Description: The day of the week to apply the schedule agent update. Value must be one of: 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', or 'Saturday'.
+
+Type: `string`
+
+Default: `"Sunday"`
 
 ### <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings)
 
@@ -200,16 +189,15 @@ Default: `{}`
 
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
-Description: This variable controls whether or not telemetry is enabled for the module.  
+Description: This variable controls whether or not telemetry is enabled for the module.
 
-For more information see <https://aka.ms/avm/telemetryinfo>.  
+For more information see <https://aka.ms/avm/telemetryinfo>.
 
 If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
 
 Default: `true`
-
 
 ### <a name="input_hour_of_day"></a> [hour\_of\_day](#input\_hour\_of\_day)
 
@@ -219,10 +207,6 @@ Type: `number`
 
 Default: `2`
 
-### <a name="input_lock"></a> [lock](#input\_lock)
-
-Description: The lock level to apply to the AVD Host Pool. Default is `ReadOnly`. Possible values are`Delete`, and `ReadOnly`.
-=======
 ### <a name="input_location"></a> [location](#input\_location)
 
 Description: Azure region where the resource should be deployed.  If null, the location will be inferred from the resource group location.
@@ -246,19 +230,6 @@ object({
 
 Default: `{}`
 
-
-### <a name="input_maxsessions"></a> [maxsessions](#input\_maxsessions)
-
-Description: The maximum number of sessions allowed on each session host in the host pool.
-
-Type: `number`
-
-Default: `16`
-
-### <a name="input_private_endpoints"></a> [private\_endpoints](#input\_private\_endpoints)
-
-Description: A map of private endpoints to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-=======
 ### <a name="input_managed_identities"></a> [managed\_identities](#input\_managed\_identities)
 
 Description: Managed identities to be created for the resource.
@@ -273,6 +244,14 @@ object({
 ```
 
 Default: `{}`
+
+### <a name="input_maxsessions"></a> [maxsessions](#input\_maxsessions)
+
+Description: The maximum number of sessions allowed on each session host in the host pool.
+
+Type: `number`
+
+Default: `16`
 
 ### <a name="input_private_endpoints"></a> [private\_endpoints](#input\_private\_endpoints)
 
@@ -458,11 +437,11 @@ Default: `[]`
 
 ### <a name="input_tags"></a> [tags](#input\_tags)
 
-Description: Map of tags to assign to the Key Vault resource.
+Description: The map of tags to be applied to the resource
 
 Type: `map(any)`
 
-Default: `null`
+Default: `{}`
 
 ### <a name="input_time_zone"></a> [time\_zone](#input\_time\_zone)
 
@@ -487,15 +466,6 @@ Description: Default prefix for generated tracing tags
 Type: `string`
 
 Default: `"avm_"`
-=======
-### <a name="input_tags"></a> [tags](#input\_tags)
-
-Description: The map of tags to be applied to the resource
-
-Type: `map(any)`
-
-Default: `{}`
-
 
 ## Outputs
 
@@ -521,21 +491,17 @@ Description: ID of the Azure Virtual Desktop DAG
 
 Description: Name of the Azure Virtual Desktop workspace
 
-=======
-
 ### <a name="output_private_endpoints"></a> [private\_endpoints](#output\_private\_endpoints)
 
 Description: A map of private endpoints. The map key is the supplied input to var.private\_endpoints. The map value is the entire azurerm\_private\_endpoint resource.
 
-
-### <a name="output_workspace_id"></a> [workspace\_id](#output\_workspace\_id)
-
-Description: The ID of the Workspace resource.
-=======
 ### <a name="output_resource"></a> [resource](#output\_resource)
 
 Description: This is the full output for the resource.
 
+### <a name="output_workspace_id"></a> [workspace\_id](#output\_workspace\_id)
+
+Description: The ID of the Workspace resource.
 
 ## Modules
 
