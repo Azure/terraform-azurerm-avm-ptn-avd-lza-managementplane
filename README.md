@@ -56,7 +56,7 @@ The following resources are used by this module:
 - [azurerm_monitor_diagnostic_setting.this2](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
 - [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
 - [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
-- [azurerm_resource_group.TODO](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
+- [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [azurerm_resource_group_template_deployment.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group_template_deployment) (resource)
 - [azurerm_role_assignment.role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
@@ -94,9 +94,15 @@ Description: The type of the AVD Host Pool. Valid values are 'Pooled' and 'Perso
 
 Type: `string`
 
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure location where the resources will be deployed.
+
+Type: `string`
+
 ### <a name="input_name"></a> [name](#input\_name)
 
-Description: The name of the this resource.
+Description: The name of the AVD Host Pool, Application Group or Workspace.
 
 Type: `string`
 
@@ -206,14 +212,6 @@ Description: The hour of the day to apply the schedule agent update. Value must 
 Type: `number`
 
 Default: `2`
-
-### <a name="input_location"></a> [location](#input\_location)
-
-Description: Azure region where the resource should be deployed.  If null, the location will be inferred from the resource group location.
-
-Type: `string`
-
-Default: `null`
 
 ### <a name="input_lock"></a> [lock](#input\_lock)
 

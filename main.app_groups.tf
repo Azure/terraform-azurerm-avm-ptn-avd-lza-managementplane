@@ -68,6 +68,6 @@ resource "azurerm_role_assignment" "this" {
 resource "azurerm_management_lock" "this" {
   count      = var.lock.kind != "None" ? 1 : 0
   name       = coalesce(var.lock.name, "lock-${var.name}")
-  scope      = azurerm_virtual_desktop_application_group.dag.id
+  scope      = azurerm_resource_group.this.id
   lock_level = var.lock.kind
 }
