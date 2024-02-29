@@ -1,6 +1,10 @@
 terraform {
   required_version = ">= 1.3.0"
   required_providers {
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = ">= 2.47.0, < 3.0.0"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 3.7.0, < 4.0.0"
@@ -15,21 +19,6 @@ terraform {
 provider "azurerm" {
   features {}
 }
-
-
-## Section to provide a random Azure region for the resource group
-# This allows us to randomize the region for the resource group.
-module "regions" {
-  source  = "Azure/regions/azurerm"
-  version = ">= 0.3.0"
-}
-
-# This allows us to randomize the region for the resource group.
-resource "random_integer" "region_index" {
-  min = 0
-  max = length(module.regions.regions) - 1
-}
-## End of section to provide a random Azure region for the resource group
 
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
@@ -47,12 +36,6 @@ resource "azurerm_log_analytics_workspace" "this" {
   name                = module.naming.log_analytics_workspace.name_unique
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
-}
-
-# This creates a Entra ID users group for the AVD users and is optional if you already have a group defined this code can be removed.
-resource "azuread_group" "aad_group" {
-  display_name     = var.user_group_name
-  security_enabled = true
 }
 
 # This is the module desktop application group

@@ -1,4 +1,4 @@
-# Create Azure Virtual Desktop application grop
+# Create Azure Virtual Desktop application group
 resource "azurerm_virtual_desktop_application_group" "dag" {
   name                = var.name
   location            = var.location
@@ -10,12 +10,26 @@ resource "azurerm_virtual_desktop_application_group" "dag" {
   tags                = local.tags
 }
 
+# Associate the desktop application group with the workspace
+resource "azurerm_virtual_desktop_workspace_application_group_association" "workappgrassoc" {
+  workspace_id         = azurerm_virtual_desktop_workspace.workspace.id
+  application_group_id = azurerm_virtual_desktop_application_group.dag.id
+
+  depends_on = [azurerm_virtual_desktop_workspace.workspace, azurerm_virtual_desktop_application_group.dag]
+}
+
 # Get an existing built-in role definition
 data "azurerm_role_definition" "role" {
   name = "Desktop Virtualization User"
 }
 
-data "azuread_group" "user_group" {
+data "azuread_groups" "existing" {
+  count         = var.user_group_name == null ? 1 : 0
+  display_names = [var.user_group_name]
+}
+
+resource "azuread_group" "new" {
+  count            = length(local.existing_group) > 0 ? 0 : 1
   display_name     = var.user_group_name
   security_enabled = true
 }
@@ -23,7 +37,7 @@ data "azuread_group" "user_group" {
 resource "azurerm_role_assignment" "role" {
   scope              = azurerm_virtual_desktop_application_group.dag.id
   role_definition_id = data.azurerm_role_definition.role.id
-  principal_id       = data.azuread_group.user_group.id
+  principal_id       = local.group_id
 }
 
 # Create Diagnostic Settings for AVD application group
