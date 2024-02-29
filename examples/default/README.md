@@ -55,6 +55,12 @@ resource "azurerm_log_analytics_workspace" "this" {
   location            = azurerm_resource_group.this.location
 }
 
+# This creates a Entra ID users group for the AVD users and is optional if you already have a group defined this code can be removed.
+resource "azuread_group" "aad_group" {
+  display_name     = var.user_group_name
+  security_enabled = true
+}
+
 # This is the module desktop application group
 module "avd" {
   source              = "../../"
@@ -91,6 +97,8 @@ The following requirements are needed by this module:
 
 The following providers are used by this module:
 
+- <a name="provider_azuread"></a> [azuread](#provider\_azuread)
+
 - <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (>= 3.7.0, < 4.0.0)
 
 - <a name="provider_random"></a> [random](#provider\_random) (>= 3.5.0, < 4.0.0)
@@ -99,6 +107,7 @@ The following providers are used by this module:
 
 The following resources are used by this module:
 
+- [azuread_group.aad_group](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/group) (resource)
 - [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)

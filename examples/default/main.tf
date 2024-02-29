@@ -49,6 +49,12 @@ resource "azurerm_log_analytics_workspace" "this" {
   location            = azurerm_resource_group.this.location
 }
 
+# This creates a Entra ID users group for the AVD users and is optional if you already have a group defined this code can be removed.
+resource "azuread_group" "aad_group" {
+  display_name     = var.user_group_name
+  security_enabled = true
+}
+
 # This is the module desktop application group
 module "avd" {
   source              = "../../"
