@@ -4,10 +4,10 @@ locals {
   telem_puid = "46d3xgtf"
 
   # TODO: change this to the name of the module. See https://azure.github.io/Azure-Verified-Modules/specs/shared/#id-sfr3---category-telemetry---deploymentusage-telemetry
-  module_name = "CHANGEME"
+  module_name = "avd-lza-managementplane"
 
   # TODO: Change this. Should be either `res` or `ptn`
-  module_type = "res"
+  module_type = "ptn"
 
   # This ensures we don't get errors if telemetry is disabled.
   telem_random_hex = can(random_id.telem[0].hex) ? random_id.telem[0].hex : ""

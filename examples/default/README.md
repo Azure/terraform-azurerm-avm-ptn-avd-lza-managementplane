@@ -18,36 +18,42 @@ provider "azurerm" {
   features {}
 }
 
-variable "enable_telemetry" {
-  type        = bool
-  default     = true
-  description = <<DESCRIPTION
-This variable controls whether or not telemetry is enabled for the module.
-For more information see <https://aka.ms/avm/telemetryinfo>.
-If it is set to false, then no telemetry will be collected.
-DESCRIPTION
-}
-
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "0.4.0"
+  version = ">= 0.3.0"
 }
 
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
   name     = module.naming.resource_group.name_unique
-  location = "MYLOCATION" # TODO update with a real location, e.g. EastUS
+  location = "eastus"
 }
 
-# This is the module call
-module "MYMODULE" {
-  source = "../../"
-  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
-  # ...
-  enable_telemetry    = var.enable_telemetry
-  name                = "" # TODO update with module.naming.<RESOURCE_TYPE>.name_unique
+resource "azurerm_log_analytics_workspace" "this" {
+  name                = module.naming.log_analytics_workspace.name_unique
   resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
+}
+
+# This is the module desktop application group
+module "avd" {
+  source              = "../../"
+  enable_telemetry    = var.enable_telemetry
+  type                = var.type
+  description         = var.description
+  user_group_name     = var.user_group_name
+  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
+  hostpooltype        = var.hostpooltype
+  name                = var.name
+  scalingplan         = var.scalingplan
+  diagnostic_settings = {
+    to_law = {
+      name                  = "to-law"
+      workspace_resource_id = azurerm_log_analytics_workspace.this.id
+    }
+  }
 }
 ```
 
@@ -70,6 +76,7 @@ The following providers are used by this module:
 
 The following resources are used by this module:
 
+- [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 
 <!-- markdownlint-disable MD013 -->
@@ -81,6 +88,14 @@ No required inputs.
 
 The following input variables are optional (have default values):
 
+### <a name="input_description"></a> [description](#input\_description)
+
+Description: The description of the AVD.
+
+Type: `string`
+
+Default: `"AVD Management Plane Deployment"`
+
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
 Description: This variable controls whether or not telemetry is enabled for the module.  
@@ -91,6 +106,46 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_hostpooltype"></a> [hostpooltype](#input\_hostpooltype)
+
+Description: The type of the AVD Host Pool. Valid values are 'Pooled' and 'Personal'.
+
+Type: `string`
+
+Default: `"Pooled"`
+
+### <a name="input_name"></a> [name](#input\_name)
+
+Description: The name of the AVD Application Group.
+
+Type: `string`
+
+Default: `"avm-avd"`
+
+### <a name="input_scalingplan"></a> [scalingplan](#input\_scalingplan)
+
+Description: The scaling plan for the AVD Host Pool.
+
+Type: `string`
+
+Default: `"scp-avd-01"`
+
+### <a name="input_type"></a> [type](#input\_type)
+
+Description: The type of the AVD Application Group. Valid values are 'Desktop' and 'RemoteApp'.
+
+Type: `string`
+
+Default: `"Desktop"`
+
+### <a name="input_user_group_name"></a> [user\_group\_name](#input\_user\_group\_name)
+
+Description: Microsoft Entra ID User Group for AVD users
+
+Type: `string`
+
+Default: `"avdusersgrp1"`
+
 ## Outputs
 
 No outputs.
@@ -99,7 +154,7 @@ No outputs.
 
 The following Modules are called:
 
-### <a name="module_MYMODULE"></a> [MYMODULE](#module\_MYMODULE)
+### <a name="module_avd"></a> [avd](#module\_avd)
 
 Source: ../../
 
@@ -109,7 +164,7 @@ Version:
 
 Source: Azure/naming/azurerm
 
-Version: 0.4.0
+Version: >= 0.3.0
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection
