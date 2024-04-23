@@ -1,14 +1,5 @@
 locals {
-  resource_group_location            = try(data.azurerm_resource_group.parent[0].location, null)
   role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
-}
-
-locals {
-  existing_group = [for g in data.azuread_groups.existing : g if g.display_name == var.user_group_name]
-}
-
-locals {
-  group_id = length(local.existing_group) > 0 ? local.existing_group[0].object_id : azuread_group.new[0].object_id
 }
 
 # Private endpoint application security group associations
@@ -29,6 +20,30 @@ locals {
 # Define resource tags
 locals {
   tags = {
-    cm-resource-parent = azurerm_virtual_desktop_host_pool.hostpool.id
+    cm-resource-parent = module.avm_res_desktopvirtualization_hostpool.resource.id
   }
+}
+
+# We pick a random region from this list.
+locals {
+  azure_regions = [
+    "ukwest",
+    "uksouth",
+    "centralindia",
+    "australiaeast",
+    "canadacentral",
+    "canadaeast",
+    "japaneast",
+    "westeurope",
+    "northeurope",
+    "eastus",
+    "eastus2",
+    "westus",
+    "westus2",
+    "westus3",
+    "southcentralus",
+    "northcentralus",
+    "centralus",
+    "westcentralus"
+  ]
 }
