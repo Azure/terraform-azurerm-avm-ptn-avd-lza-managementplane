@@ -13,11 +13,13 @@ resource "random_integer" "region_index" {
 resource "azurerm_resource_group" "this" {
   location = local.azure_regions[random_integer.region_index.result]
   name     = module.naming.resource_group.name_unique
+  tags     = local.tags
 }
 
 # Create Azure Log Analytics workspace for Azure Virtual Desktop
 module "avm_res_operationalinsights_workspace" {
   source              = "Azure/avm-res-operationalinsights-workspace/azurerm"
+  version             = "0.1.3"
   enable_telemetry    = var.enable_telemetry
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
@@ -28,6 +30,7 @@ module "avm_res_operationalinsights_workspace" {
 # Create Azure Virtual Desktop host pool
 module "avm_res_desktopvirtualization_hostpool" {
   source                                             = "Azure/avm-res-desktopvirtualization-hostpool/azurerm"
+  version                                            = "0.1.4"
   enable_telemetry                                   = var.enable_telemetry
   resource_group_name                                = azurerm_resource_group.this.name
   virtual_desktop_host_pool_type                     = var.virtual_desktop_host_pool_type
@@ -80,6 +83,7 @@ resource "azurerm_role_assignment" "this" {
 module "avm_res_desktopvirtualization_applicationgroup" {
   source                                                = "Azure/avm-res-desktopvirtualization-applicationgroup/azurerm"
   enable_telemetry                                      = var.enable_telemetry
+  version                                               = "0.1.2"
   virtual_desktop_application_group_name                = var.virtual_desktop_application_group_name
   virtual_desktop_application_group_type                = var.virtual_desktop_application_group_type
   virtual_desktop_application_group_host_pool_id        = module.avm_res_desktopvirtualization_hostpool.resource.id
@@ -92,6 +96,7 @@ module "avm_res_desktopvirtualization_applicationgroup" {
 # Create Azure Virtual Desktop workspace
 module "avm_res_desktopvirtualization_workspace" {
   source              = "Azure/avm-res-desktopvirtualization-workspace/azurerm"
+  version             = "0.1.3"
   enable_telemetry    = var.enable_telemetry
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
@@ -135,6 +140,7 @@ resource "azurerm_role_assignment" "new" {
 module "avm_res_desktopvirtualization_scaling_plan" {
   source                                           = "Azure/avm-res-desktopvirtualization-scalingplan/azurerm"
   enable_telemetry                                 = var.enable_telemetry
+  version                                          = "0.1.2"
   virtual_desktop_scaling_plan_name                = var.virtual_desktop_scaling_plan_name
   virtual_desktop_scaling_plan_location            = azurerm_resource_group.this.location
   virtual_desktop_scaling_plan_resource_group_name = azurerm_resource_group.this.name

@@ -784,31 +784,31 @@ The following Modules are called:
 
 Source: Azure/avm-res-desktopvirtualization-applicationgroup/azurerm
 
-Version:
+Version: 0.1.2
 
 ### <a name="module_avm_res_desktopvirtualization_hostpool"></a> [avm\_res\_desktopvirtualization\_hostpool](#module\_avm\_res\_desktopvirtualization\_hostpool)
 
 Source: Azure/avm-res-desktopvirtualization-hostpool/azurerm
 
-Version:
+Version: 0.1.4
 
 ### <a name="module_avm_res_desktopvirtualization_scaling_plan"></a> [avm\_res\_desktopvirtualization\_scaling\_plan](#module\_avm\_res\_desktopvirtualization\_scaling\_plan)
 
 Source: Azure/avm-res-desktopvirtualization-scalingplan/azurerm
 
-Version:
+Version: 0.1.2
 
 ### <a name="module_avm_res_desktopvirtualization_workspace"></a> [avm\_res\_desktopvirtualization\_workspace](#module\_avm\_res\_desktopvirtualization\_workspace)
 
 Source: Azure/avm-res-desktopvirtualization-workspace/azurerm
 
-Version:
+Version: 0.1.3
 
 ### <a name="module_avm_res_operationalinsights_workspace"></a> [avm\_res\_operationalinsights\_workspace](#module\_avm\_res\_operationalinsights\_workspace)
 
 Source: Azure/avm-res-operationalinsights-workspace/azurerm
 
-Version:
+Version: 0.1.3
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 
