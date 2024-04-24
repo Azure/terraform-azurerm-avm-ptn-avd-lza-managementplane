@@ -28,21 +28,21 @@ resource "azurerm_resource_group" "this" {
 module "avd" {
   source = "../../"
   # source             = "Azure/avm-ptn-avd-lza-managementplane/azurerm"
-  enable_telemetry                             = var.enable_telemetry
-  location                                     = azurerm_resource_group.this.location
-  resource_group_name                          = azurerm_resource_group.this.name
-  user_group_name                              = var.user_group_name
-  virtual_desktop_workspace_name               = var.virtual_desktop_workspace_name
-  description                                  = var.description
-  virtual_desktop_scaling_plan_time_zone       = var.virtual_desktop_scaling_plan_time_zone
-  virtual_desktop_scaling_plan_name            = var.virtual_desktop_scaling_plan_name
-  virtual_desktop_host_pool_type               = var.virtual_desktop_host_pool_type
-  virtual_desktop_host_pool_load_balancer_type = var.virtual_desktop_host_pool_load_balancer_type
-  virtual_desktop_host_pool_name               = var.virtual_desktop_host_pool_name
+  enable_telemetry                                   = var.enable_telemetry
+  location                                           = azurerm_resource_group.this.location
+  resource_group_name                                = azurerm_resource_group.this.name
+  user_group_name                                    = var.user_group_name
+  virtual_desktop_workspace_name                     = var.virtual_desktop_workspace_name
+  description                                        = var.description
+  virtual_desktop_scaling_plan_time_zone             = var.virtual_desktop_scaling_plan_time_zone
+  virtual_desktop_scaling_plan_name                  = var.virtual_desktop_scaling_plan_name
+  virtual_desktop_host_pool_type                     = var.virtual_desktop_host_pool_type
+  virtual_desktop_host_pool_load_balancer_type       = var.virtual_desktop_host_pool_load_balancer_type
+  virtual_desktop_host_pool_name                     = var.virtual_desktop_host_pool_name
   virtual_desktop_host_pool_maximum_sessions_allowed = var.virtual_desktop_host_pool_maximum_sessions_allowed
-  virtual_desktop_host_pool_start_vm_on_connect = var.virtual_desktop_host_pool_start_vm_on_connect
-  virtual_desktop_application_group_type       = var.virtual_desktop_application_group_type
-  virtual_desktop_application_group_name       = var.virtual_desktop_application_group_name
+  virtual_desktop_host_pool_start_vm_on_connect      = var.virtual_desktop_host_pool_start_vm_on_connect
+  virtual_desktop_application_group_type             = var.virtual_desktop_application_group_type
+  virtual_desktop_application_group_name             = var.virtual_desktop_application_group_name
   virtual_desktop_scaling_plan_schedule = toset(
     [
       {

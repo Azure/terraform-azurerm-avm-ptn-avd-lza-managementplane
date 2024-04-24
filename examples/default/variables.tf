@@ -63,8 +63,8 @@ variable "virtual_desktop_scaling_plan_name" {
 
 variable "virtual_desktop_scaling_plan_time_zone" {
   type        = string
-  default     = "Eastern Standard Time"
-  description = "Specifies the Time Zone which should be used by the Scaling Plan for time based events, [the possible values are defined here](https://jackstromberg.com/2017/01/list-of-time-zones-consumed-by-azure/)."
+  default     = "Coordinated Universal Time"
+  description = "Specifies the Time Zone which should be used by the Scaling Plan for time based events."
 }
 
 variable "virtual_desktop_workspace_name" {

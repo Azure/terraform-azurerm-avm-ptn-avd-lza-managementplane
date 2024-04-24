@@ -531,7 +531,7 @@ Description: (Optional) A valid custom RDP properties string for the Virtual Des
 
 Type: `string`
 
-Default: `null`
+Default: `"drivestoredirect:s:*;audiomode:i:0;videoplaybackmode:i:1;redirectclipboard:i:1;redirectprinters:i:1;devicestoredirect:s:*;redirectcomports:i:1;redirectsmartcards:i:1;usbdevicestoredirect:s:*;enablecredsspsupport:i:1;use multimon:i:0"`
 
 ### <a name="input_virtual_desktop_host_pool_description"></a> [virtual\_desktop\_host\_pool\_description](#input\_virtual\_desktop\_host\_pool\_description)
 
