@@ -1,3 +1,170 @@
+variable "description" {
+  type        = string
+  description = "(Optional) The description of the AVD Workspace."
+}
+
+variable "location" {
+  type        = string
+  description = "(Required) The location/region where the Azure Virtual Desktop resources are located. Changing this forces a new resource to be created."
+}
+
+variable "resource_group_name" {
+  type        = string
+  description = "The name of the resource group in which the AVD Private Endpoint should be created."
+}
+
+variable "user_group_name" {
+  type        = string
+  description = "Microsoft Entra ID User Group for AVD users"
+}
+
+variable "virtual_desktop_application_group_name" {
+  type        = string
+  description = "(Required) The name of the Virtual Desktop Application Group. Changing the name forces a new resource to be created."
+  nullable    = false
+
+  validation {
+    condition     = can(regex("^[a-z0-9-]{3,24}$", var.virtual_desktop_application_group_name))
+    error_message = "The name must be between 3 and 24 characters long and can only contain lowercase letters, numbers and dashes."
+  }
+}
+
+variable "virtual_desktop_application_group_type" {
+  type        = string
+  description = "(Required) Type of Virtual Desktop Application Group. Valid options are `RemoteApp` or `Desktop` application groups. Changing this forces a new resource to be created."
+  nullable    = false
+}
+
+variable "virtual_desktop_host_pool_load_balancer_type" {
+  type        = string
+  description = "(Required) `BreadthFirst` load balancing distributes new user sessions across all available session hosts in the host pool. Possible values are `BreadthFirst`, `DepthFirst` and `Persistent`. `DepthFirst` load balancing distributes new user sessions to an available session host with the highest number of connections but has not reached its maximum session limit threshold. `Persistent` should be used if the host pool type is `Personal`"
+  nullable    = false
+}
+
+variable "virtual_desktop_host_pool_name" {
+  type        = string
+  description = "(Required) The name of the Virtual Desktop Host Pool. Changing this forces a new resource to be created."
+  nullable    = false
+
+  validation {
+    condition     = can(regex("^[a-z0-9-]{3,24}$", var.virtual_desktop_host_pool_name))
+    error_message = "The name must be between 3 and 24 characters long and can only contain lowercase letters, numbers and dashes."
+  }
+}
+
+variable "virtual_desktop_host_pool_type" {
+  type        = string
+  description = "(Required) The type of the Virtual Desktop Host Pool. Valid options are `Personal` or `Pooled`. Changing the type forces a new resource to be created."
+  nullable    = false
+}
+
+variable "virtual_desktop_scaling_plan_name" {
+  type        = string
+  description = "(Required) The name which should be used for this Virtual Desktop Scaling Plan . Changing this forces a new Virtual Desktop Scaling Plan to be created."
+  nullable    = false
+}
+
+variable "virtual_desktop_scaling_plan_schedule" {
+  type = list(object({
+    days_of_week                         = set(string)
+    name                                 = string
+    off_peak_load_balancing_algorithm    = string
+    off_peak_start_time                  = string
+    peak_load_balancing_algorithm        = string
+    peak_start_time                      = string
+    ramp_down_capacity_threshold_percent = number
+    ramp_down_force_logoff_users         = bool
+    ramp_down_load_balancing_algorithm   = string
+    ramp_down_minimum_hosts_percent      = number
+    ramp_down_notification_message       = string
+    ramp_down_start_time                 = string
+    ramp_down_stop_hosts_when            = string
+    ramp_down_wait_time_minutes          = number
+    ramp_up_capacity_threshold_percent   = optional(number)
+    ramp_up_load_balancing_algorithm     = string
+    ramp_up_minimum_hosts_percent        = optional(number)
+    ramp_up_start_time                   = string
+  }))
+  description = <<-EOT
+ - `days_of_week` - (Required) A list of Days of the Week on which this schedule will be used. Possible values are `Monday`, `Tuesday`, `Wednesday`, `Thursday`, `Friday`, `Saturday`, and `Sunday`
+ - `name` - (Required) The name of the schedule.
+ - `off_peak_load_balancing_algorithm` - (Required) The load Balancing Algorithm to use during Off-Peak Hours. Possible values are `DepthFirst` and `BreadthFirst`.
+ - `off_peak_start_time` - (Required) The time at which Off-Peak scaling will begin. This is also the end-time for the Ramp-Down period. The time must be specified in "HH:MM" format.
+ - `peak_load_balancing_algorithm` - (Required) The load Balancing Algorithm to use during Peak Hours. Possible values are `DepthFirst` and `BreadthFirst`.
+ - `peak_start_time` - (Required) The time at which Peak scaling will begin. This is also the end-time for the Ramp-Up period. The time must be specified in "HH:MM" format.
+ - `ramp_down_capacity_threshold_percent` - (Required) This is the value in percentage of used host pool capacity that will be considered to evaluate whether to turn on/off virtual machines during the ramp-down and off-peak hours. For example, if capacity threshold is specified as 60% and your total host pool capacity is 100 sessions, autoscale will turn on additional session hosts once the host pool exceeds a load of 60 sessions.
+ - `ramp_down_force_logoff_users` - (Required) Whether users will be forced to log-off session hosts once the `ramp_down_wait_time_minutes` value has been exceeded during the Ramp-Down period. Possible
+ - `ramp_down_load_balancing_algorithm` - (Required) The load Balancing Algorithm to use during the Ramp-Down period. Possible values are `DepthFirst` and `BreadthFirst`.
+ - `ramp_down_minimum_hosts_percent` - (Required) The minimum percentage of session host virtual machines that you would like to get to for ramp-down and off-peak hours. For example, if Minimum percentage of hosts is specified as 10% and total number of session hosts in your host pool is 10, autoscale will ensure a minimum of 1 session host is available to take user connections.
+ - `ramp_down_notification_message` - (Required) The notification message to send to users during Ramp-Down period when they are required to log-off.
+ - `ramp_down_start_time` - (Required) The time at which Ramp-Down scaling will begin. This is also the end-time for the Ramp-Up period. The time must be specified in "HH:MM" format.
+ - `ramp_down_stop_hosts_when` - (Required) Controls Session Host shutdown behaviour during Ramp-Down period. Session Hosts can either be shutdown when all sessions on the Session Host have ended, or when there are no Active sessions left on the Session Host. Possible values are `ZeroSessions` and `ZeroActiveSessions`.
+ - `ramp_down_wait_time_minutes` - (Required) The number of minutes during Ramp-Down period that autoscale will wait after setting the session host VMs to drain mode, notifying any currently signed in users to save their work before forcing the users to logoff. Once all user sessions on the session host VM have been logged off, Autoscale will shut down the VM.
+ - `ramp_up_capacity_threshold_percent` - (Optional) This is the value of percentage of used host pool capacity that will be considered to evaluate whether to turn on/off virtual machines during the ramp-up and peak hours. For example, if capacity threshold is specified as `60%` and your total host pool capacity is `100` sessions, autoscale will turn on additional session hosts once the host pool exceeds a load of `60` sessions.
+ - `ramp_up_load_balancing_algorithm` - (Required) The load Balancing Algorithm to use during the Ramp-Up period. Possible values are `DepthFirst` and `BreadthFirst`.
+ - `ramp_up_minimum_hosts_percent` - (Optional) Specifies the minimum percentage of session host virtual machines to start during ramp-up for peak hours. For example, if Minimum percentage of hosts is specified as `10%` and total number of session hosts in your host pool is `10`, autoscale will ensure a minimum of `1` session host is available to take user connections.
+ - `ramp_up_start_time` - (Required) The time at which Ramp-Up scaling will begin. This is also the end-time for the Ramp-Up period. The time must be specified in "HH:MM" format.
+EOT
+  nullable    = false
+}
+
+variable "virtual_desktop_scaling_plan_time_zone" {
+  type        = string
+  description = "(Required) Specifies the Time Zone which should be used by the Scaling Plan for time based events, [the possible values are defined here](https://jackstromberg.com/2017/01/list-of-time-zones-consumed-by-azure/)."
+  nullable    = false
+}
+
+variable "virtual_desktop_workspace_name" {
+  type        = string
+  description = "(Required) The name of the Virtual Desktop Workspace. Changing this forces a new resource to be created."
+  nullable    = false
+}
+
+variable "diagnostic_settings" {
+  type = map(object({
+    name                                     = optional(string, null)
+    log_categories                           = optional(set(string), [])
+    log_groups                               = optional(set(string), ["allLogs"])
+    metric_categories                        = optional(set(string), ["AllMetrics"])
+    log_analytics_destination_type           = optional(string, "Dedicated")
+    workspace_resource_id                    = optional(string, null)
+    storage_account_resource_id              = optional(string, null)
+    event_hub_authorization_rule_resource_id = optional(string, null)
+    event_hub_name                           = optional(string, null)
+    marketplace_partner_resource_id          = optional(string, null)
+  }))
+  default     = {}
+  description = <<DESCRIPTION
+A map of diagnostic settings to create on the resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+
+- `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
+- `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
+- `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
+- `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
+- `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
+- `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
+- `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
+- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
+- `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
+- `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
+DESCRIPTION
+  nullable    = false
+
+  validation {
+    condition     = alltrue([for _, v in var.diagnostic_settings : contains(["Dedicated", "AzureDiagnostics"], v.log_analytics_destination_type)])
+    error_message = "Log analytics destination type must be one of: 'Dedicated', 'AzureDiagnostics'."
+  }
+  validation {
+    condition = alltrue(
+      [
+        for _, v in var.diagnostic_settings :
+        v.workspace_resource_id != null || v.storage_account_resource_id != null || v.event_hub_authorization_rule_resource_id != null || v.marketplace_partner_resource_id != null
+      ]
+    )
+    error_message = "At least one of `workspace_resource_id`, `storage_account_resource_id`, `marketplace_partner_resource_id`, or `event_hub_authorization_rule_resource_id`, must be set."
+  }
+}
+
 variable "enable_telemetry" {
   type        = bool
   default     = true
@@ -10,99 +177,121 @@ If it is set to false, then no telemetry will be collected.
 DESCRIPTION
 }
 
-# Define variables for the AVD Host Pool deployment
-variable "resource_group_name" {
-  type        = string
+variable "lock" {
+  type = object({
+    kind = string
+    name = optional(string, null)
+  })
+  default     = null
   description = <<DESCRIPTION
-The name of the resource group where the resources will be deployed.
-DESCRIPTION 
-}
+  Controls the Resource Lock configuration for this resource. The following properties can be specified:
+  
+  - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
+  - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
+  DESCRIPTION
 
-variable "name" {
-  type        = string
-  description = "The name of the AVD Host Pool, Application Group or Workspace."
   validation {
-    condition     = can(regex("^[a-z0-9-]{3,24}$", var.name))
-    error_message = "The name must be between 3 and 24 characters long and can only contain lowercase letters, numbers and dashes."
+    condition     = var.lock != null ? contains(["CanNotDelete", "ReadOnly"], var.lock.kind) : true
+    error_message = "Lock kind must be either `\"CanNotDelete\"` or `\"ReadOnly\"`."
   }
 }
 
-variable "hostpooltype" {
-  type        = string
-  description = "The type of the AVD Host Pool. Valid values are 'Pooled' and 'Personal'."
+# tflint-ignore: terraform_unused_declarations
+variable "managed_identities" {
+  type = object({
+    system_assigned            = optional(bool, false)
+    user_assigned_resource_ids = optional(set(string), [])
+  })
+  default     = {}
+  description = <<DESCRIPTION
+Controls the Managed Identity configuration on this resource. The following properties can be specified:
+
+- `system_assigned` - (Optional) Specifies if the System Assigned Managed Identity should be enabled.
+- `user_assigned_resource_ids` - (Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.
+DESCRIPTION
+  nullable    = false
 }
 
-variable "location" {
-  type        = string
-  description = "The Azure location where the resources will be deployed."
-}
-
-variable "maxsessions" {
-  type        = number
-  description = "The maximum number of sessions allowed on each session host in the host pool."
-  default     = 16
-}
-
-variable "day_of_week" {
-  type        = string
-  description = "The day of the week to apply the schedule agent update. Value must be one of: 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', or 'Saturday'."
-  default     = "Sunday"
-  validation {
-    condition     = contains(["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], var.day_of_week)
-    error_message = "The day of the week must be one of: 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', or 'Saturday'."
-  }
-}
-
-variable "hour_of_day" {
-  type        = number
-  description = "The hour of the day to apply the schedule agent update. Value must be between 0 and 23."
-  default     = 2
-  validation {
-    condition     = var.hour_of_day >= 0 && var.hour_of_day <= 23
-    error_message = "The hour of the day must be between 0 and 23."
-  }
-}
-
-variable "type" {
-  type        = string
-  description = "The type of the AVD Application Group. Valid values are 'Desktop' and 'RemoteApp'."
-}
-
-variable "user_group_name" {
-  type        = string
-  description = "Microsoft Entra ID User Group for AVD users"
-}
-
-variable "description" {
-  type        = string
-  description = "The description of the AVD."
+variable "private_endpoints" {
+  type = map(object({
+    name = optional(string, null)
+    role_assignments = optional(map(object({
+      role_definition_id_or_name             = string
+      principal_id                           = string
+      description                            = optional(string, null)
+      skip_service_principal_aad_check       = optional(bool, false)
+      condition                              = optional(string, null)
+      condition_version                      = optional(string, null)
+      delegated_managed_identity_resource_id = optional(string, null)
+    })), {})
+    lock = optional(object({
+      name = optional(string, null)
+      kind = string
+    }), null)
+    tags                                    = optional(map(string), null)
+    subnet_resource_id                      = string
+    private_dns_zone_group_name             = optional(string, "default")
+    private_dns_zone_resource_ids           = optional(set(string), [])
+    application_security_group_associations = optional(map(string), {})
+    private_service_connection_name         = optional(string, null)
+    network_interface_name                  = optional(string, null)
+    location                                = optional(string, null)
+    resource_group_name                     = optional(string, null)
+    ip_configurations = optional(map(object({
+      name               = string
+      private_ip_address = string
+    })), {})
+  }))
+  default     = {}
+  description = <<DESCRIPTION
+A map of private endpoints to create on the resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+- `name` - (Optional) The name of the private endpoint. One will be generated if not set.
+- `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. Each role assignment should include a `role_definition_id_or_name` and a `principal_id`.
+- `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
+- `tags` - (Optional) A mapping of tags to assign to the private endpoint. Each tag should be a string.
+- `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
+- `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
+- `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
+- `application_security_group_resource_ids` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+- `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
+- `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
+- `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
+- `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the resource.
+- `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. Each IP configuration should include a `name` and a `private_ip_address`.
+DESCRIPTION
+  nullable    = false
 }
 
 variable "public_network_access_enabled" {
   type        = bool
-  description = "Whether or not public network access is enabled for the AVD Workspace."
   default     = true
+  description = "Whether or not public network access is enabled for the AVD Workspace."
 }
 
-variable "subresource_names" {
-  description = "The names of the subresources to assosciatied with the private endpoint. The target subresource must be one of: 'feed', or 'global'."
-  type        = list(string)
-  default     = []
-}
-
-variable "scalingplan" {
-  type        = string
-  description = "The name of the AVD Application Group."
-  validation {
-    condition     = can(regex("^[a-z0-9-]{3,24}$", var.scalingplan))
-    error_message = "The name must be between 3 and 24 characters long and can only contain lowercase letters, numbers and dashes."
-  }
-}
-
-variable "time_zone" {
-  type        = string
-  description = "The time zone of the AVD Scaling Plan."
-  default     = "Eastern Standard Time"
+variable "role_assignments" {
+  type = map(object({
+    role_definition_id_or_name             = string
+    principal_id                           = string
+    description                            = optional(string, null)
+    skip_service_principal_aad_check       = optional(bool, false)
+    condition                              = optional(string, null)
+    condition_version                      = optional(string, null)
+    delegated_managed_identity_resource_id = optional(string, null)
+  }))
+  default     = {}
+  description = <<DESCRIPTION
+  A map of role assignments to create on the resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+  
+  - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
+  - `principal_id` - The ID of the principal to assign the role to.
+  - `description` - The description of the role assignment.
+  - `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
+  - `condition` - The condition which will be used to scope the role assignment.
+  - `condition_version` - The version of the condition syntax. Leave as `null` if you are not using a condition, if you are then valid values are '2.0'.
+  
+  > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
+  DESCRIPTION
+  nullable    = false
 }
 
 variable "schedules" {
@@ -148,17 +337,6 @@ variable "schedules" {
       off_peak_load_balancing_algorithm    = "DepthFirst"
     }
   }
-  nullable = false
-
-  validation {
-    condition = alltrue(
-      [
-        for _, v in var.schedules :
-        v.days_of_week != null || v.off_peak_start_time != null || v.off_peak_load_balancing_algorithm != null || v.ramp_down_capacity_threshold_percent != null || v.ramp_down_force_logoff_users != null || v.ramp_down_load_balancing_algorithm != null || v.ramp_down_minimum_hosts_percent != null || v.ramp_down_notification_message != null || v.ramp_down_start_time != null || v.ramp_down_stop_hosts_when != null || v.ramp_down_wait_time_minutes != null || v.ramp_up_capacity_threshold_percent != null || v.ramp_up_load_balancing_algorithm != null || v.ramp_up_minimum_hosts_percent != null || v.ramp_up_start_time != null
-      ]
-    )
-    error_message = "At least one of `days_of_week`, `off_peak_start_time`, `off_peak_load_balancing_algorithm`, `ramp_down_capacity_threshold_percent`, `ramp_down_force_logoff_users`, `ramp_down_load_balancing_algorithm`, `ramp_down_minimum_hosts_percent`, `ramp_down_notification_message`, `ramp_down_start_time`, `ramp_down_stop_hosts_when`, `ramp_down_wait_time_minutes`, `ramp_up_capacity_threshold_percent`, `ramp_up_load_balancing_algorithm`, `ramp_up_minimum_hosts_percent`, or `ramp_up_start_time`, must be set."
-  }
   description = <<DESCRIPTION
 A map of schedules to create on AVD Scaling Plan. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
@@ -181,6 +359,35 @@ A map of schedules to create on AVD Scaling Plan. The map key is deliberately ar
 - `ramp_up_minimum_hosts_percent` - (Optional) The minimum hosts percentage to use during the ramp up period. 
 - `ramp_up_start_time` -  The start time of the ramp up period. 
 DESCRIPTION
+  nullable    = false
+
+  validation {
+    condition = alltrue(
+      [
+        for _, v in var.schedules :
+        v.days_of_week != null || v.off_peak_start_time != null || v.off_peak_load_balancing_algorithm != null || v.ramp_down_capacity_threshold_percent != null || v.ramp_down_force_logoff_users != null || v.ramp_down_load_balancing_algorithm != null || v.ramp_down_minimum_hosts_percent != null || v.ramp_down_notification_message != null || v.ramp_down_start_time != null || v.ramp_down_stop_hosts_when != null || v.ramp_down_wait_time_minutes != null || v.ramp_up_capacity_threshold_percent != null || v.ramp_up_load_balancing_algorithm != null || v.ramp_up_minimum_hosts_percent != null || v.ramp_up_start_time != null
+      ]
+    )
+    error_message = "At least one of `days_of_week`, `off_peak_start_time`, `off_peak_load_balancing_algorithm`, `ramp_down_capacity_threshold_percent`, `ramp_down_force_logoff_users`, `ramp_down_load_balancing_algorithm`, `ramp_down_minimum_hosts_percent`, `ramp_down_notification_message`, `ramp_down_start_time`, `ramp_down_stop_hosts_when`, `ramp_down_wait_time_minutes`, `ramp_up_capacity_threshold_percent`, `ramp_up_load_balancing_algorithm`, `ramp_up_minimum_hosts_percent`, or `ramp_up_start_time`, must be set."
+  }
+}
+
+variable "subresource_names" {
+  type        = list(string)
+  default     = []
+  description = "The names of the subresources to assosciatied with the private endpoint. The target subresource must be one of: 'feed', or 'global'."
+}
+
+variable "tags" {
+  type        = map(string)
+  default     = null
+  description = "(Optional) Tags of the resource."
+}
+
+variable "time_zone" {
+  type        = string
+  default     = "Eastern Standard Time"
+  description = "The time zone of the AVD Scaling Plan."
 }
 
 # tflint-ignore: terraform_unused_declarations
@@ -199,170 +406,228 @@ variable "tracing_tags_prefix" {
   nullable    = false
 }
 
-variable "lock" {
+variable "virtual_desktop_application_group_default_desktop_display_name" {
+  type        = string
+  default     = null
+  description = "(Optional) Option to set the display name for the default sessionDesktop desktop when `type` is set to `Desktop`."
+}
+
+variable "virtual_desktop_application_group_description" {
+  type        = string
+  default     = null
+  description = "(Optional) Option to set a description for the Virtual Desktop Application Group."
+}
+
+variable "virtual_desktop_application_group_friendly_name" {
+  type        = string
+  default     = null
+  description = "(Optional) Option to set a friendly name for the Virtual Desktop Application Group."
+}
+
+variable "virtual_desktop_application_group_tags" {
+  type        = map(string)
+  default     = null
+  description = "(Optional) A mapping of tags to assign to the resource."
+}
+
+variable "virtual_desktop_application_group_timeouts" {
   type = object({
-    name = optional(string, null)
-    kind = optional(string, "None")
+    create = optional(string)
+    delete = optional(string)
+    read   = optional(string)
+    update = optional(string)
   })
-  description = "The lock level to apply. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`."
-  default     = {}
-  nullable    = false
-  validation {
-    condition     = contains(["CanNotDelete", "ReadOnly", "None"], var.lock.kind)
-    error_message = "The lock level must be one of: 'None', 'CanNotDelete', or 'ReadOnly'."
-  }
+  default     = null
+  description = <<-EOT
+ - `create` - (Defaults to 60 minutes) Used when creating the Virtual Desktop Application Group.
+ - `delete` - (Defaults to 60 minutes) Used when deleting the Virtual Desktop Application Group.
+ - `read` - (Defaults to 5 minutes) Used when retrieving the Virtual Desktop Application Group.
+ - `update` - (Defaults to 60 minutes) Used when updating the Virtual Desktop Application Group.
+EOT
 }
 
-# required AVM interfaces
-# remove only if not supported by the resource
-# tflint-ignore: terraform_unused_declarations
-variable "customer_managed_key" {
+variable "virtual_desktop_host_pool_custom_rdp_properties" {
+  type        = string
+  default     = "drivestoredirect:s:*;audiomode:i:0;videoplaybackmode:i:1;redirectclipboard:i:1;redirectprinters:i:1;devicestoredirect:s:*;redirectcomports:i:1;redirectsmartcards:i:1;usbdevicestoredirect:s:*;enablecredsspsupport:i:1;use multimon:i:0"
+  description = "(Optional) A valid custom RDP properties string for the Virtual Desktop Host Pool, available properties can be [found in this article](https://docs.microsoft.com/windows-server/remote/remote-desktop-services/clients/rdp-files)."
+}
+
+
+variable "virtual_desktop_host_pool_description" {
+  type        = string
+  default     = null
+  description = "(Optional) A description for the Virtual Desktop Host Pool."
+}
+
+variable "virtual_desktop_host_pool_friendly_name" {
+  type        = string
+  default     = null
+  description = "(Optional) A friendly name for the Virtual Desktop Host Pool."
+}
+
+variable "virtual_desktop_host_pool_maximum_sessions_allowed" {
+  type        = number
+  default     = null
+  description = "(Optional) A valid integer value from 0 to 999999 for the maximum number of users that have concurrent sessions on a session host. Should only be set if the `type` of your Virtual Desktop Host Pool is `Pooled`."
+}
+
+variable "virtual_desktop_host_pool_personal_desktop_assignment_type" {
+  type        = string
+  default     = null
+  description = "(Optional) `Automatic` assignment"
+}
+
+variable "virtual_desktop_host_pool_preferred_app_group_type" {
+  type        = string
+  default     = null
+  description = "Preferred App Group type to display"
+}
+
+variable "virtual_desktop_host_pool_scheduled_agent_updates" {
   type = object({
-    key_vault_resource_id              = optional(string)
-    key_name                           = optional(string)
-    key_version                        = optional(string, null)
-    user_assigned_identity_resource_id = optional(string, null)
+    enabled                   = optional(bool)
+    timezone                  = optional(string)
+    use_session_host_timezone = optional(bool)
+    schedule = optional(list(object({
+      day_of_week = string
+      hour_of_day = number
+    })))
   })
-  description = "Customer managed keys that should be associated with the resource."
-  default     = {}
+  default     = null
+  description = <<-EOT
+ - `enabled` - (Optional) Enables or disables scheduled updates of the AVD agent components (RDAgent, Geneva Monitoring agent, and side-by-side stack) on session hosts. If this is enabled then up to two `schedule` blocks must be defined. Default is `false`.
+ - `timezone` - (Optional) Specifies the time zone in which the agent update schedule will apply. If `use_session_host_timezone` is enabled then it will override this setting. Default is `UTC`
+ - `use_session_host_timezone` - (Optional) Specifies whether scheduled agent updates should be applied based on the timezone of the affected session host. If configured then this setting overrides `timezone`. Default is `false`.
+
+ ---
+ `schedule` block supports the following:
+ - `day_of_week` - (Required) The day of the week on which agent updates should be performed. Possible values are `Monday`, `Tuesday`, `Wednesday`, `Thursday`, `Friday`, `Saturday`, and `Sunday`
+ - `hour_of_day` - (Required) The hour of day the update window should start. The update is a 2 hour period following the hour provided. The value should be provided as a number between 0 and 23, with 0 being midnight and 23 being 11pm. A leading zero should not be used.
+EOT
 }
 
-variable "diagnostic_settings" {
-  type = map(object({
-    name                                     = optional(string, null)
-    log_categories                           = optional(set(string), [])
-    log_groups                               = optional(set(string), ["allLogs"])
-    metric_categories                        = optional(set(string), ["AllMetrics"])
-    log_analytics_destination_type           = optional(string, "Dedicated")
-    workspace_resource_id                    = optional(string, null)
-    storage_account_resource_id              = optional(string, null)
-    event_hub_authorization_rule_resource_id = optional(string, null)
-    event_hub_name                           = optional(string, null)
-    marketplace_partner_resource_id          = optional(string, null)
-  }))
-  default  = {}
-  nullable = false
-
-  validation {
-    condition     = alltrue([for _, v in var.diagnostic_settings : contains(["Dedicated", "AzureDiagnostics"], v.log_analytics_destination_type)])
-    error_message = "Log analytics destination type must be one of: 'Dedicated', 'AzureDiagnostics'."
-  }
-  validation {
-    condition = alltrue(
-      [
-        for _, v in var.diagnostic_settings :
-        v.workspace_resource_id != null || v.storage_account_resource_id != null || v.event_hub_authorization_rule_resource_id != null || v.marketplace_partner_resource_id != null
-      ]
-    )
-    error_message = "At least one of `workspace_resource_id`, `storage_account_resource_id`, `marketplace_partner_resource_id`, or `event_hub_authorization_rule_resource_id`, must be set."
-  }
-  description = <<DESCRIPTION
-A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-
-- `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
-- `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
-- `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
-- `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
-- `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
-- `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
-- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
-- `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
-- `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
-DESCRIPTION
+variable "virtual_desktop_host_pool_start_vm_on_connect" {
+  type        = bool
+  default     = null
+  description = "(Optional) Enables or disables the Start VM on Connection Feature. Defaults to `false`."
 }
 
-# tflint-ignore: terraform_unused_declarations
-variable "managed_identities" {
+variable "virtual_desktop_host_pool_tags" {
+  type        = map(string)
+  default     = null
+  description = "(Optional) A mapping of tags to assign to the resource."
+}
+
+variable "virtual_desktop_host_pool_timeouts" {
   type = object({
-    system_assigned            = optional(bool, false)
-    user_assigned_resource_ids = optional(set(string), [])
+    create = optional(string)
+    delete = optional(string)
+    read   = optional(string)
+    update = optional(string)
   })
-  description = "Managed identities to be created for the resource."
-  default     = {}
+  default     = null
+  description = <<-EOT
+ - `create` - (Defaults to 60 minutes) Used when creating the Virtual Desktop Host Pool.
+ - `delete` - (Defaults to 60 minutes) Used when deleting the Virtual Desktop Host Pool.
+ - `read` - (Defaults to 5 minutes) Used when retrieving the Virtual Desktop Host Pool.
+ - `update` - (Defaults to 60 minutes) Used when updating the Virtual Desktop Host Pool.
+EOT
 }
 
-variable "private_endpoints" {
-  type = map(object({
-    name = optional(string, null)
-    role_assignments = optional(map(object({
-      role_definition_id_or_name             = string
-      principal_id                           = string
-      description                            = optional(string, null)
-      skip_service_principal_aad_check       = optional(bool, false)
-      condition                              = optional(string, null)
-      condition_version                      = optional(string, null)
-      delegated_managed_identity_resource_id = optional(string, null)
-    })), {})
-    lock = optional(object({
-      name = optional(string, null)
-      kind = optional(string, "None")
-    }), {})
-    tags                                    = optional(map(any), null)
-    subnet_resource_id                      = string
-    private_dns_zone_group_name             = optional(string, "default")
-    private_dns_zone_resource_ids           = optional(set(string), [])
-    application_security_group_associations = optional(map(string), {})
-    private_service_connection_name         = optional(string, null)
-    network_interface_name                  = optional(string, null)
-    location                                = optional(string, null)
-    resource_group_name                     = optional(string, null)
-    ip_configurations = optional(map(object({
-      name               = string
-      private_ip_address = string
-    })), {})
+variable "virtual_desktop_host_pool_validate_environment" {
+  type        = bool
+  default     = null
+  description = "(Optional) Allows you to test service changes before they are deployed to production. Defaults to `false`."
+}
+
+variable "virtual_desktop_scaling_plan_description" {
+  type        = string
+  default     = null
+  description = "(Optional) A description of the Scaling Plan."
+}
+
+variable "virtual_desktop_scaling_plan_exclusion_tag" {
+  type        = string
+  default     = null
+  description = "(Optional) The name of the tag associated with the VMs you want to exclude from autoscaling."
+}
+
+variable "virtual_desktop_scaling_plan_friendly_name" {
+  type        = string
+  default     = null
+  description = "(Optional) Friendly name of the Scaling Plan."
+}
+
+variable "virtual_desktop_scaling_plan_host_pool" {
+  type = list(object({
+    hostpool_id          = string
+    scaling_plan_enabled = bool
   }))
-  default     = {}
-  description = <<DESCRIPTION
-A map of private endpoints to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-
-- `name` - (Optional) The name of the private endpoint. One will be generated if not set.
-- `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information.
-- `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
-- `tags` - (Optional) A mapping of tags to assign to the private endpoint.
-- `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
-- `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
-- `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
-- `application_security_group_resource_ids` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-- `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
-- `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
-- `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
-- `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of this resource.
-- `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-  - `name` - The name of the IP configuration.
-  - `private_ip_address` - The private IP address of the IP configuration.
-DESCRIPTION
+  default     = null
+  description = <<-EOT
+ - `hostpool_id` - (Required) The ID of the HostPool to assign the Scaling Plan to.
+ - `scaling_plan_enabled` - (Required) Specifies if the scaling plan is enabled or disabled for the HostPool.
+EOT
 }
 
-variable "role_assignments" {
-  type = map(object({
-    role_definition_id_or_name             = string
-    principal_id                           = string
-    description                            = optional(string, null)
-    skip_service_principal_aad_check       = optional(bool, false)
-    condition                              = optional(string, null)
-    condition_version                      = optional(string, null)
-    delegated_managed_identity_resource_id = optional(string, null)
-  }))
-  default     = {}
-  description = <<DESCRIPTION
-A map of role assignments to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-
-- `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
-- `principal_id` - The ID of the principal to assign the role to.
-- `description` - The description of the role assignment.
-- `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
-- `condition` - The condition which will be used to scope the role assignment.
-- `condition_version` - The version of the condition syntax. Valid values are '2.0'.
-
-> Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
-DESCRIPTION
+variable "virtual_desktop_scaling_plan_tags" {
+  type        = map(string)
+  default     = null
+  description = "(Optional) A mapping of tags which should be assigned to the Virtual Desktop Scaling Plan ."
 }
 
-# tflint-ignore: terraform_unused_declarations
-variable "tags" {
-  type        = map(any)
-  description = "The map of tags to be applied to the resource"
-  default     = {}
+variable "virtual_desktop_scaling_plan_timeouts" {
+  type = object({
+    create = optional(string)
+    delete = optional(string)
+    read   = optional(string)
+    update = optional(string)
+  })
+  default     = null
+  description = <<-EOT
+ - `create` - (Defaults to 1 hour) Used when creating the Virtual Desktop Scaling Plan.
+ - `delete` - (Defaults to 1 hour) Used when deleting the Virtual Desktop Scaling Plan.
+ - `read` - (Defaults to 5 minutes) Used when retrieving the Virtual Desktop Scaling Plan.
+ - `update` - (Defaults to 1 hour) Used when updating the Virtual Desktop Scaling Plan.
+EOT
 }
 
+variable "virtual_desktop_workspace_description" {
+  type        = string
+  default     = null
+  description = "(Optional) A description for the Virtual Desktop Workspace."
+}
+
+variable "virtual_desktop_workspace_friendly_name" {
+  type        = string
+  default     = null
+  description = "(Optional) A friendly name for the Virtual Desktop Workspace."
+}
+
+variable "virtual_desktop_workspace_public_network_access_enabled" {
+  type        = bool
+  default     = null
+  description = "(Optional) Whether public network access is allowed for this Virtual Desktop Workspace. Defaults to `true`."
+}
+
+variable "virtual_desktop_workspace_tags" {
+  type        = map(string)
+  default     = null
+  description = "(Optional) A mapping of tags to assign to the resource."
+}
+
+variable "virtual_desktop_workspace_timeouts" {
+  type = object({
+    create = optional(string)
+    delete = optional(string)
+    read   = optional(string)
+    update = optional(string)
+  })
+  default     = null
+  description = <<-EOT
+ - `create` - (Defaults to 60 minutes) Used when creating the Virtual Desktop Workspace.
+ - `delete` - (Defaults to 60 minutes) Used when deleting the Virtual Desktop Workspace.
+ - `read` - (Defaults to 5 minutes) Used when retrieving the Virtual Desktop Workspace.
+ - `update` - (Defaults to 60 minutes) Used when updating the Virtual Desktop Workspace.
+EOT
+}
