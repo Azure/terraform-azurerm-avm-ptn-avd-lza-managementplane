@@ -39,6 +39,8 @@ module "avd" {
   virtual_desktop_host_pool_type               = var.virtual_desktop_host_pool_type
   virtual_desktop_host_pool_load_balancer_type = var.virtual_desktop_host_pool_load_balancer_type
   virtual_desktop_host_pool_name               = var.virtual_desktop_host_pool_name
+  virtual_desktop_host_pool_maximum_sessions_allowed = var.virtual_desktop_host_pool_maximum_sessions_allowed
+  virtual_desktop_host_pool_start_vm_on_connect = var.virtual_desktop_host_pool_start_vm_on_connect
   virtual_desktop_application_group_type       = var.virtual_desktop_application_group_type
   virtual_desktop_application_group_name       = var.virtual_desktop_application_group_name
   virtual_desktop_scaling_plan_schedule = toset(

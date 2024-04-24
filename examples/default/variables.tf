@@ -72,3 +72,16 @@ variable "virtual_desktop_workspace_name" {
   default     = "vdws-avd-001"
   description = "The name of the AVD Workspace"
 }
+
+variable "virtual_desktop_host_pool_maximum_sessions_allowed" {
+  type        = number
+  default     = 16
+  description = "(Optional) A valid integer value from 0 to 999999 for the maximum number of users that have concurrent sessions on a session host. Should only be set if the `type` of your Virtual Desktop Host Pool is `Pooled`."
+}
+
+
+variable "virtual_desktop_host_pool_start_vm_on_connect" {
+  type        = bool
+  default     = true
+  description = "(Optional) Enables or disables the Start VM on Connection Feature. Defaults to `false`."
+}

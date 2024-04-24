@@ -13,7 +13,7 @@ resource "random_integer" "region_index" {
 resource "azurerm_resource_group" "this" {
   location = local.azure_regions[random_integer.region_index.result]
   name     = module.naming.resource_group.name_unique
-  tags     = local.tags
+  tags     = var.tags
 }
 
 # Create Azure Log Analytics workspace for Azure Virtual Desktop
@@ -38,7 +38,9 @@ module "avm_res_desktopvirtualization_hostpool" {
   virtual_desktop_host_pool_load_balancer_type       = var.virtual_desktop_host_pool_load_balancer_type
   virtual_desktop_host_pool_resource_group_name      = azurerm_resource_group.this.name
   virtual_desktop_host_pool_name                     = var.virtual_desktop_host_pool_name
+  virtual_desktop_host_pool_custom_rdp_properties = var.virtual_desktop_host_pool_custom_rdp_properties
   virtual_desktop_host_pool_maximum_sessions_allowed = var.virtual_desktop_host_pool_maximum_sessions_allowed
+  virtual_desktop_host_pool_start_vm_on_connect = var.virtual_desktop_host_pool_start_vm_on_connect
   diagnostic_settings = {
     to_law = {
       name                  = "to-law"
