@@ -431,10 +431,6 @@ variable "virtual_desktop_application_group_timeouts" {
     delete = optional(string)
     read   = optional(string)
     update = optional(string)
-    create = optional(string)
-    delete = optional(string)
-    read   = optional(string)
-    update = optional(string)
   })
   default     = null
   description = <<-EOT
