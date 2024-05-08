@@ -4,12 +4,6 @@ variable "description" {
   description = "The description of the AVD."
 }
 
-variable "description" {
-  type        = string
-  default     = "AVD Management Plane Deployment"
-  description = "The description of the AVD."
-}
-
 variable "enable_telemetry" {
   type        = bool
   default     = true
