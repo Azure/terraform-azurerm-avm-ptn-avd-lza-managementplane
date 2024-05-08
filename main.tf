@@ -10,18 +10,6 @@ resource "random_integer" "region_index" {
 }
 
 # This is required for resource modules
-module "naming" {
-  source  = "Azure/naming/azurerm"
-  version = "0.3.0"
-}
-
-# This picks a random region from the list of regions.
-resource "random_integer" "region_index" {
-  max = length(local.azure_regions) - 1
-  min = 0
-}
-
-# This is required for resource modules
 resource "azurerm_resource_group" "this" {
   location = local.azure_regions[random_integer.region_index.result]
   name     = module.naming.resource_group.name_unique
