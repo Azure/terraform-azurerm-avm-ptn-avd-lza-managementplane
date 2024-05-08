@@ -150,7 +150,7 @@ Description: Microsoft Entra ID User Group for AVD users
 
 Type: `string`
 
-Default: `"avdusersgrp"`
+Default: `"avdgroup-001"`
 
 ### <a name="input_virtual_desktop_application_group_name"></a> [virtual\_desktop\_application\_group\_name](#input\_virtual\_desktop\_application\_group\_name)
 
@@ -222,7 +222,7 @@ Description: Specifies the Time Zone which should be used by the Scaling Plan fo
 
 Type: `string`
 
-Default: `"Coordinated Universal Time"`
+Default: `"GMT Standard Time"`
 
 ### <a name="input_virtual_desktop_workspace_name"></a> [virtual\_desktop\_workspace\_name](#input\_virtual\_desktop\_workspace\_name)
 
