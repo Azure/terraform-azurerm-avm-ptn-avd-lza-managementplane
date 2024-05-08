@@ -4,6 +4,12 @@ variable "description" {
   description = "The description of the AVD."
 }
 
+variable "description" {
+  type        = string
+  default     = "AVD Management Plane Deployment"
+  description = "The description of the AVD."
+}
+
 variable "enable_telemetry" {
   type        = bool
   default     = true
@@ -23,14 +29,18 @@ variable "user_group_name" {
 variable "virtual_desktop_application_group_name" {
   type        = string
   default     = "vdag-avd-001"
+  default     = "vdag-avd-001"
   description = "The name of the AVD Application Group."
 
+
   validation {
+    condition     = can(regex("^[a-z0-9-]{3,24}$", var.virtual_desktop_application_group_name))
     condition     = can(regex("^[a-z0-9-]{3,24}$", var.virtual_desktop_application_group_name))
     error_message = "The name must be between 3 and 24 characters long and can only contain lowercase letters, numbers and dashes."
   }
 }
 
+variable "virtual_desktop_application_group_type" {
 variable "virtual_desktop_application_group_type" {
   type        = string
   default     = "Desktop"
@@ -64,21 +74,27 @@ variable "virtual_desktop_host_pool_start_vm_on_connect" {
 variable "virtual_desktop_host_pool_type" {
   type        = string
   default     = "Pooled"
+  default     = "Pooled"
   description = "The type of the AVD Host Pool. Valid values are 'Pooled' and 'Personal'."
 }
 
 variable "virtual_desktop_scaling_plan_name" {
+variable "virtual_desktop_scaling_plan_name" {
   type        = string
+  default     = "scp-avd-01"
+  description = "The scaling plan for the AVD Host Pool."
   default     = "scp-avd-01"
   description = "The scaling plan for the AVD Host Pool."
 }
 
+variable "virtual_desktop_scaling_plan_time_zone" {
 variable "virtual_desktop_scaling_plan_time_zone" {
   type        = string
   default     = "GMT Standard Time"
   description = "Specifies the Time Zone which should be used by the Scaling Plan for time based events."
 }
 
+variable "virtual_desktop_workspace_name" {
 variable "virtual_desktop_workspace_name" {
   type        = string
   default     = "vdws-avd-001"
