@@ -80,7 +80,7 @@ module "avm_res_desktopvirtualization_applicationgroup" {
 # Create Azure Virtual Desktop workspace
 module "avm_res_desktopvirtualization_workspace" {
   source              = "Azure/avm-res-desktopvirtualization-workspace/azurerm"
-  version             = "0.1.2"
+  version             = "0.1.3"
   enable_telemetry    = var.enable_telemetry
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
