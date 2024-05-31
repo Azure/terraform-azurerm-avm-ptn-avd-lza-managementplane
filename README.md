@@ -14,7 +14,7 @@ This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.7.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.6.6, < 2.0.0)
 
 - <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) (>= 2.47.0, < 3.0.0)
 
@@ -799,7 +799,7 @@ Version: 0.1.2
 
 Source: Azure/avm-res-desktopvirtualization-workspace/azurerm
 
-Version: 0.1.2
+Version: 0.1.3
 
 ### <a name="module_avm_res_operationalinsights_workspace"></a> [avm\_res\_operationalinsights\_workspace](#module\_avm\_res\_operationalinsights\_workspace)
 
