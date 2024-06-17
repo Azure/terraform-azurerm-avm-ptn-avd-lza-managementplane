@@ -110,6 +110,7 @@ DESCRIPTION
   nullable    = false
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "private_endpoints" {
   type = map(object({
     name = optional(string, null)
@@ -160,12 +161,15 @@ DESCRIPTION
   nullable    = false
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "public_network_access_enabled" {
   type        = bool
   default     = true
   description = "Whether or not public network access is enabled for the AVD Workspace."
+  nullable = true
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "role_assignments" {
   type = map(object({
     role_definition_id_or_name             = string
@@ -192,6 +196,7 @@ variable "role_assignments" {
   nullable    = false
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "schedules" {
   type = map(object({
     name                                 = string
@@ -282,6 +287,7 @@ variable "tags" {
   description = "(Optional) Tags of the resource."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "time_zone" {
   type        = string
   default     = "Eastern Standard Time"
@@ -304,30 +310,35 @@ variable "tracing_tags_prefix" {
   nullable    = false
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_application_group_default_desktop_display_name" {
   type        = string
   default     = null
   description = "(Optional) Option to set the display name for the default sessionDesktop desktop when `type` is set to `Desktop`."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_application_group_description" {
   type        = string
   default     = null
   description = "(Optional) Option to set a description for the Virtual Desktop Application Group."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_application_group_friendly_name" {
   type        = string
   default     = null
   description = "(Optional) Option to set a friendly name for the Virtual Desktop Application Group."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_application_group_tags" {
   type        = map(string)
   default     = null
   description = "(Optional) A mapping of tags to assign to the resource."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_application_group_timeouts" {
   type = object({
     create = optional(string)
@@ -350,12 +361,14 @@ variable "virtual_desktop_host_pool_custom_rdp_properties" {
   description = "(Optional) A valid custom RDP properties string for the Virtual Desktop Host Pool, available properties can be [found in this article](https://docs.microsoft.com/windows-server/remote/remote-desktop-services/clients/rdp-files)."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_host_pool_description" {
   type        = string
   default     = null
   description = "(Optional) A description for the Virtual Desktop Host Pool."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_host_pool_friendly_name" {
   type        = string
   default     = null
@@ -374,12 +387,14 @@ variable "virtual_desktop_host_pool_personal_desktop_assignment_type" {
   description = "(Optional) `Automatic` assignment"
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_host_pool_preferred_app_group_type" {
   type        = string
   default     = null
   description = "Preferred App Group type to display"
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_host_pool_scheduled_agent_updates" {
   type = object({
     enabled                   = optional(bool)
@@ -409,12 +424,14 @@ variable "virtual_desktop_host_pool_start_vm_on_connect" {
   description = "(Optional) Enables or disables the Start VM on Connection Feature. Defaults to `false`."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_host_pool_tags" {
   type        = map(string)
   default     = null
   description = "(Optional) A mapping of tags to assign to the resource."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_host_pool_timeouts" {
   type = object({
     create = optional(string)
@@ -431,30 +448,35 @@ variable "virtual_desktop_host_pool_timeouts" {
 EOT
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_host_pool_validate_environment" {
   type        = bool
   default     = null
   description = "(Optional) Allows you to test service changes before they are deployed to production. Defaults to `false`."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_scaling_plan_description" {
   type        = string
   default     = null
   description = "(Optional) A description of the Scaling Plan."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_scaling_plan_exclusion_tag" {
   type        = string
   default     = null
   description = "(Optional) The name of the tag associated with the VMs you want to exclude from autoscaling."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_scaling_plan_friendly_name" {
   type        = string
   default     = null
   description = "(Optional) Friendly name of the Scaling Plan."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_scaling_plan_host_pool" {
   type = list(object({
     hostpool_id          = string
@@ -467,12 +489,14 @@ variable "virtual_desktop_scaling_plan_host_pool" {
 EOT
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_scaling_plan_tags" {
   type        = map(string)
   default     = null
   description = "(Optional) A mapping of tags which should be assigned to the Virtual Desktop Scaling Plan ."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_scaling_plan_timeouts" {
   type = object({
     create = optional(string)
@@ -489,30 +513,35 @@ variable "virtual_desktop_scaling_plan_timeouts" {
 EOT
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_workspace_description" {
   type        = string
   default     = null
   description = "(Optional) A description for the Virtual Desktop Workspace."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_workspace_friendly_name" {
   type        = string
   default     = null
   description = "(Optional) A friendly name for the Virtual Desktop Workspace."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_workspace_public_network_access_enabled" {
   type        = bool
   default     = null
   description = "(Optional) Whether public network access is allowed for this Virtual Desktop Workspace. Defaults to `true`."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_workspace_tags" {
   type        = map(string)
   default     = null
   description = "(Optional) A mapping of tags to assign to the resource."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_workspace_timeouts" {
   type = object({
     create = optional(string)
