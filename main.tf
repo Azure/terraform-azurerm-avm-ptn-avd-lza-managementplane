@@ -23,7 +23,6 @@ module "avm_res_desktopvirtualization_hostpool" {
   virtual_desktop_host_pool_custom_rdp_properties    = var.virtual_desktop_host_pool_custom_rdp_properties
   virtual_desktop_host_pool_maximum_sessions_allowed = var.virtual_desktop_host_pool_maximum_sessions_allowed
   virtual_desktop_host_pool_start_vm_on_connect      = var.virtual_desktop_host_pool_start_vm_on_connect
-  tags                                               = var.virtual_desktop_host_pool_tags
   diagnostic_settings = {
     to_law = {
       name                  = "to-law"
@@ -43,6 +42,13 @@ module "avm_res_desktopvirtualization_hostpool" {
 resource "azurerm_virtual_desktop_host_pool_registration_info" "registrationinfo" {
   expiration_date = timeadd(timestamp(), "48h")
   hostpool_id     = module.avm_res_desktopvirtualization_hostpool.resource.id
+
+  lifecycle {
+    ignore_changes = [
+      expiration_date,
+      hostpool_id,
+   ]
+  }
 }
 
 # Create Azure Virtual Desktop application group
