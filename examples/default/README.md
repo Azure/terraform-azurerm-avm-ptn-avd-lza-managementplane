@@ -49,50 +49,7 @@ module "avd" {
   virtual_desktop_host_pool_start_vm_on_connect      = var.virtual_desktop_host_pool_start_vm_on_connect
   virtual_desktop_application_group_type             = var.virtual_desktop_application_group_type
   virtual_desktop_application_group_name             = var.virtual_desktop_application_group_name
-  virtual_desktop_scaling_plan_schedule = toset(
-    [
-      {
-        name                                 = "Weekday"
-        days_of_week                         = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-        ramp_up_start_time                   = "09:00"
-        ramp_up_load_balancing_algorithm     = "BreadthFirst"
-        ramp_up_minimum_hosts_percent        = 50
-        ramp_up_capacity_threshold_percent   = 80
-        peak_start_time                      = "10:00"
-        peak_load_balancing_algorithm        = "DepthFirst"
-        ramp_down_start_time                 = "17:00"
-        ramp_down_load_balancing_algorithm   = "BreadthFirst"
-        ramp_down_minimum_hosts_percent      = 50
-        ramp_down_force_logoff_users         = true
-        ramp_down_wait_time_minutes          = 15
-        ramp_down_notification_message       = "The session will end in 15 minutes."
-        ramp_down_capacity_threshold_percent = 50
-        ramp_down_stop_hosts_when            = "ZeroActiveSessions"
-        off_peak_start_time                  = "18:00"
-        off_peak_load_balancing_algorithm    = "BreadthFirst"
-      },
-      {
-        name                                 = "Weekend"
-        days_of_week                         = ["Saturday", "Sunday"]
-        ramp_up_start_time                   = "09:00"
-        ramp_up_load_balancing_algorithm     = "BreadthFirst"
-        ramp_up_minimum_hosts_percent        = 50
-        ramp_up_capacity_threshold_percent   = 80
-        peak_start_time                      = "10:00"
-        peak_load_balancing_algorithm        = "DepthFirst"
-        ramp_down_start_time                 = "17:00"
-        ramp_down_load_balancing_algorithm   = "BreadthFirst"
-        ramp_down_minimum_hosts_percent      = 50
-        ramp_down_force_logoff_users         = true
-        ramp_down_wait_time_minutes          = 15
-        ramp_down_notification_message       = "The session will end in 15 minutes."
-        ramp_down_capacity_threshold_percent = 50
-        ramp_down_stop_hosts_when            = "ZeroActiveSessions"
-        off_peak_start_time                  = "18:00"
-        off_peak_load_balancing_algorithm    = "BreadthFirst"
-      }
-    ]
-  )
+  log_analytics_workspace_name                       = module.naming.log_analytics_workspace.name_unique
 }
 ```
 

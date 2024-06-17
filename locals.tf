@@ -1,7 +1,3 @@
-locals {
-  role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
-}
-
 # Private endpoint application security group associations
 # Remove if this resource does not support private endpoints
 
