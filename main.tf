@@ -47,7 +47,7 @@ resource "azurerm_virtual_desktop_host_pool_registration_info" "registrationinfo
     ignore_changes = [
       expiration_date,
       hostpool_id,
-   ]
+    ]
   }
 }
 
