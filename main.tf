@@ -12,7 +12,7 @@ module "avm_res_operationalinsights_workspace" {
 # Create Azure Virtual Desktop host pool
 module "avm_res_desktopvirtualization_hostpool" {
   source                                             = "Azure/avm-res-desktopvirtualization-hostpool/azurerm"
-  version                                            = "0.1.4"
+  version                                            = "0.1.5"
   enable_telemetry                                   = var.enable_telemetry
   resource_group_name                                = var.resource_group_name
   virtual_desktop_host_pool_type                     = var.virtual_desktop_host_pool_type
