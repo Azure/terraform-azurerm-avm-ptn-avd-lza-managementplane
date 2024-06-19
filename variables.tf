@@ -6,6 +6,12 @@ variable "description" {
 variable "location" {
   type        = string
   description = "(Required) The location/region where the Azure Virtual Desktop resources are located. Changing this forces a new resource to be created."
+  nullable    = false
+}
+
+variable "log_analytics_workspace_name" {
+  type        = string
+  description = "The name of the Log Analytics Workspace to use for diagnostics."
 }
 
 variable "resource_group_name" {
@@ -64,50 +70,6 @@ variable "virtual_desktop_scaling_plan_name" {
   nullable    = false
 }
 
-variable "virtual_desktop_scaling_plan_schedule" {
-  type = list(object({
-    days_of_week                         = set(string)
-    name                                 = string
-    off_peak_load_balancing_algorithm    = string
-    off_peak_start_time                  = string
-    peak_load_balancing_algorithm        = string
-    peak_start_time                      = string
-    ramp_down_capacity_threshold_percent = number
-    ramp_down_force_logoff_users         = bool
-    ramp_down_load_balancing_algorithm   = string
-    ramp_down_minimum_hosts_percent      = number
-    ramp_down_notification_message       = string
-    ramp_down_start_time                 = string
-    ramp_down_stop_hosts_when            = string
-    ramp_down_wait_time_minutes          = number
-    ramp_up_capacity_threshold_percent   = optional(number)
-    ramp_up_load_balancing_algorithm     = string
-    ramp_up_minimum_hosts_percent        = optional(number)
-    ramp_up_start_time                   = string
-  }))
-  description = <<-EOT
- - `days_of_week` - (Required) A list of Days of the Week on which this schedule will be used. Possible values are `Monday`, `Tuesday`, `Wednesday`, `Thursday`, `Friday`, `Saturday`, and `Sunday`
- - `name` - (Required) The name of the schedule.
- - `off_peak_load_balancing_algorithm` - (Required) The load Balancing Algorithm to use during Off-Peak Hours. Possible values are `DepthFirst` and `BreadthFirst`.
- - `off_peak_start_time` - (Required) The time at which Off-Peak scaling will begin. This is also the end-time for the Ramp-Down period. The time must be specified in "HH:MM" format.
- - `peak_load_balancing_algorithm` - (Required) The load Balancing Algorithm to use during Peak Hours. Possible values are `DepthFirst` and `BreadthFirst`.
- - `peak_start_time` - (Required) The time at which Peak scaling will begin. This is also the end-time for the Ramp-Up period. The time must be specified in "HH:MM" format.
- - `ramp_down_capacity_threshold_percent` - (Required) This is the value in percentage of used host pool capacity that will be considered to evaluate whether to turn on/off virtual machines during the ramp-down and off-peak hours. For example, if capacity threshold is specified as 60% and your total host pool capacity is 100 sessions, autoscale will turn on additional session hosts once the host pool exceeds a load of 60 sessions.
- - `ramp_down_force_logoff_users` - (Required) Whether users will be forced to log-off session hosts once the `ramp_down_wait_time_minutes` value has been exceeded during the Ramp-Down period. Possible
- - `ramp_down_load_balancing_algorithm` - (Required) The load Balancing Algorithm to use during the Ramp-Down period. Possible values are `DepthFirst` and `BreadthFirst`.
- - `ramp_down_minimum_hosts_percent` - (Required) The minimum percentage of session host virtual machines that you would like to get to for ramp-down and off-peak hours. For example, if Minimum percentage of hosts is specified as 10% and total number of session hosts in your host pool is 10, autoscale will ensure a minimum of 1 session host is available to take user connections.
- - `ramp_down_notification_message` - (Required) The notification message to send to users during Ramp-Down period when they are required to log-off.
- - `ramp_down_start_time` - (Required) The time at which Ramp-Down scaling will begin. This is also the end-time for the Ramp-Up period. The time must be specified in "HH:MM" format.
- - `ramp_down_stop_hosts_when` - (Required) Controls Session Host shutdown behaviour during Ramp-Down period. Session Hosts can either be shutdown when all sessions on the Session Host have ended, or when there are no Active sessions left on the Session Host. Possible values are `ZeroSessions` and `ZeroActiveSessions`.
- - `ramp_down_wait_time_minutes` - (Required) The number of minutes during Ramp-Down period that autoscale will wait after setting the session host VMs to drain mode, notifying any currently signed in users to save their work before forcing the users to logoff. Once all user sessions on the session host VM have been logged off, Autoscale will shut down the VM.
- - `ramp_up_capacity_threshold_percent` - (Optional) This is the value of percentage of used host pool capacity that will be considered to evaluate whether to turn on/off virtual machines during the ramp-up and peak hours. For example, if capacity threshold is specified as `60%` and your total host pool capacity is `100` sessions, autoscale will turn on additional session hosts once the host pool exceeds a load of `60` sessions.
- - `ramp_up_load_balancing_algorithm` - (Required) The load Balancing Algorithm to use during the Ramp-Up period. Possible values are `DepthFirst` and `BreadthFirst`.
- - `ramp_up_minimum_hosts_percent` - (Optional) Specifies the minimum percentage of session host virtual machines to start during ramp-up for peak hours. For example, if Minimum percentage of hosts is specified as `10%` and total number of session hosts in your host pool is `10`, autoscale will ensure a minimum of `1` session host is available to take user connections.
- - `ramp_up_start_time` - (Required) The time at which Ramp-Up scaling will begin. This is also the end-time for the Ramp-Up period. The time must be specified in "HH:MM" format.
-EOT
-  nullable    = false
-}
-
 variable "virtual_desktop_scaling_plan_time_zone" {
   type        = string
   description = "(Required) Specifies the Time Zone which should be used by the Scaling Plan for time based events, [the possible values are defined here](https://jackstromberg.com/2017/01/list-of-time-zones-consumed-by-azure/)."
@@ -120,51 +82,6 @@ variable "virtual_desktop_workspace_name" {
   nullable    = false
 }
 
-variable "diagnostic_settings" {
-  type = map(object({
-    name                                     = optional(string, null)
-    log_categories                           = optional(set(string), [])
-    log_groups                               = optional(set(string), ["allLogs"])
-    metric_categories                        = optional(set(string), ["AllMetrics"])
-    log_analytics_destination_type           = optional(string, "Dedicated")
-    workspace_resource_id                    = optional(string, null)
-    storage_account_resource_id              = optional(string, null)
-    event_hub_authorization_rule_resource_id = optional(string, null)
-    event_hub_name                           = optional(string, null)
-    marketplace_partner_resource_id          = optional(string, null)
-  }))
-  default     = {}
-  description = <<DESCRIPTION
-A map of diagnostic settings to create on the resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-
-- `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
-- `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
-- `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
-- `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
-- `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
-- `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
-- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
-- `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
-- `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
-DESCRIPTION
-  nullable    = false
-
-  validation {
-    condition     = alltrue([for _, v in var.diagnostic_settings : contains(["Dedicated", "AzureDiagnostics"], v.log_analytics_destination_type)])
-    error_message = "Log analytics destination type must be one of: 'Dedicated', 'AzureDiagnostics'."
-  }
-  validation {
-    condition = alltrue(
-      [
-        for _, v in var.diagnostic_settings :
-        v.workspace_resource_id != null || v.storage_account_resource_id != null || v.event_hub_authorization_rule_resource_id != null || v.marketplace_partner_resource_id != null
-      ]
-    )
-    error_message = "At least one of `workspace_resource_id`, `storage_account_resource_id`, `marketplace_partner_resource_id`, or `event_hub_authorization_rule_resource_id`, must be set."
-  }
-}
-
 variable "enable_telemetry" {
   type        = bool
   default     = true
@@ -175,20 +92,6 @@ For more information see <https://aka.ms/avm/telemetryinfo>.
 
 If it is set to false, then no telemetry will be collected.
 DESCRIPTION
-}
-
-variable "lock" {
-  type = object({
-    kind = string
-    name = optional(string, null)
-  })
-  default     = null
-  description = <<DESCRIPTION
-  Controls the Resource Lock configuration for this resource. The following properties can be specified:
-  
-  - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
-  - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
-  DESCRIPTION  
 }
 
 # tflint-ignore: terraform_unused_declarations
@@ -207,6 +110,7 @@ DESCRIPTION
   nullable    = false
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "private_endpoints" {
   type = map(object({
     name = optional(string, null)
@@ -218,6 +122,7 @@ variable "private_endpoints" {
       condition                              = optional(string, null)
       condition_version                      = optional(string, null)
       delegated_managed_identity_resource_id = optional(string, null)
+      principal_type                         = optional(string, null)
     })), {})
     lock = optional(object({
       name = optional(string, null)
@@ -257,12 +162,14 @@ DESCRIPTION
   nullable    = false
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "public_network_access_enabled" {
   type        = bool
   default     = true
   description = "Whether or not public network access is enabled for the AVD Workspace."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "role_assignments" {
   type = map(object({
     role_definition_id_or_name             = string
@@ -272,6 +179,7 @@ variable "role_assignments" {
     condition                              = optional(string, null)
     condition_version                      = optional(string, null)
     delegated_managed_identity_resource_id = optional(string, null)
+    principal_type                         = optional(string, null)
   }))
   default     = {}
   description = <<DESCRIPTION
@@ -289,6 +197,7 @@ variable "role_assignments" {
   nullable    = false
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "schedules" {
   type = map(object({
     name                                 = string
@@ -379,6 +288,7 @@ variable "tags" {
   description = "(Optional) Tags of the resource."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "time_zone" {
   type        = string
   default     = "Eastern Standard Time"
@@ -401,30 +311,35 @@ variable "tracing_tags_prefix" {
   nullable    = false
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_application_group_default_desktop_display_name" {
   type        = string
   default     = null
   description = "(Optional) Option to set the display name for the default sessionDesktop desktop when `type` is set to `Desktop`."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_application_group_description" {
   type        = string
   default     = null
   description = "(Optional) Option to set a description for the Virtual Desktop Application Group."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_application_group_friendly_name" {
   type        = string
   default     = null
   description = "(Optional) Option to set a friendly name for the Virtual Desktop Application Group."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_application_group_tags" {
   type        = map(string)
   default     = null
   description = "(Optional) A mapping of tags to assign to the resource."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_application_group_timeouts" {
   type = object({
     create = optional(string)
@@ -447,12 +362,14 @@ variable "virtual_desktop_host_pool_custom_rdp_properties" {
   description = "(Optional) A valid custom RDP properties string for the Virtual Desktop Host Pool, available properties can be [found in this article](https://docs.microsoft.com/windows-server/remote/remote-desktop-services/clients/rdp-files)."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_host_pool_description" {
   type        = string
   default     = null
   description = "(Optional) A description for the Virtual Desktop Host Pool."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_host_pool_friendly_name" {
   type        = string
   default     = null
@@ -465,18 +382,21 @@ variable "virtual_desktop_host_pool_maximum_sessions_allowed" {
   description = "(Optional) A valid integer value from 0 to 999999 for the maximum number of users that have concurrent sessions on a session host. Should only be set if the `type` of your Virtual Desktop Host Pool is `Pooled`."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_host_pool_personal_desktop_assignment_type" {
   type        = string
   default     = null
   description = "(Optional) `Automatic` assignment"
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_host_pool_preferred_app_group_type" {
   type        = string
   default     = null
   description = "Preferred App Group type to display"
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_host_pool_scheduled_agent_updates" {
   type = object({
     enabled                   = optional(bool)
@@ -506,12 +426,14 @@ variable "virtual_desktop_host_pool_start_vm_on_connect" {
   description = "(Optional) Enables or disables the Start VM on Connection Feature. Defaults to `false`."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_host_pool_tags" {
   type        = map(string)
   default     = null
   description = "(Optional) A mapping of tags to assign to the resource."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_host_pool_timeouts" {
   type = object({
     create = optional(string)
@@ -528,30 +450,35 @@ variable "virtual_desktop_host_pool_timeouts" {
 EOT
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_host_pool_validate_environment" {
   type        = bool
   default     = null
   description = "(Optional) Allows you to test service changes before they are deployed to production. Defaults to `false`."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_scaling_plan_description" {
   type        = string
   default     = null
   description = "(Optional) A description of the Scaling Plan."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_scaling_plan_exclusion_tag" {
   type        = string
   default     = null
   description = "(Optional) The name of the tag associated with the VMs you want to exclude from autoscaling."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_scaling_plan_friendly_name" {
   type        = string
   default     = null
   description = "(Optional) Friendly name of the Scaling Plan."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_scaling_plan_host_pool" {
   type = list(object({
     hostpool_id          = string
@@ -564,12 +491,14 @@ variable "virtual_desktop_scaling_plan_host_pool" {
 EOT
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_scaling_plan_tags" {
   type        = map(string)
   default     = null
   description = "(Optional) A mapping of tags which should be assigned to the Virtual Desktop Scaling Plan ."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_scaling_plan_timeouts" {
   type = object({
     create = optional(string)
@@ -586,30 +515,35 @@ variable "virtual_desktop_scaling_plan_timeouts" {
 EOT
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_workspace_description" {
   type        = string
   default     = null
   description = "(Optional) A description for the Virtual Desktop Workspace."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_workspace_friendly_name" {
   type        = string
   default     = null
   description = "(Optional) A friendly name for the Virtual Desktop Workspace."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_workspace_public_network_access_enabled" {
   type        = bool
   default     = null
   description = "(Optional) Whether public network access is allowed for this Virtual Desktop Workspace. Defaults to `true`."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_workspace_tags" {
   type        = map(string)
   default     = null
   description = "(Optional) A mapping of tags to assign to the resource."
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_workspace_timeouts" {
   type = object({
     create = optional(string)

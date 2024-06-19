@@ -1,7 +1,3 @@
-locals {
-  role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
-}
-
 # Private endpoint application security group associations
 # Remove if this resource does not support private endpoints
 
@@ -22,28 +18,4 @@ locals {
   tags = {
     cm-resource-parent = module.avm_res_desktopvirtualization_hostpool.resource.id
   }
-}
-
-# We pick a random region from this list.
-locals {
-  azure_regions = [
-    "ukwest",
-    "uksouth",
-    "centralindia",
-    "australiaeast",
-    "canadacentral",
-    "canadaeast",
-    "japaneast",
-    "westeurope",
-    "northeurope",
-    "eastus",
-    "eastus2",
-    "westus",
-    "westus2",
-    "westus3",
-    "southcentralus",
-    "northcentralus",
-    "centralus",
-    "westcentralus"
-  ]
 }
