@@ -82,6 +82,20 @@ variable "virtual_desktop_workspace_name" {
   nullable    = false
 }
 
+variable "registration_expiration_period" {
+  type        = string
+  default     = "48h"
+  description = "The expiration period for the registration token. Must be less than or equal to 30 days."
+
+  validation {
+    condition = can(regex("^(\\d+)([smhdw])$", var.registration_expiration_period)) && (
+      (tonumber(regex("\\d+", var.registration_expiration_period)) <= 30 && regex("\\D", var.registration_expiration_period) == "d") ||
+      (regex("\\D", var.registration_expiration_period) != "d")
+    )
+    error_message = "The expiration period must be a valid duration string and less than or equal to 30 days."
+  }
+}
+
 variable "enable_telemetry" {
   type        = bool
   default     = true

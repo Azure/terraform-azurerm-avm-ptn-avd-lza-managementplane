@@ -40,7 +40,7 @@ module "avm_res_desktopvirtualization_hostpool" {
 
 # Registration information for the host pool.
 resource "azurerm_virtual_desktop_host_pool_registration_info" "registrationinfo" {
-  expiration_date = timeadd(timestamp(), "48h")
+  expiration_date = timeadd(timestamp(), var.registration_expiration_period)
   hostpool_id     = module.avm_res_desktopvirtualization_hostpool.resource.id
 
   lifecycle {
