@@ -1,9 +1,3 @@
-variable "description" {
-  type        = string
-  default     = "AVD Management Plane Deployment"
-  description = "The description of the AVD."
-}
-
 variable "enable_telemetry" {
   type        = bool
   default     = true
@@ -35,6 +29,12 @@ variable "virtual_desktop_application_group_type" {
   type        = string
   default     = "Desktop"
   description = "The type of the AVD Application Group. Valid values are 'Desktop' and 'RemoteApp'."
+}
+
+variable "virtual_desktop_host_pool_friendly_name" {
+  type        = string
+  default     = "AVD Host Pool"
+  description = "(Optional) A friendly name for the Virtual Desktop Host Pool."
 }
 
 variable "virtual_desktop_host_pool_load_balancer_type" {
