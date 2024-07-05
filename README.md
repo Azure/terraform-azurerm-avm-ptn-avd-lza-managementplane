@@ -52,12 +52,6 @@ The following resources are used by this module:
 
 The following input variables are required:
 
-### <a name="input_description"></a> [description](#input\_description)
-
-Description: (Optional) The description of the AVD Workspace.
-
-Type: `string`
-
 ### <a name="input_location"></a> [location](#input\_location)
 
 Description: (Required) The location/region where the Azure Virtual Desktop resources are located. Changing this forces a new resource to be created.
@@ -730,7 +724,7 @@ Version: 0.1.3
 
 Source: Azure/avm-res-desktopvirtualization-hostpool/azurerm
 
-Version: 0.1.5
+Version: 0.2.0
 
 ### <a name="module_avm_res_desktopvirtualization_scaling_plan"></a> [avm\_res\_desktopvirtualization\_scaling\_plan](#module\_avm\_res\_desktopvirtualization\_scaling\_plan)
 
@@ -742,7 +736,7 @@ Version: 0.1.2
 
 Source: Azure/avm-res-desktopvirtualization-workspace/azurerm
 
-Version: 0.1.3
+Version: 0.1.4
 
 ### <a name="module_avm_res_operationalinsights_workspace"></a> [avm\_res\_operationalinsights\_workspace](#module\_avm\_res\_operationalinsights\_workspace)
 

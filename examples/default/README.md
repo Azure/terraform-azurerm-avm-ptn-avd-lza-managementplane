@@ -39,7 +39,6 @@ module "avd" {
   resource_group_name                                = azurerm_resource_group.this.name
   user_group_name                                    = var.user_group_name
   virtual_desktop_workspace_name                     = var.virtual_desktop_workspace_name
-  description                                        = var.description
   virtual_desktop_scaling_plan_time_zone             = var.virtual_desktop_scaling_plan_time_zone
   virtual_desktop_scaling_plan_name                  = var.virtual_desktop_scaling_plan_name
   virtual_desktop_host_pool_type                     = var.virtual_desktop_host_pool_type
@@ -49,6 +48,7 @@ module "avd" {
   virtual_desktop_host_pool_start_vm_on_connect      = var.virtual_desktop_host_pool_start_vm_on_connect
   virtual_desktop_application_group_type             = var.virtual_desktop_application_group_type
   virtual_desktop_application_group_name             = var.virtual_desktop_application_group_name
+  virtual_desktop_host_pool_friendly_name            = var.virtual_desktop_host_pool_friendly_name
   log_analytics_workspace_name                       = module.naming.log_analytics_workspace.name_unique
 }
 ```
@@ -124,6 +124,14 @@ Description: The type of the AVD Application Group. Valid values are 'Desktop' a
 Type: `string`
 
 Default: `"Desktop"`
+
+### <a name="input_virtual_desktop_host_pool_friendly_name"></a> [virtual\_desktop\_host\_pool\_friendly\_name](#input\_virtual\_desktop\_host\_pool\_friendly\_name)
+
+Description: (Optional) A friendly name for the Virtual Desktop Host Pool.
+
+Type: `string`
+
+Default: `"AVD Host Pool"`
 
 ### <a name="input_virtual_desktop_host_pool_load_balancer_type"></a> [virtual\_desktop\_host\_pool\_load\_balancer\_type](#input\_virtual\_desktop\_host\_pool\_load\_balancer\_type)
 

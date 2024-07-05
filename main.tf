@@ -12,7 +12,7 @@ module "avm_res_operationalinsights_workspace" {
 # Create Azure Virtual Desktop host pool
 module "avm_res_desktopvirtualization_hostpool" {
   source                                             = "Azure/avm-res-desktopvirtualization-hostpool/azurerm"
-  version                                            = "0.1.5"
+  version                                            = "0.2.0"
   enable_telemetry                                   = var.enable_telemetry
   resource_group_name                                = var.resource_group_name
   virtual_desktop_host_pool_type                     = var.virtual_desktop_host_pool_type
@@ -23,6 +23,7 @@ module "avm_res_desktopvirtualization_hostpool" {
   virtual_desktop_host_pool_custom_rdp_properties    = var.virtual_desktop_host_pool_custom_rdp_properties
   virtual_desktop_host_pool_maximum_sessions_allowed = var.virtual_desktop_host_pool_maximum_sessions_allowed
   virtual_desktop_host_pool_start_vm_on_connect      = var.virtual_desktop_host_pool_start_vm_on_connect
+  virtual_desktop_host_pool_friendly_name            = var.virtual_desktop_host_pool_friendly_name
   diagnostic_settings = {
     to_law = {
       name                  = "to-law"
@@ -67,14 +68,14 @@ module "avm_res_desktopvirtualization_applicationgroup" {
 
 # Create Azure Virtual Desktop workspace
 module "avm_res_desktopvirtualization_workspace" {
-  source              = "Azure/avm-res-desktopvirtualization-workspace/azurerm"
-  version             = "0.1.3"
-  enable_telemetry    = var.enable_telemetry
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  description         = var.description
-  name                = var.virtual_desktop_workspace_name
-  tags                = local.tags
+  source                                        = "Azure/avm-res-desktopvirtualization-workspace/azurerm"
+  version                                       = "0.1.4"
+  enable_telemetry                              = var.enable_telemetry
+  virtual_desktop_workspace_resource_group_name = var.resource_group_name
+  resource_group_name                           = var.resource_group_name
+  virtual_desktop_workspace_location            = var.location
+  virtual_desktop_workspace_name                = var.virtual_desktop_workspace_name
+  tags                                          = local.tags
   diagnostic_settings = {
     to_law = {
       name                  = "to-law"

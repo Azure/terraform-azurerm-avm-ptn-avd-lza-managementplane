@@ -1,8 +1,3 @@
-variable "description" {
-  type        = string
-  description = "(Optional) The description of the AVD Workspace."
-}
-
 variable "location" {
   type        = string
   description = "(Required) The location/region where the Azure Virtual Desktop resources are located. Changing this forces a new resource to be created."
