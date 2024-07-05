@@ -83,14 +83,6 @@ No required inputs.
 
 The following input variables are optional (have default values):
 
-### <a name="input_description"></a> [description](#input\_description)
-
-Description: The description of the AVD.
-
-Type: `string`
-
-Default: `"AVD Management Plane Deployment"`
-
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
 Description: This variable controls whether or not telemetry is enabled for the module.  
