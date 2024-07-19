@@ -14,11 +14,6 @@ variable "resource_group_name" {
   description = "The name of the resource group in which the AVD Private Endpoint should be created."
 }
 
-variable "user_group_name" {
-  type        = string
-  description = "Microsoft Entra ID User Group for AVD users"
-}
-
 variable "virtual_desktop_application_group_name" {
   type        = string
   description = "(Required) The name of the Virtual Desktop Application Group. Changing the name forces a new resource to be created."
@@ -289,12 +284,6 @@ variable "subresource_names" {
   type        = list(string)
   default     = []
   description = "The names of the subresources to assosciatied with the private endpoint. The target subresource must be one of: 'feed', or 'global'."
-}
-
-variable "tags" {
-  type        = map(string)
-  default     = null
-  description = "(Optional) Tags of the resource."
 }
 
 # tflint-ignore: terraform_unused_declarations

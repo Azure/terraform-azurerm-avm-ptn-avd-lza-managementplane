@@ -15,11 +15,9 @@ This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
 The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.6.6, < 2.0.0)
-
 - <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) (>= 2.47.0, < 3.0.0)
-
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.71.0, < 4.0.0)
-
+- <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.6.0, <4.0.0)
 
 ## Resources
@@ -38,6 +36,7 @@ The following resources are used by this module:
 - [azurerm_client_config.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 - [azurerm_subscription.primary](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subscription) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/hashicorp/modtm/latest/docs/data-sources/module_source) (data source)
+
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -59,12 +58,6 @@ Type: `string`
 ### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
 
 Description: The name of the resource group in which the AVD Private Endpoint should be created.
-
-Type: `string`
-
-### <a name="input_user_group_name"></a> [user\_group\_name](#input\_user\_group\_name)
-
-Description: Microsoft Entra ID User Group for AVD users
 
 Type: `string`
 
@@ -338,14 +331,6 @@ Description: The names of the subresources to assosciatied with the private endp
 Type: `list(string)`
 
 Default: `[]`
-
-### <a name="input_tags"></a> [tags](#input\_tags)
-
-Description: (Optional) Tags of the resource.
-
-Type: `map(string)`
-
-Default: `null`
 
 ### <a name="input_time_zone"></a> [time\_zone](#input\_time\_zone)
 
@@ -710,7 +695,7 @@ The following Modules are called:
 
 Source: Azure/avm-res-desktopvirtualization-applicationgroup/azurerm
 
-Version: 0.1.3
+Version: 0.1.4
 
 ### <a name="module_avm_res_desktopvirtualization_hostpool"></a> [avm\_res\_desktopvirtualization\_hostpool](#module\_avm\_res\_desktopvirtualization\_hostpool)
 
@@ -722,19 +707,19 @@ Version: 0.2.0
 
 Source: Azure/avm-res-desktopvirtualization-scalingplan/azurerm
 
-Version: 0.1.2
+Version: 0.1.3
 
 ### <a name="module_avm_res_desktopvirtualization_workspace"></a> [avm\_res\_desktopvirtualization\_workspace](#module\_avm\_res\_desktopvirtualization\_workspace)
 
 Source: Azure/avm-res-desktopvirtualization-workspace/azurerm
 
-Version: 0.1.4
+Version: 0.1.5
 
 ### <a name="module_avm_res_operationalinsights_workspace"></a> [avm\_res\_operationalinsights\_workspace](#module\_avm\_res\_operationalinsights\_workspace)
 
 Source: Azure/avm-res-operationalinsights-workspace/azurerm
 
-Version: 0.1.3
+Version: 0.3.2
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection
