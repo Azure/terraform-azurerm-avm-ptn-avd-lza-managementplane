@@ -291,12 +291,6 @@ variable "subresource_names" {
   description = "The names of the subresources to assosciatied with the private endpoint. The target subresource must be one of: 'feed', or 'global'."
 }
 
-variable "tags" {
-  type        = map(string)
-  default     = null
-  description = "(Optional) Tags of the resource."
-}
-
 # tflint-ignore: terraform_unused_declarations
 variable "time_zone" {
   type        = string
