@@ -86,14 +86,6 @@ Type: `bool`
 
 Default: `true`
 
-### <a name="input_user_group_name"></a> [user\_group\_name](#input\_user\_group\_name)
-
-Description: Microsoft Entra ID User Group for AVD users
-
-Type: `string`
-
-Default: `"avdgroup-001"`
-
 ### <a name="input_virtual_desktop_application_group_name"></a> [virtual\_desktop\_application\_group\_name](#input\_virtual\_desktop\_application\_group\_name)
 
 Description: The name of the AVD Application Group.

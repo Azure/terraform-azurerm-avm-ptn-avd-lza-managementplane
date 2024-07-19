@@ -8,12 +8,6 @@ If it is set to false, then no telemetry will be collected.
 DESCRIPTION
 }
 
-variable "user_group_name" {
-  type        = string
-  default     = "avdgroup-001"
-  description = "Microsoft Entra ID User Group for AVD users"
-}
-
 variable "virtual_desktop_application_group_name" {
   type        = string
   default     = "vdag-avd-001"
