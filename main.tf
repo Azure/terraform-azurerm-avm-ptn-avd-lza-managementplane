@@ -1,7 +1,7 @@
 # Create Azure Log Analytics workspace for Azure Virtual Desktop
 module "avm_res_operationalinsights_workspace" {
   source              = "Azure/avm-res-operationalinsights-workspace/azurerm"
-  version             = "0.1.3"
+  version             = "0.3.2"
   enable_telemetry    = var.enable_telemetry
   resource_group_name = var.resource_group_name
   location            = var.location
@@ -54,22 +54,24 @@ resource "azurerm_virtual_desktop_host_pool_registration_info" "registrationinfo
 
 # Create Azure Virtual Desktop application group
 module "avm_res_desktopvirtualization_applicationgroup" {
-  source                                                = "Azure/avm-res-desktopvirtualization-applicationgroup/azurerm"
-  version                                               = "0.1.3"
-  enable_telemetry                                      = var.enable_telemetry
-  virtual_desktop_application_group_name                = var.virtual_desktop_application_group_name
-  virtual_desktop_application_group_type                = var.virtual_desktop_application_group_type
-  virtual_desktop_application_group_host_pool_id        = module.avm_res_desktopvirtualization_hostpool.resource.id
-  virtual_desktop_application_group_resource_group_name = var.resource_group_name
-  virtual_desktop_application_group_location            = var.location
-  user_group_name                                       = var.user_group_name
-  virtual_desktop_application_group_tags                = local.tags
+  source                                                         = "Azure/avm-res-desktopvirtualization-applicationgroup/azurerm"
+  version                                                        = "0.1.4"
+  enable_telemetry                                               = var.enable_telemetry
+  virtual_desktop_application_group_name                         = var.virtual_desktop_application_group_name
+  virtual_desktop_application_group_type                         = var.virtual_desktop_application_group_type
+  virtual_desktop_application_group_host_pool_id                 = module.avm_res_desktopvirtualization_hostpool.resource.id
+  virtual_desktop_application_group_resource_group_name          = var.resource_group_name
+  virtual_desktop_application_group_location                     = var.location
+  virtual_desktop_application_group_default_desktop_display_name = var.virtual_desktop_application_group_default_desktop_display_name
+  virtual_desktop_application_group_description                  = var.virtual_desktop_application_group_description
+  virtual_desktop_application_group_friendly_name                = var.virtual_desktop_application_group_friendly_name
+  virtual_desktop_application_group_tags                         = local.tags
 }
 
 # Create Azure Virtual Desktop workspace
 module "avm_res_desktopvirtualization_workspace" {
   source                                        = "Azure/avm-res-desktopvirtualization-workspace/azurerm"
-  version                                       = "0.1.4"
+  version                                       = "0.1.5"
   enable_telemetry                              = var.enable_telemetry
   virtual_desktop_workspace_resource_group_name = var.resource_group_name
   resource_group_name                           = var.resource_group_name
@@ -109,7 +111,7 @@ resource "azurerm_role_assignment" "new" {
 module "avm_res_desktopvirtualization_scaling_plan" {
   source                                           = "Azure/avm-res-desktopvirtualization-scalingplan/azurerm"
   enable_telemetry                                 = var.enable_telemetry
-  version                                          = "0.1.2"
+  version                                          = "0.1.3"
   virtual_desktop_scaling_plan_name                = var.virtual_desktop_scaling_plan_name
   virtual_desktop_scaling_plan_location            = var.location
   virtual_desktop_scaling_plan_resource_group_name = var.resource_group_name
@@ -134,7 +136,7 @@ module "avm_res_desktopvirtualization_scaling_plan" {
         ramp_up_minimum_hosts_percent        = 50
         ramp_up_capacity_threshold_percent   = 80
         peak_start_time                      = "10:00"
-        peak_load_balancing_algorithm        = "DepthFirst"
+        peak_load_balancing_algorithm        = "BreadthFirst"
         ramp_down_start_time                 = "17:00"
         ramp_down_load_balancing_algorithm   = "BreadthFirst"
         ramp_down_minimum_hosts_percent      = 50

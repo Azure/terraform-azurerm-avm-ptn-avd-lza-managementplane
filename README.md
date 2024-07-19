@@ -64,12 +64,6 @@ Description: The name of the resource group in which the AVD Private Endpoint sh
 
 Type: `string`
 
-### <a name="input_user_group_name"></a> [user\_group\_name](#input\_user\_group\_name)
-
-Description: Microsoft Entra ID User Group for AVD users
-
-Type: `string`
-
 ### <a name="input_virtual_desktop_application_group_name"></a> [virtual\_desktop\_application\_group\_name](#input\_virtual\_desktop\_application\_group\_name)
 
 Description: (Required) The name of the Virtual Desktop Application Group. Changing the name forces a new resource to be created.
@@ -704,7 +698,7 @@ The following Modules are called:
 
 Source: Azure/avm-res-desktopvirtualization-applicationgroup/azurerm
 
-Version: 0.1.3
+Version: 0.1.4
 
 ### <a name="module_avm_res_desktopvirtualization_hostpool"></a> [avm\_res\_desktopvirtualization\_hostpool](#module\_avm\_res\_desktopvirtualization\_hostpool)
 
@@ -716,19 +710,19 @@ Version: 0.2.0
 
 Source: Azure/avm-res-desktopvirtualization-scalingplan/azurerm
 
-Version: 0.1.2
+Version: 0.1.3
 
 ### <a name="module_avm_res_desktopvirtualization_workspace"></a> [avm\_res\_desktopvirtualization\_workspace](#module\_avm\_res\_desktopvirtualization\_workspace)
 
 Source: Azure/avm-res-desktopvirtualization-workspace/azurerm
 
-Version: 0.1.4
+Version: 0.1.5
 
 ### <a name="module_avm_res_operationalinsights_workspace"></a> [avm\_res\_operationalinsights\_workspace](#module\_avm\_res\_operationalinsights\_workspace)
 
 Source: Azure/avm-res-operationalinsights-workspace/azurerm
 
-Version: 0.1.3
+Version: 0.3.2
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

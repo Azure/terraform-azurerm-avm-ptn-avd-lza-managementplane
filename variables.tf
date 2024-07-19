@@ -14,11 +14,6 @@ variable "resource_group_name" {
   description = "The name of the resource group in which the AVD Private Endpoint should be created."
 }
 
-variable "user_group_name" {
-  type        = string
-  description = "Microsoft Entra ID User Group for AVD users"
-}
-
 variable "virtual_desktop_application_group_name" {
   type        = string
   description = "(Required) The name of the Virtual Desktop Application Group. Changing the name forces a new resource to be created."
