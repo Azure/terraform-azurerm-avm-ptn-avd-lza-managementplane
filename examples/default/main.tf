@@ -31,7 +31,6 @@ module "avd" {
   enable_telemetry                                   = var.enable_telemetry
   location                                           = azurerm_resource_group.this.location
   resource_group_name                                = azurerm_resource_group.this.name
-  user_group_name                                    = var.user_group_name
   virtual_desktop_workspace_name                     = var.virtual_desktop_workspace_name
   virtual_desktop_scaling_plan_time_zone             = var.virtual_desktop_scaling_plan_time_zone
   virtual_desktop_scaling_plan_name                  = var.virtual_desktop_scaling_plan_name
