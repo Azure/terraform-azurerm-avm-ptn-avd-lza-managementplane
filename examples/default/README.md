@@ -37,7 +37,6 @@ module "avd" {
   enable_telemetry                                   = var.enable_telemetry
   location                                           = azurerm_resource_group.this.location
   resource_group_name                                = azurerm_resource_group.this.name
-  user_group_name                                    = var.user_group_name
   virtual_desktop_workspace_name                     = var.virtual_desktop_workspace_name
   virtual_desktop_scaling_plan_time_zone             = var.virtual_desktop_scaling_plan_time_zone
   virtual_desktop_scaling_plan_name                  = var.virtual_desktop_scaling_plan_name
@@ -61,12 +60,6 @@ The following requirements are needed by this module:
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.6.6, < 2.0.0)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.7.0, < 4.0.0)
-
-## Providers
-
-The following providers are used by this module:
-
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (>= 3.7.0, < 4.0.0)
 
 ## Resources
 
@@ -92,14 +85,6 @@ If it is set to false, then no telemetry will be collected.
 Type: `bool`
 
 Default: `true`
-
-### <a name="input_user_group_name"></a> [user\_group\_name](#input\_user\_group\_name)
-
-Description: Microsoft Entra ID User Group for AVD users
-
-Type: `string`
-
-Default: `"avdgroup-001"`
 
 ### <a name="input_virtual_desktop_application_group_name"></a> [virtual\_desktop\_application\_group\_name](#input\_virtual\_desktop\_application\_group\_name)
 
