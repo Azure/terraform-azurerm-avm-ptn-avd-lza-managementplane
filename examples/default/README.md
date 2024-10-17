@@ -35,20 +35,24 @@ module "avd" {
   source = "../../"
   # source             = "Azure/avm-ptn-avd-lza-managementplane/azurerm"
   enable_telemetry                                   = var.enable_telemetry
-  location                                           = azurerm_resource_group.this.location
   resource_group_name                                = azurerm_resource_group.this.name
   virtual_desktop_workspace_name                     = var.virtual_desktop_workspace_name
+  virtual_desktop_workspace_location                 = var.virtual_desktop_workspace_location
   virtual_desktop_scaling_plan_time_zone             = var.virtual_desktop_scaling_plan_time_zone
   virtual_desktop_scaling_plan_name                  = var.virtual_desktop_scaling_plan_name
+  virtual_desktop_scaling_plan_location              = var.virtual_desktop_scaling_plan_location
   virtual_desktop_host_pool_type                     = var.virtual_desktop_host_pool_type
   virtual_desktop_host_pool_load_balancer_type       = var.virtual_desktop_host_pool_load_balancer_type
   virtual_desktop_host_pool_name                     = var.virtual_desktop_host_pool_name
+  virtual_desktop_host_pool_location                 = var.virtual_desktop_host_pool_location
   virtual_desktop_host_pool_maximum_sessions_allowed = var.virtual_desktop_host_pool_maximum_sessions_allowed
   virtual_desktop_host_pool_start_vm_on_connect      = var.virtual_desktop_host_pool_start_vm_on_connect
   virtual_desktop_application_group_type             = var.virtual_desktop_application_group_type
   virtual_desktop_application_group_name             = var.virtual_desktop_application_group_name
+  virtual_desktop_application_group_location         = var.virtual_desktop_application_group_location
   virtual_desktop_host_pool_friendly_name            = var.virtual_desktop_host_pool_friendly_name
   log_analytics_workspace_name                       = module.naming.log_analytics_workspace.name_unique
+  log_analytics_workspace_location                   = var.log_analytics_workspace_location
 }
 ```
 
@@ -70,7 +74,37 @@ The following resources are used by this module:
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
 
-No required inputs.
+The following input variables are required:
+
+### <a name="input_log_analytics_workspace_location"></a> [log\_analytics\_workspace\_location](#input\_log\_analytics\_workspace\_location)
+
+Description: Location for the Log Analytics workspace
+
+Type: `string`
+
+### <a name="input_virtual_desktop_application_group_location"></a> [virtual\_desktop\_application\_group\_location](#input\_virtual\_desktop\_application\_group\_location)
+
+Description: Location for the virtual desktop application group
+
+Type: `string`
+
+### <a name="input_virtual_desktop_host_pool_location"></a> [virtual\_desktop\_host\_pool\_location](#input\_virtual\_desktop\_host\_pool\_location)
+
+Description: Location for the host pool
+
+Type: `string`
+
+### <a name="input_virtual_desktop_scaling_plan_location"></a> [virtual\_desktop\_scaling\_plan\_location](#input\_virtual\_desktop\_scaling\_plan\_location)
+
+Description: Location for the scaling plan
+
+Type: `string`
+
+### <a name="input_virtual_desktop_workspace_location"></a> [virtual\_desktop\_workspace\_location](#input\_virtual\_desktop\_workspace\_location)
+
+Description: Location for the virtual desktop workspace
+
+Type: `string`
 
 ## Optional Inputs
 

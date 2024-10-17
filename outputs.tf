@@ -13,9 +13,9 @@ output "log_analytics_workspace_id" {
   value       = module.avm_res_operationalinsights_workspace.resource.id
 }
 
-output "private_endpoints" {
+output "private_endpoints_hostpool" {
   description = "A map of private endpoints. The map key is the supplied input to var.private_endpoints. The map value is the entire azurerm_private_endpoint resource."
-  value       = azurerm_private_endpoint.this
+  value       = module.avm_res_desktopvirtualization_hostpool.private_endpoints
 }
 
 output "registrationinfo_token" {

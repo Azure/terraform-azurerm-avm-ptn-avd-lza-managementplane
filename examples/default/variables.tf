@@ -1,3 +1,28 @@
+variable "log_analytics_workspace_location" {
+  type        = string
+  description = "Location for the Log Analytics workspace"
+}
+
+variable "virtual_desktop_application_group_location" {
+  type        = string
+  description = "Location for the virtual desktop application group"
+}
+
+variable "virtual_desktop_host_pool_location" {
+  type        = string
+  description = "Location for the host pool"
+}
+
+variable "virtual_desktop_scaling_plan_location" {
+  type        = string
+  description = "Location for the scaling plan"
+}
+
+variable "virtual_desktop_workspace_location" {
+  type        = string
+  description = "Location for the virtual desktop workspace"
+}
+
 variable "enable_telemetry" {
   type        = bool
   default     = true

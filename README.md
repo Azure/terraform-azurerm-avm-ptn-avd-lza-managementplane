@@ -28,8 +28,6 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
-- [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
-- [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
 - [azurerm_role_assignment.new](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [azurerm_virtual_desktop_host_pool_registration_info.registrationinfo](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_desktop_host_pool_registration_info) (resource)
 - [azurerm_virtual_desktop_workspace_application_group_association.workappgrassoc](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_desktop_workspace_application_group_association) (resource)
@@ -46,9 +44,9 @@ The following resources are used by this module:
 
 The following input variables are required:
 
-### <a name="input_location"></a> [location](#input\_location)
+### <a name="input_log_analytics_workspace_location"></a> [log\_analytics\_workspace\_location](#input\_log\_analytics\_workspace\_location)
 
-Description: (Required) The location/region where the Azure Virtual Desktop resources are located. Changing this forces a new resource to be created.
+Description: The location of the Log Analytics Workspace to use for diagnostics.
 
 Type: `string`
 
@@ -61,6 +59,12 @@ Type: `string`
 ### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
 
 Description: The name of the resource group in which the AVD Private Endpoint should be created.
+
+Type: `string`
+
+### <a name="input_virtual_desktop_application_group_location"></a> [virtual\_desktop\_application\_group\_location](#input\_virtual\_desktop\_application\_group\_location)
+
+Description: The location/region where the Virtual Desktop Application Group resources are located. Changing this forces a new resource to be created.
 
 Type: `string`
 
@@ -82,6 +86,12 @@ Description: (Required) `BreadthFirst` load balancing distributes new user sessi
 
 Type: `string`
 
+### <a name="input_virtual_desktop_host_pool_location"></a> [virtual\_desktop\_host\_pool\_location](#input\_virtual\_desktop\_host\_pool\_location)
+
+Description: Location for the host pool
+
+Type: `string`
+
 ### <a name="input_virtual_desktop_host_pool_name"></a> [virtual\_desktop\_host\_pool\_name](#input\_virtual\_desktop\_host\_pool\_name)
 
 Description: (Required) The name of the Virtual Desktop Host Pool. Changing this forces a new resource to be created.
@@ -94,6 +104,12 @@ Description: (Required) The type of the Virtual Desktop Host Pool. Valid options
 
 Type: `string`
 
+### <a name="input_virtual_desktop_scaling_plan_location"></a> [virtual\_desktop\_scaling\_plan\_location](#input\_virtual\_desktop\_scaling\_plan\_location)
+
+Description: Location for the scaling plan
+
+Type: `string`
+
 ### <a name="input_virtual_desktop_scaling_plan_name"></a> [virtual\_desktop\_scaling\_plan\_name](#input\_virtual\_desktop\_scaling\_plan\_name)
 
 Description: (Required) The name which should be used for this Virtual Desktop Scaling Plan . Changing this forces a new Virtual Desktop Scaling Plan to be created.
@@ -103,6 +119,12 @@ Type: `string`
 ### <a name="input_virtual_desktop_scaling_plan_time_zone"></a> [virtual\_desktop\_scaling\_plan\_time\_zone](#input\_virtual\_desktop\_scaling\_plan\_time\_zone)
 
 Description: (Required) Specifies the Time Zone which should be used by the Scaling Plan for time based events, [the possible values are defined here](https://jackstromberg.com/2017/01/list-of-time-zones-consumed-by-azure/).
+
+Type: `string`
+
+### <a name="input_virtual_desktop_workspace_location"></a> [virtual\_desktop\_workspace\_location](#input\_virtual\_desktop\_workspace\_location)
+
+Description: Location for the virtual desktop workspace
 
 Type: `string`
 
@@ -326,14 +348,6 @@ Default:
   }
 }
 ```
-
-### <a name="input_subresource_names"></a> [subresource\_names](#input\_subresource\_names)
-
-Description: The names of the subresources to assosciatied with the private endpoint. The target subresource must be one of: 'feed', or 'global'.
-
-Type: `list(string)`
-
-Default: `[]`
 
 ### <a name="input_time_zone"></a> [time\_zone](#input\_time\_zone)
 
@@ -666,7 +680,7 @@ Description: The ID of the host pool.
 
 Description: The ID of the Log Analytics workspace.
 
-### <a name="output_private_endpoints"></a> [private\_endpoints](#output\_private\_endpoints)
+### <a name="output_private_endpoints_hostpool"></a> [private\_endpoints\_hostpool](#output\_private\_endpoints\_hostpool)
 
 Description: A map of private endpoints. The map key is the supplied input to var.private\_endpoints. The map value is the entire azurerm\_private\_endpoint resource.
 
@@ -698,19 +712,19 @@ The following Modules are called:
 
 Source: Azure/avm-res-desktopvirtualization-applicationgroup/azurerm
 
-Version: 0.1.4
+Version: 0.1.5
 
 ### <a name="module_avm_res_desktopvirtualization_hostpool"></a> [avm\_res\_desktopvirtualization\_hostpool](#module\_avm\_res\_desktopvirtualization\_hostpool)
 
 Source: Azure/avm-res-desktopvirtualization-hostpool/azurerm
 
-Version: 0.2.0
+Version: 0.2.1
 
 ### <a name="module_avm_res_desktopvirtualization_scaling_plan"></a> [avm\_res\_desktopvirtualization\_scaling\_plan](#module\_avm\_res\_desktopvirtualization\_scaling\_plan)
 
 Source: Azure/avm-res-desktopvirtualization-scalingplan/azurerm
 
-Version: 0.1.3
+Version: 0.1.4
 
 ### <a name="module_avm_res_desktopvirtualization_workspace"></a> [avm\_res\_desktopvirtualization\_workspace](#module\_avm\_res\_desktopvirtualization\_workspace)
 
