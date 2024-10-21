@@ -8,6 +8,28 @@ variable "log_analytics_workspace_name" {
   description = "The name of the Log Analytics Workspace to use for diagnostics."
 }
 
+variable "monitor_data_collection_rule_location" {
+  type        = string
+  description = "(Optional) The Azure Region where the Data Collection Rule should exist. Changing this forces a new Data Collection Rule to be created."
+}
+
+variable "monitor_data_collection_rule_name" {
+  type        = string
+  description = "(Optional) The name which should be used for this Data Collection Rule. Changing this forces a new Data Collection Rule to be created."
+  nullable    = false
+
+  validation {
+    condition     = can(regex("^microsoft-avdi-", var.monitor_data_collection_rule_name))
+    error_message = "The name must start with 'microsoft-avdi-'."
+  }
+}
+
+variable "monitor_data_collection_rule_resource_group_name" {
+  type        = string
+  description = "The name of the Resource Group where the Data Collection Rule should exist. Changing this forces a new Data Collection Rule to be created."
+  nullable    = false
+}
+
 variable "resource_group_name" {
   type        = string
   description = "The name of the resource group in which the AVD Private Endpoint should be created."
@@ -102,6 +124,13 @@ For more information see <https://aka.ms/avm/telemetryinfo>.
 
 If it is set to false, then no telemetry will be collected.
 DESCRIPTION
+}
+
+# tflint-ignore: terraform_unused_declarations
+variable "log_analytics_workspace_tags" {
+  type        = map(string)
+  default     = null
+  description = "(Optional) A mapping of tags to assign to the resource."
 }
 
 # tflint-ignore: terraform_unused_declarations

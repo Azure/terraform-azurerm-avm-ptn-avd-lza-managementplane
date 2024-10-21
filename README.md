@@ -4,10 +4,11 @@
 This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
 
 ## Features
-- Azure Virtual Desktop Host Pool
+- Azure Virtual Desktop Host Pool includes Diagnostic log settings
 - Azure Virtual Desktop Application Group
-- Azure Virtual Desktop Workspace
+- Azure Virtual Desktop Workspace includes Diagnostic log settings
 - Azure Virtual Desktop Scaling
+- Azure Virtual Desktop Insights with Log Analytics workspace
 
 <!-- markdownlint-disable MD033 -->
 ## Requirements
@@ -15,8 +16,6 @@ This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
 The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.6.6, < 2.0.0)
-
-- <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) (>= 2.47.0, < 3.0.0)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.71.0, < 4.0.0)
 
@@ -28,15 +27,13 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
-- [azurerm_role_assignment.new](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
+- [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
 - [azurerm_virtual_desktop_host_pool_registration_info.registrationinfo](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_desktop_host_pool_registration_info) (resource)
 - [azurerm_virtual_desktop_workspace_application_group_association.workappgrassoc](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_desktop_workspace_application_group_association) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.example](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
-- [azuread_service_principal.spn](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/service_principal) (data source)
 - [azurerm_client_config.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
-- [azurerm_subscription.primary](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subscription) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/data-sources/module_source) (data source)
 
 <!-- markdownlint-disable MD013 -->
@@ -53,6 +50,24 @@ Type: `string`
 ### <a name="input_log_analytics_workspace_name"></a> [log\_analytics\_workspace\_name](#input\_log\_analytics\_workspace\_name)
 
 Description: The name of the Log Analytics Workspace to use for diagnostics.
+
+Type: `string`
+
+### <a name="input_monitor_data_collection_rule_location"></a> [monitor\_data\_collection\_rule\_location](#input\_monitor\_data\_collection\_rule\_location)
+
+Description: (Optional) The Azure Region where the Data Collection Rule should exist. Changing this forces a new Data Collection Rule to be created.
+
+Type: `string`
+
+### <a name="input_monitor_data_collection_rule_name"></a> [monitor\_data\_collection\_rule\_name](#input\_monitor\_data\_collection\_rule\_name)
+
+Description: (Optional) The name which should be used for this Data Collection Rule. Changing this forces a new Data Collection Rule to be created.
+
+Type: `string`
+
+### <a name="input_monitor_data_collection_rule_resource_group_name"></a> [monitor\_data\_collection\_rule\_resource\_group\_name](#input\_monitor\_data\_collection\_rule\_resource\_group\_name)
+
+Description: The name of the Resource Group where the Data Collection Rule should exist. Changing this forces a new Data Collection Rule to be created.
 
 Type: `string`
 
@@ -149,6 +164,14 @@ If it is set to false, then no telemetry will be collected.
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_log_analytics_workspace_tags"></a> [log\_analytics\_workspace\_tags](#input\_log\_analytics\_workspace\_tags)
+
+Description: (Optional) A mapping of tags to assign to the resource.
+
+Type: `map(string)`
+
+Default: `null`
 
 ### <a name="input_managed_identities"></a> [managed\_identities](#input\_managed\_identities)
 
@@ -672,6 +695,10 @@ The following outputs are exported:
 
 Description: The ID of the application group.
 
+### <a name="output_dcr_resource_id"></a> [dcr\_resource\_id](#output\_dcr\_resource\_id)
+
+Description: The ID of the Monitor Data Collection Rule.
+
 ### <a name="output_hostpool_id"></a> [hostpool\_id](#output\_hostpool\_id)
 
 Description: The ID of the host pool.
@@ -700,6 +727,10 @@ Description: This output is the full output for the resource to allow flexibilit
 
 Description: The ID of the scaling plan.
 
+### <a name="output_virtual_desktop_host_pool_name"></a> [virtual\_desktop\_host\_pool\_name](#output\_virtual\_desktop\_host\_pool\_name)
+
+Description: The name of the host pool.
+
 ### <a name="output_workspace_id"></a> [workspace\_id](#output\_workspace\_id)
 
 Description: The ID of the workspace.
@@ -707,6 +738,12 @@ Description: The ID of the workspace.
 ## Modules
 
 The following Modules are called:
+
+### <a name="module_avm_ptn_avd_lza_insights"></a> [avm\_ptn\_avd\_lza\_insights](#module\_avm\_ptn\_avd\_lza\_insights)
+
+Source: Azure/avm-ptn-avd-lza-insights/azurerm
+
+Version: 0.1.3
 
 ### <a name="module_avm_res_desktopvirtualization_applicationgroup"></a> [avm\_res\_desktopvirtualization\_applicationgroup](#module\_avm\_res\_desktopvirtualization\_applicationgroup)
 
@@ -731,12 +768,6 @@ Version: 0.1.4
 Source: Azure/avm-res-desktopvirtualization-workspace/azurerm
 
 Version: 0.1.5
-
-### <a name="module_avm_res_operationalinsights_workspace"></a> [avm\_res\_operationalinsights\_workspace](#module\_avm\_res\_operationalinsights\_workspace)
-
-Source: Azure/avm-res-operationalinsights-workspace/azurerm
-
-Version: 0.3.2
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

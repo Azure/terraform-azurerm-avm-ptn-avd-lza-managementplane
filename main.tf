@@ -1,14 +1,3 @@
-# Create Azure Log Analytics workspace for Azure Virtual Desktop
-module "avm_res_operationalinsights_workspace" {
-  source              = "Azure/avm-res-operationalinsights-workspace/azurerm"
-  version             = "0.3.2"
-  enable_telemetry    = var.enable_telemetry
-  resource_group_name = var.resource_group_name
-  location            = var.log_analytics_workspace_location
-  name                = var.log_analytics_workspace_name
-  tags                = local.tags
-}
-
 # Create Azure Virtual Desktop host pool
 module "avm_res_desktopvirtualization_hostpool" {
   source                                             = "Azure/avm-res-desktopvirtualization-hostpool/azurerm"
@@ -24,12 +13,6 @@ module "avm_res_desktopvirtualization_hostpool" {
   virtual_desktop_host_pool_maximum_sessions_allowed = var.virtual_desktop_host_pool_maximum_sessions_allowed
   virtual_desktop_host_pool_start_vm_on_connect      = var.virtual_desktop_host_pool_start_vm_on_connect
   virtual_desktop_host_pool_friendly_name            = var.virtual_desktop_host_pool_friendly_name
-  diagnostic_settings = {
-    to_law = {
-      name                  = "to-law"
-      workspace_resource_id = module.avm_res_operationalinsights_workspace.resource.id
-    }
-  }
   virtual_desktop_host_pool_scheduled_agent_updates = {
     enabled = "true"
     schedule = tolist([{
@@ -78,12 +61,6 @@ module "avm_res_desktopvirtualization_workspace" {
   virtual_desktop_workspace_location            = var.virtual_desktop_workspace_location
   virtual_desktop_workspace_name                = var.virtual_desktop_workspace_name
   tags                                          = local.tags
-  diagnostic_settings = {
-    to_law = {
-      name                  = "to-law"
-      workspace_resource_id = module.avm_res_operationalinsights_workspace.resource.id
-    }
-  }
 }
 
 resource "azurerm_virtual_desktop_workspace_application_group_association" "workappgrassoc" {
@@ -91,21 +68,23 @@ resource "azurerm_virtual_desktop_workspace_application_group_association" "work
   workspace_id         = module.avm_res_desktopvirtualization_workspace.resource.id
 }
 
-# Get the subscription
-data "azurerm_subscription" "primary" {}
-
+/*
 # Get the service principal for Azure Vitual Desktop
 data "azuread_service_principal" "spn" {
   client_id = "9cdead84-a844-4324-93f2-b2e6bb768d07"
 }
+*/
 
 resource "random_uuid" "example" {}
 
+# Uncomment to assign the role to the service principal if it is not already assigned
+/*
 resource "azurerm_role_assignment" "new" {
   principal_id         = data.azuread_service_principal.spn.object_id
   scope                = data.azurerm_subscription.primary.id
   role_definition_name = "Desktop Virtualization Power On Off Contributor"
 }
+*/
 
 # Create Azure Virtual Desktop scaling plan
 module "avm_res_desktopvirtualization_scaling_plan" {

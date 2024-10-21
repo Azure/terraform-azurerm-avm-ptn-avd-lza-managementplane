@@ -1,7 +1,17 @@
 <!-- BEGIN_TF_DOCS -->
 # Default example
 
-This deploys the module in its simplest form.
+This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
+
+## Features
+- Azure Virtual Desktop Host Pool includes Diagnostic log settings
+- Azure Virtual Desktop Desktop Application Group
+- Azure Virtual Desktop Workspace includes Diagnostic log settings
+- Azure Virtual Desktop Scaling
+- Azure Virtual Desktop Insights with Log Analytics workspace
+- An AVD session host joined to Entra ID
+- Azure Virtual Dekstop Spoke network resources: vnet, subnet
+- Azure Key Vault
 
 ```hcl
 terraform {
@@ -11,12 +21,22 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 3.7.0, < 4.0.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.6.0, <4.0.0"
+    }
   }
 }
 
 provider "azurerm" {
-  features {}
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
 }
+
+data "azurerm_client_config" "current" {}
 
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
@@ -27,9 +47,15 @@ module "naming" {
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
   location = "eastus"
-  name     = module.naming.resource_group.name_unique
+  name     = "RG-AVDdemo"
+  tags     = var.tags
 }
 
+resource "azurerm_user_assigned_identity" "this" {
+  location            = azurerm_resource_group.this.location
+  name                = "uai-avd-dcr"
+  resource_group_name = azurerm_resource_group.this.name
+}
 
 module "avd" {
   source = "../../"
@@ -51,8 +77,188 @@ module "avd" {
   virtual_desktop_application_group_name             = var.virtual_desktop_application_group_name
   virtual_desktop_application_group_location         = var.virtual_desktop_application_group_location
   virtual_desktop_host_pool_friendly_name            = var.virtual_desktop_host_pool_friendly_name
-  log_analytics_workspace_name                       = module.naming.log_analytics_workspace.name_unique
-  log_analytics_workspace_location                   = var.log_analytics_workspace_location
+  monitor_data_collection_rule_name                  = "microsoft-avdi-eastus"
+  monitor_data_collection_rule_location              = var.monitor_data_collection_rule_location
+  monitor_data_collection_rule_resource_group_name   = var.monitor_data_collection_rule_resource_group_name
+  monitor_data_collection_rule_data_flow = [
+    {
+      destinations = [var.log_analytics_workspace_name]
+      streams      = ["Microsoft-Perf", "Microsoft-Event"]
+    }
+  ]
+  log_analytics_workspace_location = var.log_analytics_workspace_location
+  log_analytics_workspace_name     = var.log_analytics_workspace_name
+  log_analytics_workspace_tags     = var.tags
+}
+
+# Deploy an vnet and subnet for AVD session hosts
+resource "azurerm_virtual_network" "this_vnet" {
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.virtual_network.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+}
+
+resource "azurerm_subnet" "this_subnet_1" {
+  address_prefixes     = ["10.0.1.0/24"]
+  name                 = "${module.naming.subnet.name_unique}-1"
+  resource_group_name  = azurerm_resource_group.this.name
+  virtual_network_name = azurerm_virtual_network.this_vnet.name
+}
+
+# Deploy a single AVD session host using marketplace image
+resource "azurerm_network_interface" "this" {
+  count = var.vm_count
+
+  location                       = azurerm_resource_group.this.location
+  name                           = "${var.avd_vm_name}-${count.index}-nic"
+  resource_group_name            = azurerm_resource_group.this.name
+  accelerated_networking_enabled = true
+
+  ip_configuration {
+    name                          = "internal"
+    private_ip_address_allocation = "Dynamic"
+    subnet_id                     = azurerm_subnet.this_subnet_1.id
+  }
+}
+
+# Create Key Vault for storing secrets
+resource "azurerm_key_vault" "kv" {
+  location                    = azurerm_resource_group.this.location
+  name                        = module.naming.key_vault.name_unique
+  resource_group_name         = azurerm_resource_group.this.name
+  sku_name                    = "standard"
+  tenant_id                   = data.azurerm_client_config.current.tenant_id
+  enable_rbac_authorization   = true
+  enabled_for_deployment      = true
+  enabled_for_disk_encryption = true
+  purge_protection_enabled    = true
+  soft_delete_retention_days  = 7
+  tags                        = var.tags
+}
+
+# Generate VM local password
+resource "random_password" "vmpass" {
+  length  = 20
+  special = true
+}
+
+# Create Key Vault Secret
+resource "azurerm_key_vault_secret" "localpassword" {
+  key_vault_id = azurerm_key_vault.kv.id
+  name         = "vmlocalpassword"
+  value        = random_password.vmpass.result
+  content_type = "Password"
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
+}
+
+resource "azurerm_role_assignment" "keystor" {
+  principal_id         = data.azurerm_client_config.current.object_id
+  scope                = azurerm_key_vault.kv.id
+  role_definition_name = "Key Vault Administrator"
+}
+
+resource "azurerm_windows_virtual_machine" "this" {
+  count = var.vm_count
+
+  admin_password             = random_password.vmpass.result
+  admin_username             = azurerm_key_vault_secret.localpassword.name
+  location                   = azurerm_resource_group.this.location
+  name                       = "${var.avd_vm_name}-${count.index}"
+  network_interface_ids      = [azurerm_network_interface.this[count.index].id]
+  resource_group_name        = azurerm_resource_group.this.name
+  size                       = "Standard_D4s_v4"
+  computer_name              = "${var.avd_vm_name}-${count.index}"
+  encryption_at_host_enabled = true
+  secure_boot_enabled        = true
+  vtpm_enabled               = true
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Premium_LRS"
+    name                 = "${var.avd_vm_name}-${count.index}-osdisk"
+  }
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.this.id]
+  }
+  source_image_reference {
+    offer     = "windows-11"
+    publisher = "microsoftwindowsdesktop"
+    sku       = "win11-23h2-avd"
+    version   = "latest"
+  }
+}
+
+# Virtual Machine Extension for AMA agent
+resource "azurerm_virtual_machine_extension" "ama" {
+  count = var.vm_count
+
+  name                      = "AzureMonitorWindowsAgent-${count.index}"
+  publisher                 = "Microsoft.Azure.Monitor"
+  type                      = "AzureMonitorWindowsAgent"
+  type_handler_version      = "1.22"
+  virtual_machine_id        = azurerm_windows_virtual_machine.this[count.index].id
+  automatic_upgrade_enabled = true
+
+  depends_on = [module.avd]
+}
+
+# Virtual Machine Extension for AAD Join
+resource "azurerm_virtual_machine_extension" "aadjoin" {
+  count = var.vm_count
+
+  name                       = "${var.avd_vm_name}-${count.index}-aadJoin"
+  publisher                  = "Microsoft.Azure.ActiveDirectory"
+  type                       = "AADLoginForWindows"
+  type_handler_version       = "1.0"
+  virtual_machine_id         = azurerm_windows_virtual_machine.this[count.index].id
+  auto_upgrade_minor_version = true
+}
+
+# Virtual Machine Extension for AVD Agent
+resource "azurerm_virtual_machine_extension" "vmext_dsc" {
+  count = var.vm_count
+
+  name                       = "${var.avd_vm_name}-${count.index}-avd_dsc"
+  publisher                  = "Microsoft.Powershell"
+  type                       = "DSC"
+  type_handler_version       = "2.73"
+  virtual_machine_id         = azurerm_windows_virtual_machine.this[count.index].id
+  auto_upgrade_minor_version = true
+  protected_settings         = <<PROTECTED_SETTINGS
+  {
+    "properties": {
+      "registrationInfoToken": "${module.avd.registrationinfo_token}"
+    }
+  }
+PROTECTED_SETTINGS
+  settings                   = <<-SETTINGS
+    {
+      "modulesUrl": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02714.342.zip",
+      "configurationFunction": "Configuration.ps1\\AddSessionHost",
+      "properties": {
+        "HostPoolName":"${module.avd.virtual_desktop_host_pool_name}"
+    }
+ } 
+  SETTINGS
+
+  depends_on = [
+    azurerm_virtual_machine_extension.aadjoin,
+    module.avd
+  ]
+}
+
+# Creates an association between an Azure Monitor data collection rule and a virtual machine.
+resource "azurerm_monitor_data_collection_rule_association" "example" {
+  count = var.vm_count
+
+  target_resource_id      = azurerm_windows_virtual_machine.this[count.index].id
+  data_collection_rule_id = module.avd.dcr_resource_id.id
+  name                    = "${var.avd_vm_name}-association-${count.index}"
 }
 ```
 
@@ -65,50 +271,44 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.7.0, < 4.0.0)
 
+- <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.6.0, <4.0.0)
+
 ## Resources
 
 The following resources are used by this module:
 
+- [azurerm_key_vault.kv](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault) (resource)
+- [azurerm_key_vault_secret.localpassword](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) (resource)
+- [azurerm_monitor_data_collection_rule_association.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_data_collection_rule_association) (resource)
+- [azurerm_network_interface.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
+- [azurerm_role_assignment.keystor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
+- [azurerm_subnet.this_subnet_1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) (resource)
+- [azurerm_user_assigned_identity.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) (resource)
+- [azurerm_virtual_machine_extension.aadjoin](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension) (resource)
+- [azurerm_virtual_machine_extension.ama](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension) (resource)
+- [azurerm_virtual_machine_extension.vmext_dsc](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension) (resource)
+- [azurerm_virtual_network.this_vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) (resource)
+- [azurerm_windows_virtual_machine.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/windows_virtual_machine) (resource)
+- [random_password.vmpass](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) (resource)
+- [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
 
-The following input variables are required:
-
-### <a name="input_log_analytics_workspace_location"></a> [log\_analytics\_workspace\_location](#input\_log\_analytics\_workspace\_location)
-
-Description: Location for the Log Analytics workspace
-
-Type: `string`
-
-### <a name="input_virtual_desktop_application_group_location"></a> [virtual\_desktop\_application\_group\_location](#input\_virtual\_desktop\_application\_group\_location)
-
-Description: Location for the virtual desktop application group
-
-Type: `string`
-
-### <a name="input_virtual_desktop_host_pool_location"></a> [virtual\_desktop\_host\_pool\_location](#input\_virtual\_desktop\_host\_pool\_location)
-
-Description: Location for the host pool
-
-Type: `string`
-
-### <a name="input_virtual_desktop_scaling_plan_location"></a> [virtual\_desktop\_scaling\_plan\_location](#input\_virtual\_desktop\_scaling\_plan\_location)
-
-Description: Location for the scaling plan
-
-Type: `string`
-
-### <a name="input_virtual_desktop_workspace_location"></a> [virtual\_desktop\_workspace\_location](#input\_virtual\_desktop\_workspace\_location)
-
-Description: Location for the virtual desktop workspace
-
-Type: `string`
+No required inputs.
 
 ## Optional Inputs
 
 The following input variables are optional (have default values):
+
+### <a name="input_avd_vm_name"></a> [avd\_vm\_name](#input\_avd\_vm\_name)
+
+Description: Base name for the Azure Virtual Desktop VMs
+
+Type: `string`
+
+Default: `"vm-avd"`
 
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
@@ -119,6 +319,60 @@ If it is set to false, then no telemetry will be collected.
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_log_analytics_workspace_location"></a> [log\_analytics\_workspace\_location](#input\_log\_analytics\_workspace\_location)
+
+Description: Location for the Log Analytics workspace
+
+Type: `string`
+
+Default: `"eastus2"`
+
+### <a name="input_log_analytics_workspace_name"></a> [log\_analytics\_workspace\_name](#input\_log\_analytics\_workspace\_name)
+
+Description: The name of the Log Analytics workspace for Azure Virtual Desktop.
+
+Type: `string`
+
+Default: `"avd-log-analytics-workspace"`
+
+### <a name="input_monitor_data_collection_rule_location"></a> [monitor\_data\_collection\_rule\_location](#input\_monitor\_data\_collection\_rule\_location)
+
+Description: The location for the monitor data collection rule.
+
+Type: `string`
+
+Default: `"eastus"`
+
+### <a name="input_monitor_data_collection_rule_resource_group_name"></a> [monitor\_data\_collection\_rule\_resource\_group\_name](#input\_monitor\_data\_collection\_rule\_resource\_group\_name)
+
+Description: The resource group for the monitor data collection rule.
+
+Type: `string`
+
+Default: `"RG-AVDdemo"`
+
+### <a name="input_tags"></a> [tags](#input\_tags)
+
+Description: A map of tags to add to all resources
+
+Type: `map(string)`
+
+Default:
+
+```json
+{
+  "Owner.Email": "name@microsoft.com"
+}
+```
+
+### <a name="input_virtual_desktop_application_group_location"></a> [virtual\_desktop\_application\_group\_location](#input\_virtual\_desktop\_application\_group\_location)
+
+Description: Location for the virtual desktop application group
+
+Type: `string`
+
+Default: `"eastus2"`
 
 ### <a name="input_virtual_desktop_application_group_name"></a> [virtual\_desktop\_application\_group\_name](#input\_virtual\_desktop\_application\_group\_name)
 
@@ -152,6 +406,14 @@ Type: `string`
 
 Default: `"BreadthFirst"`
 
+### <a name="input_virtual_desktop_host_pool_location"></a> [virtual\_desktop\_host\_pool\_location](#input\_virtual\_desktop\_host\_pool\_location)
+
+Description: Location for the host pool
+
+Type: `string`
+
+Default: `"eastus2"`
+
 ### <a name="input_virtual_desktop_host_pool_maximum_sessions_allowed"></a> [virtual\_desktop\_host\_pool\_maximum\_sessions\_allowed](#input\_virtual\_desktop\_host\_pool\_maximum\_sessions\_allowed)
 
 Description: (Optional) A valid integer value from 0 to 999999 for the maximum number of users that have concurrent sessions on a session host. Should only be set if the `type` of your Virtual Desktop Host Pool is `Pooled`.
@@ -184,6 +446,14 @@ Type: `string`
 
 Default: `"Pooled"`
 
+### <a name="input_virtual_desktop_scaling_plan_location"></a> [virtual\_desktop\_scaling\_plan\_location](#input\_virtual\_desktop\_scaling\_plan\_location)
+
+Description: Location for the scaling plan
+
+Type: `string`
+
+Default: `"eastus2"`
+
 ### <a name="input_virtual_desktop_scaling_plan_name"></a> [virtual\_desktop\_scaling\_plan\_name](#input\_virtual\_desktop\_scaling\_plan\_name)
 
 Description: The scaling plan for the AVD Host Pool.
@@ -200,6 +470,14 @@ Type: `string`
 
 Default: `"GMT Standard Time"`
 
+### <a name="input_virtual_desktop_workspace_location"></a> [virtual\_desktop\_workspace\_location](#input\_virtual\_desktop\_workspace\_location)
+
+Description: Location for the virtual desktop workspace
+
+Type: `string`
+
+Default: `"eastus2"`
+
 ### <a name="input_virtual_desktop_workspace_name"></a> [virtual\_desktop\_workspace\_name](#input\_virtual\_desktop\_workspace\_name)
 
 Description: The name of the AVD Workspace
@@ -207,6 +485,14 @@ Description: The name of the AVD Workspace
 Type: `string`
 
 Default: `"vdws-avd-001"`
+
+### <a name="input_vm_count"></a> [vm\_count](#input\_vm\_count)
+
+Description: Number of virtual machines to create
+
+Type: `number`
+
+Default: `1`
 
 ## Outputs
 

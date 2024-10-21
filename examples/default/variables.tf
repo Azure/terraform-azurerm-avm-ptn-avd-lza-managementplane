@@ -1,26 +1,7 @@
-variable "log_analytics_workspace_location" {
+variable "avd_vm_name" {
   type        = string
-  description = "Location for the Log Analytics workspace"
-}
-
-variable "virtual_desktop_application_group_location" {
-  type        = string
-  description = "Location for the virtual desktop application group"
-}
-
-variable "virtual_desktop_host_pool_location" {
-  type        = string
-  description = "Location for the host pool"
-}
-
-variable "virtual_desktop_scaling_plan_location" {
-  type        = string
-  description = "Location for the scaling plan"
-}
-
-variable "virtual_desktop_workspace_location" {
-  type        = string
-  description = "Location for the virtual desktop workspace"
+  default     = "vm-avd"
+  description = "Base name for the Azure Virtual Desktop VMs"
 }
 
 variable "enable_telemetry" {
@@ -31,6 +12,42 @@ This variable controls whether or not telemetry is enabled for the module.
 For more information see <https://aka.ms/avm/telemetryinfo>.
 If it is set to false, then no telemetry will be collected.
 DESCRIPTION
+}
+
+variable "log_analytics_workspace_location" {
+  type        = string
+  default     = "eastus2"
+  description = "Location for the Log Analytics workspace"
+}
+
+variable "log_analytics_workspace_name" {
+  type        = string
+  default     = "avd-log-analytics-workspace"
+  description = "The name of the Log Analytics workspace for Azure Virtual Desktop."
+}
+
+variable "monitor_data_collection_rule_location" {
+  type        = string
+  default     = "eastus"
+  description = "The location for the monitor data collection rule."
+}
+
+variable "monitor_data_collection_rule_resource_group_name" {
+  type        = string
+  default     = "RG-AVDdemo"
+  description = "The resource group for the monitor data collection rule."
+}
+
+variable "tags" {
+  type        = map(string)
+  default     = { "Owner.Email" : "name@microsoft.com" }
+  description = "A map of tags to add to all resources"
+}
+
+variable "virtual_desktop_application_group_location" {
+  type        = string
+  default     = "eastus2"
+  description = "Location for the virtual desktop application group"
 }
 
 variable "virtual_desktop_application_group_name" {
@@ -62,6 +79,12 @@ variable "virtual_desktop_host_pool_load_balancer_type" {
   description = "`BreadthFirst` load balancing distributes new user sessions across all available session hosts in the host pool. Possible values are `BreadthFirst`, `DepthFirst` and `Persistent`. `DepthFirst` load balancing distributes new user sessions to an available session host with the highest number of connections but has not reached its maximum session limit threshold. `Persistent` should be used if the host pool type is `Personal`"
 }
 
+variable "virtual_desktop_host_pool_location" {
+  type        = string
+  default     = "eastus2"
+  description = "Location for the host pool"
+}
+
 variable "virtual_desktop_host_pool_maximum_sessions_allowed" {
   type        = number
   default     = 16
@@ -86,6 +109,12 @@ variable "virtual_desktop_host_pool_type" {
   description = "The type of the AVD Host Pool. Valid values are 'Pooled' and 'Personal'."
 }
 
+variable "virtual_desktop_scaling_plan_location" {
+  type        = string
+  default     = "eastus2"
+  description = "Location for the scaling plan"
+}
+
 variable "virtual_desktop_scaling_plan_name" {
   type        = string
   default     = "scp-avd-01"
@@ -98,8 +127,20 @@ variable "virtual_desktop_scaling_plan_time_zone" {
   description = "Specifies the Time Zone which should be used by the Scaling Plan for time based events."
 }
 
+variable "virtual_desktop_workspace_location" {
+  type        = string
+  default     = "eastus2"
+  description = "Location for the virtual desktop workspace"
+}
+
 variable "virtual_desktop_workspace_name" {
   type        = string
   default     = "vdws-avd-001"
   description = "The name of the AVD Workspace"
+}
+
+variable "vm_count" {
+  type        = number
+  default     = 1
+  description = "Number of virtual machines to create"
 }
