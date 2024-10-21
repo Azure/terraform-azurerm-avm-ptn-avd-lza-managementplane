@@ -5,7 +5,7 @@ output "application_group_id" {
 
 output "dcr_resource_id" {
   description = "The ID of the Monitor Data Collection Rule."
-  value       = module.avm-ptn-avd-lza-insights.resource_id
+  value       = module.avm_ptn_avd_lza_insights.resource_id
 }
 
 output "hostpool_id" {
