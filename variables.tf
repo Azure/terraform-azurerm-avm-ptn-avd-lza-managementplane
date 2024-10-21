@@ -1,7 +1,6 @@
-variable "location" {
+variable "log_analytics_workspace_location" {
   type        = string
-  description = "(Required) The location/region where the Azure Virtual Desktop resources are located. Changing this forces a new resource to be created."
-  nullable    = false
+  description = "The location of the Log Analytics Workspace to use for diagnostics."
 }
 
 variable "log_analytics_workspace_name" {
@@ -9,9 +8,37 @@ variable "log_analytics_workspace_name" {
   description = "The name of the Log Analytics Workspace to use for diagnostics."
 }
 
+variable "monitor_data_collection_rule_location" {
+  type        = string
+  description = "(Optional) The Azure Region where the Data Collection Rule should exist. Changing this forces a new Data Collection Rule to be created."
+}
+
+variable "monitor_data_collection_rule_name" {
+  type        = string
+  description = "(Optional) The name which should be used for this Data Collection Rule. Changing this forces a new Data Collection Rule to be created."
+  nullable    = false
+
+  validation {
+    condition     = can(regex("^microsoft-avdi-", var.monitor_data_collection_rule_name))
+    error_message = "The name must start with 'microsoft-avdi-'."
+  }
+}
+
+variable "monitor_data_collection_rule_resource_group_name" {
+  type        = string
+  description = "The name of the Resource Group where the Data Collection Rule should exist. Changing this forces a new Data Collection Rule to be created."
+  nullable    = false
+}
+
 variable "resource_group_name" {
   type        = string
   description = "The name of the resource group in which the AVD Private Endpoint should be created."
+}
+
+variable "virtual_desktop_application_group_location" {
+  type        = string
+  description = "The location/region where the Virtual Desktop Application Group resources are located. Changing this forces a new resource to be created."
+  nullable    = false
 }
 
 variable "virtual_desktop_application_group_name" {
@@ -37,6 +64,11 @@ variable "virtual_desktop_host_pool_load_balancer_type" {
   nullable    = false
 }
 
+variable "virtual_desktop_host_pool_location" {
+  type        = string
+  description = "Location for the host pool"
+}
+
 variable "virtual_desktop_host_pool_name" {
   type        = string
   description = "(Required) The name of the Virtual Desktop Host Pool. Changing this forces a new resource to be created."
@@ -54,6 +86,11 @@ variable "virtual_desktop_host_pool_type" {
   nullable    = false
 }
 
+variable "virtual_desktop_scaling_plan_location" {
+  type        = string
+  description = "Location for the scaling plan"
+}
+
 variable "virtual_desktop_scaling_plan_name" {
   type        = string
   description = "(Required) The name which should be used for this Virtual Desktop Scaling Plan . Changing this forces a new Virtual Desktop Scaling Plan to be created."
@@ -64,6 +101,11 @@ variable "virtual_desktop_scaling_plan_time_zone" {
   type        = string
   description = "(Required) Specifies the Time Zone which should be used by the Scaling Plan for time based events, [the possible values are defined here](https://jackstromberg.com/2017/01/list-of-time-zones-consumed-by-azure/)."
   nullable    = false
+}
+
+variable "virtual_desktop_workspace_location" {
+  type        = string
+  description = "Location for the virtual desktop workspace"
 }
 
 variable "virtual_desktop_workspace_name" {
@@ -82,6 +124,13 @@ For more information see <https://aka.ms/avm/telemetryinfo>.
 
 If it is set to false, then no telemetry will be collected.
 DESCRIPTION
+}
+
+# tflint-ignore: terraform_unused_declarations
+variable "log_analytics_workspace_tags" {
+  type        = map(string)
+  default     = null
+  description = "(Optional) A mapping of tags to assign to the resource."
 }
 
 # tflint-ignore: terraform_unused_declarations
@@ -278,12 +327,6 @@ DESCRIPTION
     )
     error_message = "At least one of `days_of_week`, `off_peak_start_time`, `off_peak_load_balancing_algorithm`, `ramp_down_capacity_threshold_percent`, `ramp_down_force_logoff_users`, `ramp_down_load_balancing_algorithm`, `ramp_down_minimum_hosts_percent`, `ramp_down_notification_message`, `ramp_down_start_time`, `ramp_down_stop_hosts_when`, `ramp_down_wait_time_minutes`, `ramp_up_capacity_threshold_percent`, `ramp_up_load_balancing_algorithm`, `ramp_up_minimum_hosts_percent`, or `ramp_up_start_time`, must be set."
   }
-}
-
-variable "subresource_names" {
-  type        = list(string)
-  default     = []
-  description = "The names of the subresources to assosciatied with the private endpoint. The target subresource must be one of: 'feed', or 'global'."
 }
 
 # tflint-ignore: terraform_unused_declarations

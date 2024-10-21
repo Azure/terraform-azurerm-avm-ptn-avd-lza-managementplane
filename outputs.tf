@@ -3,6 +3,11 @@ output "application_group_id" {
   value       = module.avm_res_desktopvirtualization_applicationgroup.resource.id
 }
 
+output "dcr_resource_id" {
+  description = "The ID of the Monitor Data Collection Rule."
+  value       = module.avm_ptn_avd_lza_insights.resource_id
+}
+
 output "hostpool_id" {
   description = "The ID of the host pool."
   value       = module.avm_res_desktopvirtualization_hostpool.resource.id
@@ -10,18 +15,18 @@ output "hostpool_id" {
 
 output "log_analytics_workspace_id" {
   description = "The ID of the Log Analytics workspace."
-  value       = module.avm_res_operationalinsights_workspace.resource.id
+  value       = azurerm_log_analytics_workspace.this.id
 }
 
-output "private_endpoints" {
+output "private_endpoints_hostpool" {
   description = "A map of private endpoints. The map key is the supplied input to var.private_endpoints. The map value is the entire azurerm_private_endpoint resource."
-  value       = azurerm_private_endpoint.this
+  value       = module.avm_res_desktopvirtualization_hostpool.private_endpoints
 }
 
 output "registrationinfo_token" {
   description = "The token for the host pool registration."
   sensitive   = true
-  value       = azurerm_virtual_desktop_host_pool_registration_info.registrationinfo.token
+  value       = module.avm_res_desktopvirtualization_hostpool.registrationinfo_token
 }
 
 output "resource" {
@@ -37,6 +42,11 @@ output "resource_id" {
 output "scaling_plan_id" {
   description = "The ID of the scaling plan."
   value       = module.avm_res_desktopvirtualization_scaling_plan.resource.id
+}
+
+output "virtual_desktop_host_pool_name" {
+  description = "The name of the host pool."
+  value       = module.avm_res_desktopvirtualization_hostpool.resource.name
 }
 
 output "workspace_id" {
