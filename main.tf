@@ -2,9 +2,11 @@
 module "avm_res_desktopvirtualization_hostpool" {
   source                                             = "Azure/avm-res-desktopvirtualization-hostpool/azurerm"
   version                                            = "0.2.1"
+  version                                            = "0.2.1"
   enable_telemetry                                   = var.enable_telemetry
   resource_group_name                                = var.resource_group_name
   virtual_desktop_host_pool_type                     = var.virtual_desktop_host_pool_type
+  virtual_desktop_host_pool_location                 = var.virtual_desktop_host_pool_location
   virtual_desktop_host_pool_location                 = var.virtual_desktop_host_pool_location
   virtual_desktop_host_pool_load_balancer_type       = var.virtual_desktop_host_pool_load_balancer_type
   virtual_desktop_host_pool_resource_group_name      = var.resource_group_name
@@ -45,11 +47,13 @@ resource "azurerm_virtual_desktop_host_pool_registration_info" "registrationinfo
 module "avm_res_desktopvirtualization_applicationgroup" {
   source                                                         = "Azure/avm-res-desktopvirtualization-applicationgroup/azurerm"
   version                                                        = "0.1.5"
+  version                                                        = "0.1.5"
   enable_telemetry                                               = var.enable_telemetry
   virtual_desktop_application_group_name                         = var.virtual_desktop_application_group_name
   virtual_desktop_application_group_type                         = var.virtual_desktop_application_group_type
   virtual_desktop_application_group_host_pool_id                 = module.avm_res_desktopvirtualization_hostpool.resource.id
   virtual_desktop_application_group_resource_group_name          = var.resource_group_name
+  virtual_desktop_application_group_location                     = var.virtual_desktop_application_group_location
   virtual_desktop_application_group_location                     = var.virtual_desktop_application_group_location
   virtual_desktop_application_group_default_desktop_display_name = var.virtual_desktop_application_group_default_desktop_display_name
   virtual_desktop_application_group_description                  = var.virtual_desktop_application_group_description
@@ -82,14 +86,18 @@ resource "azurerm_virtual_desktop_workspace_application_group_association" "work
 }
 
 /*
+/*
 # Get the service principal for Azure Vitual Desktop
 data "azuread_service_principal" "spn" {
   client_id = "9cdead84-a844-4324-93f2-b2e6bb768d07"
 }
 */
+*/
 
 resource "random_uuid" "example" {}
 
+# Uncomment to assign the role to the service principal if it is not already assigned
+/*
 # Uncomment to assign the role to the service principal if it is not already assigned
 /*
 resource "azurerm_role_assignment" "new" {
@@ -98,13 +106,16 @@ resource "azurerm_role_assignment" "new" {
   role_definition_name = "Desktop Virtualization Power On Off Contributor"
 }
 */
+*/
 
 # Create Azure Virtual Desktop scaling plan
 module "avm_res_desktopvirtualization_scaling_plan" {
   source                                           = "Azure/avm-res-desktopvirtualization-scalingplan/azurerm"
   enable_telemetry                                 = var.enable_telemetry
   version                                          = "0.1.4"
+  version                                          = "0.1.4"
   virtual_desktop_scaling_plan_name                = var.virtual_desktop_scaling_plan_name
+  virtual_desktop_scaling_plan_location            = var.virtual_desktop_scaling_plan_location
   virtual_desktop_scaling_plan_location            = var.virtual_desktop_scaling_plan_location
   virtual_desktop_scaling_plan_resource_group_name = var.resource_group_name
   virtual_desktop_scaling_plan_time_zone           = var.virtual_desktop_scaling_plan_time_zone

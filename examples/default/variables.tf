@@ -4,6 +4,12 @@ variable "avd_vm_name" {
   description = "Base name for the Azure Virtual Desktop VMs"
 }
 
+variable "avd_vm_name" {
+  type        = string
+  default     = "vm-avd"
+  description = "Base name for the Azure Virtual Desktop VMs"
+}
+
 variable "enable_telemetry" {
   type        = bool
   default     = true
@@ -137,6 +143,12 @@ variable "virtual_desktop_workspace_name" {
   type        = string
   default     = "vdws-avd-001"
   description = "The name of the AVD Workspace"
+}
+
+variable "vm_count" {
+  type        = number
+  default     = 1
+  description = "Number of virtual machines to create"
 }
 
 variable "vm_count" {

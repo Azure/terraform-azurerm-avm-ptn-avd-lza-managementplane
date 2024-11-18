@@ -9,6 +9,10 @@ terraform {
       source  = "hashicorp/random"
       version = ">= 3.6.0, <4.0.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.6.0, <4.0.0"
+    }
   }
 }
 
@@ -18,7 +22,14 @@ provider "azurerm" {
       prevent_deletion_if_contains_resources = false
     }
   }
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
 }
+
+data "azurerm_client_config" "current" {}
 
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
@@ -33,6 +44,11 @@ resource "azurerm_resource_group" "this" {
   tags     = var.tags
 }
 
+resource "azurerm_user_assigned_identity" "this" {
+  location            = azurerm_resource_group.this.location
+  name                = "uai-avd-dcr"
+  resource_group_name = azurerm_resource_group.this.name
+}
 resource "azurerm_user_assigned_identity" "this" {
   location            = azurerm_resource_group.this.location
   name                = "uai-avd-dcr"
@@ -72,14 +88,17 @@ module "avd" {
   virtual_desktop_scaling_plan_time_zone             = var.virtual_desktop_scaling_plan_time_zone
   virtual_desktop_scaling_plan_name                  = var.virtual_desktop_scaling_plan_name
   virtual_desktop_scaling_plan_location              = var.virtual_desktop_scaling_plan_location
+  virtual_desktop_scaling_plan_location              = var.virtual_desktop_scaling_plan_location
   virtual_desktop_host_pool_type                     = var.virtual_desktop_host_pool_type
   virtual_desktop_host_pool_load_balancer_type       = var.virtual_desktop_host_pool_load_balancer_type
   virtual_desktop_host_pool_name                     = var.virtual_desktop_host_pool_name
+  virtual_desktop_host_pool_location                 = var.virtual_desktop_host_pool_location
   virtual_desktop_host_pool_location                 = var.virtual_desktop_host_pool_location
   virtual_desktop_host_pool_maximum_sessions_allowed = var.virtual_desktop_host_pool_maximum_sessions_allowed
   virtual_desktop_host_pool_start_vm_on_connect      = var.virtual_desktop_host_pool_start_vm_on_connect
   virtual_desktop_application_group_type             = var.virtual_desktop_application_group_type
   virtual_desktop_application_group_name             = var.virtual_desktop_application_group_name
+  virtual_desktop_application_group_location         = var.virtual_desktop_application_group_location
   virtual_desktop_application_group_location         = var.virtual_desktop_application_group_location
   virtual_desktop_host_pool_friendly_name            = var.virtual_desktop_host_pool_friendly_name
   monitor_data_collection_rule_name                  = "microsoft-avdi-eastus"

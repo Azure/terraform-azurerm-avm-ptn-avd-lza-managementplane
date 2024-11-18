@@ -12,6 +12,17 @@ This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
 - An AVD session host joined to Entra ID
 - Azure Virtual Dekstop Spoke network resources: vnet, subnet
 - Azure Key Vault
+This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
+
+## Features
+- Azure Virtual Desktop Host Pool includes Diagnostic log settings
+- Azure Virtual Desktop Desktop Application Group
+- Azure Virtual Desktop Workspace includes Diagnostic log settings
+- Azure Virtual Desktop Scaling
+- Azure Virtual Desktop Insights with Log Analytics workspace
+- An AVD session host joined to Entra ID
+- Azure Virtual Dekstop Spoke network resources: vnet, subnet
+- Azure Key Vault
 
 ```hcl
 terraform {
@@ -20,6 +31,10 @@ terraform {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 3.7.0, < 4.0.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.6.0, <4.0.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -34,7 +49,14 @@ provider "azurerm" {
       prevent_deletion_if_contains_resources = false
     }
   }
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
 }
+
+data "azurerm_client_config" "current" {}
 
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
@@ -49,6 +71,11 @@ resource "azurerm_resource_group" "this" {
   tags     = var.tags
 }
 
+resource "azurerm_user_assigned_identity" "this" {
+  location            = azurerm_resource_group.this.location
+  name                = "uai-avd-dcr"
+  resource_group_name = azurerm_resource_group.this.name
+}
 resource "azurerm_user_assigned_identity" "this" {
   location            = azurerm_resource_group.this.location
   name                = "uai-avd-dcr"
@@ -88,14 +115,17 @@ module "avd" {
   virtual_desktop_scaling_plan_time_zone             = var.virtual_desktop_scaling_plan_time_zone
   virtual_desktop_scaling_plan_name                  = var.virtual_desktop_scaling_plan_name
   virtual_desktop_scaling_plan_location              = var.virtual_desktop_scaling_plan_location
+  virtual_desktop_scaling_plan_location              = var.virtual_desktop_scaling_plan_location
   virtual_desktop_host_pool_type                     = var.virtual_desktop_host_pool_type
   virtual_desktop_host_pool_load_balancer_type       = var.virtual_desktop_host_pool_load_balancer_type
   virtual_desktop_host_pool_name                     = var.virtual_desktop_host_pool_name
+  virtual_desktop_host_pool_location                 = var.virtual_desktop_host_pool_location
   virtual_desktop_host_pool_location                 = var.virtual_desktop_host_pool_location
   virtual_desktop_host_pool_maximum_sessions_allowed = var.virtual_desktop_host_pool_maximum_sessions_allowed
   virtual_desktop_host_pool_start_vm_on_connect      = var.virtual_desktop_host_pool_start_vm_on_connect
   virtual_desktop_application_group_type             = var.virtual_desktop_application_group_type
   virtual_desktop_application_group_name             = var.virtual_desktop_application_group_name
+  virtual_desktop_application_group_location         = var.virtual_desktop_application_group_location
   virtual_desktop_application_group_location         = var.virtual_desktop_application_group_location
   virtual_desktop_host_pool_friendly_name            = var.virtual_desktop_host_pool_friendly_name
   monitor_data_collection_rule_name                  = "microsoft-avdi-eastus"
@@ -288,6 +318,8 @@ The following requirements are needed by this module:
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.6.0, <4.0.0)
 
+- <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.6.0, <4.0.0)
+
 ## Resources
 
 The following resources are used by this module:
@@ -312,6 +344,14 @@ No required inputs.
 ## Optional Inputs
 
 The following input variables are optional (have default values):
+
+### <a name="input_avd_vm_name"></a> [avd\_vm\_name](#input\_avd\_vm\_name)
+
+Description: Base name for the Azure Virtual Desktop VMs
+
+Type: `string`
+
+Default: `"vm-avd"`
 
 ### <a name="input_avd_vm_name"></a> [avd\_vm\_name](#input\_avd\_vm\_name)
 
@@ -496,6 +536,14 @@ Description: The name of the AVD Workspace
 Type: `string`
 
 Default: `"vdws-avd-001"`
+
+### <a name="input_vm_count"></a> [vm\_count](#input\_vm\_count)
+
+Description: Number of virtual machines to create
+
+Type: `number`
+
+Default: `1`
 
 ### <a name="input_vm_count"></a> [vm\_count](#input\_vm\_count)
 
