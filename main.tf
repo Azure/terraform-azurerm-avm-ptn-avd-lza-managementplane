@@ -20,6 +20,12 @@ module "avm_res_desktopvirtualization_hostpool" {
       hour_of_day = 0
     }])
   }
+  diagnostic_settings = {
+    to_law = {
+      name                  = "to-law"
+      workspace_resource_id = azurerm_log_analytics_workspace.this.id
+    }
+  }
 }
 
 # Registration information for the host pool.
@@ -54,13 +60,20 @@ module "avm_res_desktopvirtualization_applicationgroup" {
 # Create Azure Virtual Desktop workspace
 module "avm_res_desktopvirtualization_workspace" {
   source                                        = "Azure/avm-res-desktopvirtualization-workspace/azurerm"
-  version                                       = "0.1.5"
-  enable_telemetry                              = var.enable_telemetry
+  version                                       = "0.1.6"
+  virtual_desktop_workspace_location            = var.virtual_desktop_workspace_location
+  virtual_desktop_workspace_description         = var.virtual_desktop_workspace_description
   virtual_desktop_workspace_resource_group_name = var.resource_group_name
   resource_group_name                           = var.resource_group_name
-  virtual_desktop_workspace_location            = var.virtual_desktop_workspace_location
   virtual_desktop_workspace_name                = var.virtual_desktop_workspace_name
+  virtual_desktop_workspace_friendly_name       = var.virtual_desktop_workspace_friendly_name
   tags                                          = local.tags
+  diagnostic_settings = {
+    to_law = {
+      name                  = "to-law"
+      workspace_resource_id = azurerm_log_analytics_workspace.this.id
+    }
+  }
 }
 
 resource "azurerm_virtual_desktop_workspace_application_group_association" "workappgrassoc" {
@@ -105,49 +118,6 @@ module "avm_res_desktopvirtualization_scaling_plan" {
       }
     ]
   )
-  virtual_desktop_scaling_plan_schedule = toset(
-    [
-      {
-        name                                 = "Weekday"
-        days_of_week                         = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-        ramp_up_start_time                   = "09:00"
-        ramp_up_load_balancing_algorithm     = "BreadthFirst"
-        ramp_up_minimum_hosts_percent        = 50
-        ramp_up_capacity_threshold_percent   = 80
-        peak_start_time                      = "10:00"
-        peak_load_balancing_algorithm        = "BreadthFirst"
-        ramp_down_start_time                 = "17:00"
-        ramp_down_load_balancing_algorithm   = "BreadthFirst"
-        ramp_down_minimum_hosts_percent      = 50
-        ramp_down_force_logoff_users         = true
-        ramp_down_wait_time_minutes          = 15
-        ramp_down_notification_message       = "The session will end in 15 minutes."
-        ramp_down_capacity_threshold_percent = 50
-        ramp_down_stop_hosts_when            = "ZeroActiveSessions"
-        off_peak_start_time                  = "18:00"
-        off_peak_load_balancing_algorithm    = "BreadthFirst"
-      },
-      {
-        name                                 = "Weekend"
-        days_of_week                         = ["Saturday", "Sunday"]
-        ramp_up_start_time                   = "09:00"
-        ramp_up_load_balancing_algorithm     = "BreadthFirst"
-        ramp_up_minimum_hosts_percent        = 50
-        ramp_up_capacity_threshold_percent   = 80
-        peak_start_time                      = "10:00"
-        peak_load_balancing_algorithm        = "DepthFirst"
-        ramp_down_start_time                 = "17:00"
-        ramp_down_load_balancing_algorithm   = "BreadthFirst"
-        ramp_down_minimum_hosts_percent      = 50
-        ramp_down_force_logoff_users         = true
-        ramp_down_wait_time_minutes          = 15
-        ramp_down_notification_message       = "The session will end in 15 minutes."
-        ramp_down_capacity_threshold_percent = 50
-        ramp_down_stop_hosts_when            = "ZeroActiveSessions"
-        off_peak_start_time                  = "18:00"
-        off_peak_load_balancing_algorithm    = "BreadthFirst"
-      }
-    ]
-  )
+  virtual_desktop_scaling_plan_schedule = var.virtual_desktop_scaling_plan_schedule
 }
 

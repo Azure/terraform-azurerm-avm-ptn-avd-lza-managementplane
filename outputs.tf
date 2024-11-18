@@ -23,6 +23,11 @@ output "private_endpoints_hostpool" {
   value       = module.avm_res_desktopvirtualization_hostpool.private_endpoints
 }
 
+output "private_endpoints_workspace" {
+  description = "A map of private endpoints. The map key is the supplied input to var.private_endpoints. The map value is the entire azurerm_private_endpoint resource."
+  value       = module.avm_res_desktopvirtualization_workspace.private_endpoints
+}
+
 output "registrationinfo_token" {
   description = "The token for the host pool registration."
   sensitive   = true
@@ -52,4 +57,9 @@ output "virtual_desktop_host_pool_name" {
 output "workspace_id" {
   description = "The ID of the workspace."
   value       = module.avm_res_desktopvirtualization_workspace.resource.id
+}
+
+output "workspace_name" {
+  description = "The name of the workspace."
+  value       = module.avm_res_desktopvirtualization_workspace.resource.name
 }
