@@ -679,10 +679,6 @@ Description: The ID of the Log Analytics workspace.
 
 Description: A map of private endpoints. The map key is the supplied input to var.private\_endpoints. The map value is the entire azurerm\_private\_endpoint resource.
 
-### <a name="output_private_endpoints_workspace"></a> [private\_endpoints\_workspace](#output\_private\_endpoints\_workspace)
-
-Description: A map of private endpoints. The map key is the supplied input to var.private\_endpoints. The map value is the entire azurerm\_private\_endpoint resource.
-
 ### <a name="output_registrationinfo_token"></a> [registrationinfo\_token](#output\_registrationinfo\_token)
 
 Description: The token for the host pool registration.
