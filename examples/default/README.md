@@ -56,11 +56,6 @@ resource "azurerm_user_assigned_identity" "this" {
   name                = "uai-avd-dcr"
   resource_group_name = azurerm_resource_group.this.name
 }
-resource "azurerm_user_assigned_identity" "this" {
-  location            = azurerm_resource_group.this.location
-  name                = "uai-avd-dcr"
-  resource_group_name = azurerm_resource_group.this.name
-}
 
 module "avd" {
   source = "../../"
