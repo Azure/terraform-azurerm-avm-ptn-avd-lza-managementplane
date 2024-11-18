@@ -12,17 +12,6 @@ This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
 - An AVD session host joined to Entra ID
 - Azure Virtual Dekstop Spoke network resources: vnet, subnet
 - Azure Key Vault
-This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
-
-## Features
-- Azure Virtual Desktop Host Pool includes Diagnostic log settings
-- Azure Virtual Desktop Desktop Application Group
-- Azure Virtual Desktop Workspace includes Diagnostic log settings
-- Azure Virtual Desktop Scaling
-- Azure Virtual Desktop Insights with Log Analytics workspace
-- An AVD session host joined to Entra ID
-- Azure Virtual Dekstop Spoke network resources: vnet, subnet
-- Azure Key Vault
 
 ```hcl
 terraform {
@@ -36,19 +25,10 @@ terraform {
       source  = "hashicorp/random"
       version = ">= 3.6.0, <4.0.0"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = ">= 3.6.0, <4.0.0"
-    }
   }
 }
 
 provider "azurerm" {
-  features {
-    resource_group {
-      prevent_deletion_if_contains_resources = false
-    }
-  }
   features {
     resource_group {
       prevent_deletion_if_contains_resources = false
@@ -115,17 +95,14 @@ module "avd" {
   virtual_desktop_scaling_plan_time_zone             = var.virtual_desktop_scaling_plan_time_zone
   virtual_desktop_scaling_plan_name                  = var.virtual_desktop_scaling_plan_name
   virtual_desktop_scaling_plan_location              = var.virtual_desktop_scaling_plan_location
-  virtual_desktop_scaling_plan_location              = var.virtual_desktop_scaling_plan_location
   virtual_desktop_host_pool_type                     = var.virtual_desktop_host_pool_type
   virtual_desktop_host_pool_load_balancer_type       = var.virtual_desktop_host_pool_load_balancer_type
   virtual_desktop_host_pool_name                     = var.virtual_desktop_host_pool_name
-  virtual_desktop_host_pool_location                 = var.virtual_desktop_host_pool_location
   virtual_desktop_host_pool_location                 = var.virtual_desktop_host_pool_location
   virtual_desktop_host_pool_maximum_sessions_allowed = var.virtual_desktop_host_pool_maximum_sessions_allowed
   virtual_desktop_host_pool_start_vm_on_connect      = var.virtual_desktop_host_pool_start_vm_on_connect
   virtual_desktop_application_group_type             = var.virtual_desktop_application_group_type
   virtual_desktop_application_group_name             = var.virtual_desktop_application_group_name
-  virtual_desktop_application_group_location         = var.virtual_desktop_application_group_location
   virtual_desktop_application_group_location         = var.virtual_desktop_application_group_location
   virtual_desktop_host_pool_friendly_name            = var.virtual_desktop_host_pool_friendly_name
   monitor_data_collection_rule_name                  = "microsoft-avdi-eastus"
@@ -134,6 +111,7 @@ module "avd" {
   log_analytics_workspace_location                   = var.log_analytics_workspace_location
   log_analytics_workspace_name                       = var.log_analytics_workspace_name
   log_analytics_workspace_tags                       = var.tags
+
 }
 
 # Deploy an vnet and subnet for AVD session hosts
@@ -166,46 +144,13 @@ resource "azurerm_network_interface" "this" {
     subnet_id                     = azurerm_subnet.this_subnet_1.id
   }
 }
-/*
-# Create Key Vault for storing secrets
-resource "azurerm_key_vault" "kv" {
-  location                    = azurerm_resource_group.this.location
-  name                        = module.naming.key_vault.name_unique
-  resource_group_name         = azurerm_resource_group.this.name
-  sku_name                    = "standard"
-  tenant_id                   = data.azurerm_client_config.current.tenant_id
-  enable_rbac_authorization   = true
-  enabled_for_deployment      = true
-  enabled_for_disk_encryption = true
-  purge_protection_enabled    = true
-  soft_delete_retention_days  = 7
-  tags                        = var.tags
-}
-*/
+
 # Generate VM local password
 resource "random_password" "vmpass" {
   length  = 20
   special = true
 }
-/*
-# Create Key Vault Secret
-resource "azurerm_key_vault_secret" "localpassword" {
-  key_vault_id = azurerm_key_vault.kv.id
-  name         = "vmlocalpassword"
-  value        = random_password.vmpass.result
-  content_type = "Password"
 
-  lifecycle {
-    ignore_changes = [tags]
-  }
-}
-
-resource "azurerm_role_assignment" "keystor" {
-  principal_id         = data.azurerm_client_config.current.object_id
-  scope                = azurerm_key_vault.kv.id
-  role_definition_name = "Key Vault Administrator"
-}
-*/
 resource "azurerm_windows_virtual_machine" "this" {
   count = var.vm_count
 
@@ -318,8 +263,6 @@ The following requirements are needed by this module:
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.6.0, <4.0.0)
 
-- <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.6.0, <4.0.0)
-
 ## Resources
 
 The following resources are used by this module:
@@ -335,6 +278,7 @@ The following resources are used by this module:
 - [azurerm_virtual_network.this_vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) (resource)
 - [azurerm_windows_virtual_machine.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/windows_virtual_machine) (resource)
 - [random_password.vmpass](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) (resource)
+- [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -344,14 +288,6 @@ No required inputs.
 ## Optional Inputs
 
 The following input variables are optional (have default values):
-
-### <a name="input_avd_vm_name"></a> [avd\_vm\_name](#input\_avd\_vm\_name)
-
-Description: Base name for the Azure Virtual Desktop VMs
-
-Type: `string`
-
-Default: `"vm-avd"`
 
 ### <a name="input_avd_vm_name"></a> [avd\_vm\_name](#input\_avd\_vm\_name)
 
@@ -536,14 +472,6 @@ Description: The name of the AVD Workspace
 Type: `string`
 
 Default: `"vdws-avd-001"`
-
-### <a name="input_vm_count"></a> [vm\_count](#input\_vm\_count)
-
-Description: Number of virtual machines to create
-
-Type: `number`
-
-Default: `1`
 
 ### <a name="input_vm_count"></a> [vm\_count](#input\_vm\_count)
 

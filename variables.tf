@@ -1,7 +1,5 @@
 variable "log_analytics_workspace_location" {
-variable "log_analytics_workspace_location" {
   type        = string
-  description = "The location of the Log Analytics Workspace to use for diagnostics."
   description = "The location of the Log Analytics Workspace to use for diagnostics."
 }
 
@@ -13,6 +11,22 @@ variable "log_analytics_workspace_name" {
 variable "monitor_data_collection_rule_location" {
   type        = string
   description = "(Optional) The Azure Region where the Data Collection Rule should exist. Changing this forces a new Data Collection Rule to be created."
+}
+
+variable "monitor_data_collection_rule_location" {
+  type        = string
+  description = "(Optional) The Azure Region where the Data Collection Rule should exist. Changing this forces a new Data Collection Rule to be created."
+}
+
+variable "monitor_data_collection_rule_name" {
+  type        = string
+  description = "(Optional) The name which should be used for this Data Collection Rule. Changing this forces a new Data Collection Rule to be created."
+  nullable    = false
+
+  validation {
+    condition     = can(regex("^microsoft-avdi-", var.monitor_data_collection_rule_name))
+    error_message = "The name must start with 'microsoft-avdi-'."
+  }
 }
 
 variable "monitor_data_collection_rule_name" {
@@ -30,22 +44,6 @@ variable "monitor_data_collection_rule_resource_group_name" {
   type        = string
   description = "The name of the Resource Group where the Data Collection Rule should exist. Changing this forces a new Data Collection Rule to be created."
   nullable    = false
-}
-
-variable "monitor_data_collection_rule_location" {
-  type        = string
-  description = "(Optional) The Azure Region where the Data Collection Rule should exist. Changing this forces a new Data Collection Rule to be created."
-}
-
-variable "monitor_data_collection_rule_name" {
-  type        = string
-  description = "(Optional) The name which should be used for this Data Collection Rule. Changing this forces a new Data Collection Rule to be created."
-  nullable    = false
-
-  validation {
-    condition     = can(regex("^microsoft-avdi-", var.monitor_data_collection_rule_name))
-    error_message = "The name must start with 'microsoft-avdi-'."
-  }
 }
 
 variable "monitor_data_collection_rule_resource_group_name" {

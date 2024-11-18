@@ -5,12 +5,9 @@ This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
 
 ## Features
 - Azure Virtual Desktop Host Pool includes Diagnostic log settings
-- Azure Virtual Desktop Host Pool includes Diagnostic log settings
 - Azure Virtual Desktop Application Group
 - Azure Virtual Desktop Workspace includes Diagnostic log settings
-- Azure Virtual Desktop Workspace includes Diagnostic log settings
 - Azure Virtual Desktop Scaling
-- Azure Virtual Desktop Insights with Log Analytics workspace
 - Azure Virtual Desktop Insights with Log Analytics workspace
 
 <!-- markdownlint-disable MD033 -->
@@ -31,7 +28,6 @@ The following requirements are needed by this module:
 The following resources are used by this module:
 
 - [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
-- [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
 - [azurerm_virtual_desktop_host_pool_registration_info.registrationinfo](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_desktop_host_pool_registration_info) (resource)
 - [azurerm_virtual_desktop_workspace_application_group_association.workappgrassoc](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_desktop_workspace_application_group_association) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/resources/telemetry) (resource)
@@ -46,9 +42,7 @@ The following resources are used by this module:
 The following input variables are required:
 
 ### <a name="input_log_analytics_workspace_location"></a> [log\_analytics\_workspace\_location](#input\_log\_analytics\_workspace\_location)
-### <a name="input_log_analytics_workspace_location"></a> [log\_analytics\_workspace\_location](#input\_log\_analytics\_workspace\_location)
 
-Description: The location of the Log Analytics Workspace to use for diagnostics.
 Description: The location of the Log Analytics Workspace to use for diagnostics.
 
 Type: `string`
@@ -56,24 +50,6 @@ Type: `string`
 ### <a name="input_log_analytics_workspace_name"></a> [log\_analytics\_workspace\_name](#input\_log\_analytics\_workspace\_name)
 
 Description: The name of the Log Analytics Workspace to use for diagnostics.
-
-Type: `string`
-
-### <a name="input_monitor_data_collection_rule_location"></a> [monitor\_data\_collection\_rule\_location](#input\_monitor\_data\_collection\_rule\_location)
-
-Description: (Optional) The Azure Region where the Data Collection Rule should exist. Changing this forces a new Data Collection Rule to be created.
-
-Type: `string`
-
-### <a name="input_monitor_data_collection_rule_name"></a> [monitor\_data\_collection\_rule\_name](#input\_monitor\_data\_collection\_rule\_name)
-
-Description: (Optional) The name which should be used for this Data Collection Rule. Changing this forces a new Data Collection Rule to be created.
-
-Type: `string`
-
-### <a name="input_monitor_data_collection_rule_resource_group_name"></a> [monitor\_data\_collection\_rule\_resource\_group\_name](#input\_monitor\_data\_collection\_rule\_resource\_group\_name)
-
-Description: The name of the Resource Group where the Data Collection Rule should exist. Changing this forces a new Data Collection Rule to be created.
 
 Type: `string`
 
@@ -107,12 +83,6 @@ Description: The location/region where the Virtual Desktop Application Group res
 
 Type: `string`
 
-### <a name="input_virtual_desktop_application_group_location"></a> [virtual\_desktop\_application\_group\_location](#input\_virtual\_desktop\_application\_group\_location)
-
-Description: The location/region where the Virtual Desktop Application Group resources are located. Changing this forces a new resource to be created.
-
-Type: `string`
-
 ### <a name="input_virtual_desktop_application_group_name"></a> [virtual\_desktop\_application\_group\_name](#input\_virtual\_desktop\_application\_group\_name)
 
 Description: (Required) The name of the Virtual Desktop Application Group. Changing the name forces a new resource to be created.
@@ -137,12 +107,6 @@ Description: Location for the host pool
 
 Type: `string`
 
-### <a name="input_virtual_desktop_host_pool_location"></a> [virtual\_desktop\_host\_pool\_location](#input\_virtual\_desktop\_host\_pool\_location)
-
-Description: Location for the host pool
-
-Type: `string`
-
 ### <a name="input_virtual_desktop_host_pool_name"></a> [virtual\_desktop\_host\_pool\_name](#input\_virtual\_desktop\_host\_pool\_name)
 
 Description: (Required) The name of the Virtual Desktop Host Pool. Changing this forces a new resource to be created.
@@ -152,12 +116,6 @@ Type: `string`
 ### <a name="input_virtual_desktop_host_pool_type"></a> [virtual\_desktop\_host\_pool\_type](#input\_virtual\_desktop\_host\_pool\_type)
 
 Description: (Required) The type of the Virtual Desktop Host Pool. Valid options are `Personal` or `Pooled`. Changing the type forces a new resource to be created.
-
-Type: `string`
-
-### <a name="input_virtual_desktop_scaling_plan_location"></a> [virtual\_desktop\_scaling\_plan\_location](#input\_virtual\_desktop\_scaling\_plan\_location)
-
-Description: Location for the scaling plan
 
 Type: `string`
 
@@ -231,12 +189,6 @@ Description: Location for the virtual desktop workspace
 
 Type: `string`
 
-### <a name="input_virtual_desktop_workspace_location"></a> [virtual\_desktop\_workspace\_location](#input\_virtual\_desktop\_workspace\_location)
-
-Description: Location for the virtual desktop workspace
-
-Type: `string`
-
 ### <a name="input_virtual_desktop_workspace_name"></a> [virtual\_desktop\_workspace\_name](#input\_virtual\_desktop\_workspace\_name)
 
 Description: (Required) The name of the Virtual Desktop Workspace. Changing this forces a new resource to be created.
@@ -258,14 +210,6 @@ If it is set to false, then no telemetry will be collected.
 Type: `bool`
 
 Default: `true`
-
-### <a name="input_log_analytics_workspace_tags"></a> [log\_analytics\_workspace\_tags](#input\_log\_analytics\_workspace\_tags)
-
-Description: (Optional) A mapping of tags to assign to the resource.
-
-Type: `map(string)`
-
-Default: `null`
 
 ### <a name="input_log_analytics_workspace_tags"></a> [log\_analytics\_workspace\_tags](#input\_log\_analytics\_workspace\_tags)
 
@@ -723,10 +667,6 @@ Description: The ID of the application group.
 
 Description: The ID of the Monitor Data Collection Rule.
 
-### <a name="output_dcr_resource_id"></a> [dcr\_resource\_id](#output\_dcr\_resource\_id)
-
-Description: The ID of the Monitor Data Collection Rule.
-
 ### <a name="output_hostpool_id"></a> [hostpool\_id](#output\_hostpool\_id)
 
 Description: The ID of the host pool.
@@ -735,7 +675,6 @@ Description: The ID of the host pool.
 
 Description: The ID of the Log Analytics workspace.
 
-### <a name="output_private_endpoints_hostpool"></a> [private\_endpoints\_hostpool](#output\_private\_endpoints\_hostpool)
 ### <a name="output_private_endpoints_hostpool"></a> [private\_endpoints\_hostpool](#output\_private\_endpoints\_hostpool)
 
 Description: A map of private endpoints. The map key is the supplied input to var.private\_endpoints. The map value is the entire azurerm\_private\_endpoint resource.
@@ -760,10 +699,6 @@ Description: The ID of the scaling plan.
 
 Description: The name of the host pool.
 
-### <a name="output_virtual_desktop_host_pool_name"></a> [virtual\_desktop\_host\_pool\_name](#output\_virtual\_desktop\_host\_pool\_name)
-
-Description: The name of the host pool.
-
 ### <a name="output_workspace_id"></a> [workspace\_id](#output\_workspace\_id)
 
 Description: The ID of the workspace.
@@ -782,17 +717,10 @@ Source: Azure/avm-ptn-avd-lza-insights/azurerm
 
 Version: 0.1.3
 
-### <a name="module_avm_ptn_avd_lza_insights"></a> [avm\_ptn\_avd\_lza\_insights](#module\_avm\_ptn\_avd\_lza\_insights)
-
-Source: Azure/avm-ptn-avd-lza-insights/azurerm
-
-Version: 0.1.3
-
 ### <a name="module_avm_res_desktopvirtualization_applicationgroup"></a> [avm\_res\_desktopvirtualization\_applicationgroup](#module\_avm\_res\_desktopvirtualization\_applicationgroup)
 
 Source: Azure/avm-res-desktopvirtualization-applicationgroup/azurerm
 
-Version: 0.1.5
 Version: 0.1.5
 
 ### <a name="module_avm_res_desktopvirtualization_hostpool"></a> [avm\_res\_desktopvirtualization\_hostpool](#module\_avm\_res\_desktopvirtualization\_hostpool)
@@ -800,13 +728,11 @@ Version: 0.1.5
 Source: Azure/avm-res-desktopvirtualization-hostpool/azurerm
 
 Version: 0.2.1
-Version: 0.2.1
 
 ### <a name="module_avm_res_desktopvirtualization_scaling_plan"></a> [avm\_res\_desktopvirtualization\_scaling\_plan](#module\_avm\_res\_desktopvirtualization\_scaling\_plan)
 
 Source: Azure/avm-res-desktopvirtualization-scalingplan/azurerm
 
-Version: 0.1.4
 Version: 0.1.4
 
 ### <a name="module_avm_res_desktopvirtualization_workspace"></a> [avm\_res\_desktopvirtualization\_workspace](#module\_avm\_res\_desktopvirtualization\_workspace)

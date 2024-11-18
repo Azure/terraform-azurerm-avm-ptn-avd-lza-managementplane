@@ -4,12 +4,6 @@ variable "avd_vm_name" {
   description = "Base name for the Azure Virtual Desktop VMs"
 }
 
-variable "avd_vm_name" {
-  type        = string
-  default     = "vm-avd"
-  description = "Base name for the Azure Virtual Desktop VMs"
-}
-
 variable "enable_telemetry" {
   type        = bool
   default     = true
