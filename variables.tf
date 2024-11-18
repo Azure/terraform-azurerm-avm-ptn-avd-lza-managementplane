@@ -13,11 +13,6 @@ variable "monitor_data_collection_rule_location" {
   description = "(Optional) The Azure Region where the Data Collection Rule should exist. Changing this forces a new Data Collection Rule to be created."
 }
 
-variable "monitor_data_collection_rule_location" {
-  type        = string
-  description = "(Optional) The Azure Region where the Data Collection Rule should exist. Changing this forces a new Data Collection Rule to be created."
-}
-
 variable "monitor_data_collection_rule_name" {
   type        = string
   description = "(Optional) The name which should be used for this Data Collection Rule. Changing this forces a new Data Collection Rule to be created."
@@ -27,23 +22,6 @@ variable "monitor_data_collection_rule_name" {
     condition     = can(regex("^microsoft-avdi-", var.monitor_data_collection_rule_name))
     error_message = "The name must start with 'microsoft-avdi-'."
   }
-}
-
-variable "monitor_data_collection_rule_name" {
-  type        = string
-  description = "(Optional) The name which should be used for this Data Collection Rule. Changing this forces a new Data Collection Rule to be created."
-  nullable    = false
-
-  validation {
-    condition     = can(regex("^microsoft-avdi-", var.monitor_data_collection_rule_name))
-    error_message = "The name must start with 'microsoft-avdi-'."
-  }
-}
-
-variable "monitor_data_collection_rule_resource_group_name" {
-  type        = string
-  description = "The name of the Resource Group where the Data Collection Rule should exist. Changing this forces a new Data Collection Rule to be created."
-  nullable    = false
 }
 
 variable "monitor_data_collection_rule_resource_group_name" {
@@ -55,12 +33,6 @@ variable "monitor_data_collection_rule_resource_group_name" {
 variable "resource_group_name" {
   type        = string
   description = "The name of the resource group in which the AVD Private Endpoint should be created."
-}
-
-variable "virtual_desktop_application_group_location" {
-  type        = string
-  description = "The location/region where the Virtual Desktop Application Group resources are located. Changing this forces a new resource to be created."
-  nullable    = false
 }
 
 variable "virtual_desktop_application_group_location" {
@@ -97,11 +69,6 @@ variable "virtual_desktop_host_pool_location" {
   description = "Location for the host pool"
 }
 
-variable "virtual_desktop_host_pool_location" {
-  type        = string
-  description = "Location for the host pool"
-}
-
 variable "virtual_desktop_host_pool_name" {
   type        = string
   description = "(Required) The name of the Virtual Desktop Host Pool. Changing this forces a new resource to be created."
@@ -117,11 +84,6 @@ variable "virtual_desktop_host_pool_type" {
   type        = string
   description = "(Required) The type of the Virtual Desktop Host Pool. Valid options are `Personal` or `Pooled`. Changing the type forces a new resource to be created."
   nullable    = false
-}
-
-variable "virtual_desktop_scaling_plan_location" {
-  type        = string
-  description = "Location for the scaling plan"
 }
 
 variable "virtual_desktop_scaling_plan_location" {
@@ -191,11 +153,6 @@ variable "virtual_desktop_workspace_location" {
   description = "Location for the virtual desktop workspace"
 }
 
-variable "virtual_desktop_workspace_location" {
-  type        = string
-  description = "Location for the virtual desktop workspace"
-}
-
 variable "virtual_desktop_workspace_name" {
   type        = string
   description = "(Required) The name of the Virtual Desktop Workspace. Changing this forces a new resource to be created."
@@ -212,13 +169,6 @@ For more information see <https://aka.ms/avm/telemetryinfo>.
 
 If it is set to false, then no telemetry will be collected.
 DESCRIPTION
-}
-
-# tflint-ignore: terraform_unused_declarations
-variable "log_analytics_workspace_tags" {
-  type        = map(string)
-  default     = null
-  description = "(Optional) A mapping of tags to assign to the resource."
 }
 
 # tflint-ignore: terraform_unused_declarations
