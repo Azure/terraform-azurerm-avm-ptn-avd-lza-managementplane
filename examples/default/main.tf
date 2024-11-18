@@ -88,7 +88,6 @@ module "avd" {
   log_analytics_workspace_location                   = var.log_analytics_workspace_location
   log_analytics_workspace_name                       = var.log_analytics_workspace_name
   log_analytics_workspace_tags                       = var.tags
-
 }
 
 # Deploy an vnet and subnet for AVD session hosts
