@@ -53,3 +53,8 @@ output "workspace_id" {
   description = "The ID of the workspace."
   value       = module.avm_res_desktopvirtualization_workspace.resource.id
 }
+
+output "workspace_name" {
+  description = "The name of the workspace."
+  value       = module.avm_res_desktopvirtualization_workspace.resource.name
+}

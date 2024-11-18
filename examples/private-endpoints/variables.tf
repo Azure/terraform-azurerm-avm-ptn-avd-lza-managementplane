@@ -34,7 +34,7 @@ variable "monitor_data_collection_rule_location" {
 
 variable "monitor_data_collection_rule_resource_group_name" {
   type        = string
-  default     = "RG-AVDdemo"
+  default     = "RG-JS-AVDdemo4"
   description = "The resource group for the monitor data collection rule."
 }
 

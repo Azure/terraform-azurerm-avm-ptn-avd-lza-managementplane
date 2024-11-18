@@ -131,6 +131,52 @@ Description: (Required) The name which should be used for this Virtual Desktop S
 
 Type: `string`
 
+### <a name="input_virtual_desktop_scaling_plan_schedule"></a> [virtual\_desktop\_scaling\_plan\_schedule](#input\_virtual\_desktop\_scaling\_plan\_schedule)
+
+Description: - `days_of_week` - (Required) A list of Days of the Week on which this schedule will be used. Possible values are `Monday`, `Tuesday`, `Wednesday`, `Thursday`, `Friday`, `Saturday`, and `Sunday`
+- `name` - (Required) The name of the schedule.
+- `off_peak_load_balancing_algorithm` - (Required) The load Balancing Algorithm to use during Off-Peak Hours. Possible values are `DepthFirst` and `BreadthFirst`.
+- `off_peak_start_time` - (Required) The time at which Off-Peak scaling will begin. This is also the end-time for the Ramp-Down period. The time must be specified in "HH:MM" format.
+- `peak_load_balancing_algorithm` - (Required) The load Balancing Algorithm to use during Peak Hours. Possible values are `DepthFirst` and `BreadthFirst`.
+- `peak_start_time` - (Required) The time at which Peak scaling will begin. This is also the end-time for the Ramp-Up period. The time must be specified in "HH:MM" format.
+- `ramp_down_capacity_threshold_percent` - (Required) This is the value in percentage of used host pool capacity that will be considered to evaluate whether to turn on/off virtual machines during the ramp-down and off-peak hours. For example, if capacity threshold is specified as 60% and your total host pool capacity is 100 sessions, autoscale will turn on additional session hosts once the host pool exceeds a load of 60 sessions.
+- `ramp_down_force_logoff_users` - (Required) Whether users will be forced to log-off session hosts once the `ramp_down_wait_time_minutes` value has been exceeded during the Ramp-Down period. Possible
+- `ramp_down_load_balancing_algorithm` - (Required) The load Balancing Algorithm to use during the Ramp-Down period. Possible values are `DepthFirst` and `BreadthFirst`.
+- `ramp_down_minimum_hosts_percent` - (Required) The minimum percentage of session host virtual machines that you would like to get to for ramp-down and off-peak hours. For example, if Minimum percentage of hosts is specified as 10% and total number of session hosts in your host pool is 10, autoscale will ensure a minimum of 1 session host is available to take user connections.
+- `ramp_down_notification_message` - (Required) The notification message to send to users during Ramp-Down period when they are required to log-off.
+- `ramp_down_start_time` - (Required) The time at which Ramp-Down scaling will begin. This is also the end-time for the Ramp-Up period. The time must be specified in "HH:MM" format.
+- `ramp_down_stop_hosts_when` - (Required) Controls Session Host shutdown behaviour during Ramp-Down period. Session Hosts can either be shutdown when all sessions on the Session Host have ended, or when there are no Active sessions left on the Session Host. Possible values are `ZeroSessions` and `ZeroActiveSessions`.
+- `ramp_down_wait_time_minutes` - (Required) The number of minutes during Ramp-Down period that autoscale will wait after setting the session host VMs to drain mode, notifying any currently signed in users to save their work before forcing the users to logoff. Once all user sessions on the session host VM have been logged off, Autoscale will shut down the VM.
+- `ramp_up_capacity_threshold_percent` - (Optional) This is the value of percentage of used host pool capacity that will be considered to evaluate whether to turn on/off virtual machines during the ramp-up and peak hours. For example, if capacity threshold is specified as `60%` and your total host pool capacity is `100` sessions, autoscale will turn on additional session hosts once the host pool exceeds a load of `60` sessions.
+- `ramp_up_load_balancing_algorithm` - (Required) The load Balancing Algorithm to use during the Ramp-Up period. Possible values are `DepthFirst` and `BreadthFirst`.
+- `ramp_up_minimum_hosts_percent` - (Optional) Specifies the minimum percentage of session host virtual machines to start during ramp-up for peak hours. For example, if Minimum percentage of hosts is specified as `10%` and total number of session hosts in your host pool is `10`, autoscale will ensure a minimum of `1` session host is available to take user connections.
+- `ramp_up_start_time` - (Required) The time at which Ramp-Up scaling will begin. This is also the end-time for the Ramp-Up period. The time must be specified in "HH:MM" format.
+
+Type:
+
+```hcl
+list(object({
+    days_of_week                         = set(string)
+    name                                 = string
+    off_peak_load_balancing_algorithm    = string
+    off_peak_start_time                  = string
+    peak_load_balancing_algorithm        = string
+    peak_start_time                      = string
+    ramp_down_capacity_threshold_percent = number
+    ramp_down_force_logoff_users         = bool
+    ramp_down_load_balancing_algorithm   = string
+    ramp_down_minimum_hosts_percent      = number
+    ramp_down_notification_message       = string
+    ramp_down_start_time                 = string
+    ramp_down_stop_hosts_when            = string
+    ramp_down_wait_time_minutes          = number
+    ramp_up_capacity_threshold_percent   = optional(number)
+    ramp_up_load_balancing_algorithm     = string
+    ramp_up_minimum_hosts_percent        = optional(number)
+    ramp_up_start_time                   = string
+  }))
+```
+
 ### <a name="input_virtual_desktop_scaling_plan_time_zone"></a> [virtual\_desktop\_scaling\_plan\_time\_zone](#input\_virtual\_desktop\_scaling\_plan\_time\_zone)
 
 Description: (Required) Specifies the Time Zone which should be used by the Scaling Plan for time based events, [the possible values are defined here](https://jackstromberg.com/2017/01/list-of-time-zones-consumed-by-azure/).
@@ -193,11 +239,12 @@ Default: `{}`
 
 ### <a name="input_private_endpoints"></a> [private\_endpoints](#input\_private\_endpoints)
 
-Description: A map of private endpoints to create on the resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Description: A map of private endpoints to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+
 - `name` - (Optional) The name of the private endpoint. One will be generated if not set.
-- `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. Each role assignment should include a `role_definition_id_or_name` and a `principal_id`.
+- `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information.
 - `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
-- `tags` - (Optional) A mapping of tags to assign to the private endpoint. Each tag should be a string.
+- `tags` - (Optional) A mapping of tags to assign to the private endpoint.
 - `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
 - `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
 - `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
@@ -205,8 +252,10 @@ Description: A map of private endpoints to create on the resource. The map key i
 - `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
 - `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
 - `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
-- `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the resource.
-- `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. Each IP configuration should include a `name` and a `private_ip_address`.
+- `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of this resource.
+- `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+  - `name` - The name of the IP configuration.
+  - `private_ip_address` - The private IP address of the IP configuration.
 
 Type:
 
@@ -224,8 +273,8 @@ map(object({
       principal_type                         = optional(string, null)
     })), {})
     lock = optional(object({
-      name = optional(string, null)
       kind = string
+      name = optional(string, null)
     }), null)
     tags                                    = optional(map(string), null)
     subnet_resource_id                      = string
@@ -290,87 +339,6 @@ map(object({
 ```
 
 Default: `{}`
-
-### <a name="input_schedules"></a> [schedules](#input\_schedules)
-
-Description: A map of schedules to create on AVD Scaling Plan. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-
-- `name` -  The name of the schedule.
-- `days_of_week` -  The days of the week to apply the schedule to.
-- `off_peak_start_time` -  The start time of the off peak period.
-- `off_peak_load_balancing_algorithm` -  The load balancing algorithm to use during the off peak period.
-- `ramp_down_capacity_threshold_percent` -  The capacity threshold percentage to use during the ramp down period.
-- `ramp_down_force_logoff_users` -  Whether to force log off users during the ramp down period.
-- `ramp_down_load_balancing_algorithm` -  The load balancing algorithm to use during the ramp down period.
-- `ramp_down_minimum_hosts_percent` -  The minimum hosts percentage to use during the ramp down period.
-- `ramp_down_notification_message` -  The notification message to use during the ramp down period.
-- `ramp_down_start_time` -  The start time of the ramp down period.
-- `ramp_down_stop_hosts_when` -  When to stop hosts during the ramp down period.
-- `ramp_down_wait_time_minutes` -  The wait time in minutes to use during the ramp down period.
-- `peak_start_time` -  The start time of the peak period.
-- `peak_load_balancing_algorithm` -  The load balancing algorithm to use during the peak period.
-- `ramp_up_capacity_threshold_percent` - (Optional) The capacity threshold percentage to use during the ramp up period.
-- `ramp_up_load_balancing_algorithm` -  The load balancing algorithm to use during the ramp up period.
-- `ramp_up_minimum_hosts_percent` - (Optional) The minimum hosts percentage to use during the ramp up period.
-- `ramp_up_start_time` -  The start time of the ramp up period.
-
-Type:
-
-```hcl
-map(object({
-    name                                 = string
-    days_of_week                         = set(string)
-    off_peak_start_time                  = string
-    off_peak_load_balancing_algorithm    = string
-    ramp_down_capacity_threshold_percent = number
-    ramp_down_force_logoff_users         = bool
-    ramp_down_load_balancing_algorithm   = string
-    ramp_down_minimum_hosts_percent      = number
-    ramp_down_notification_message       = string
-    ramp_down_start_time                 = string
-    ramp_down_stop_hosts_when            = string
-    ramp_down_wait_time_minutes          = number
-    peak_start_time                      = string
-    peak_load_balancing_algorithm        = string
-    ramp_up_capacity_threshold_percent   = optional(number)
-    ramp_up_load_balancing_algorithm     = string
-    ramp_up_minimum_hosts_percent        = optional(number)
-    ramp_up_start_time                   = string
-  }))
-```
-
-Default:
-
-```json
-{
-  "schedule1": {
-    "days_of_week": [
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday"
-    ],
-    "name": "Weekdays",
-    "off_peak_load_balancing_algorithm": "DepthFirst",
-    "off_peak_start_time": "22:00",
-    "peak_load_balancing_algorithm": "BreadthFirst",
-    "peak_start_time": "09:00",
-    "ramp_down_capacity_threshold_percent": 5,
-    "ramp_down_force_logoff_users": false,
-    "ramp_down_load_balancing_algorithm": "DepthFirst",
-    "ramp_down_minimum_hosts_percent": 10,
-    "ramp_down_notification_message": "Please log off in the next 45 minutes...",
-    "ramp_down_start_time": "19:00",
-    "ramp_down_stop_hosts_when": "ZeroSessions",
-    "ramp_down_wait_time_minutes": 45,
-    "ramp_up_capacity_threshold_percent": 10,
-    "ramp_up_load_balancing_algorithm": "BreadthFirst",
-    "ramp_up_minimum_hosts_percent": 20,
-    "ramp_up_start_time": "05:00"
-  }
-}
-```
 
 ### <a name="input_time_zone"></a> [time\_zone](#input\_time\_zone)
 
@@ -735,6 +703,10 @@ Description: The name of the host pool.
 
 Description: The ID of the workspace.
 
+### <a name="output_workspace_name"></a> [workspace\_name](#output\_workspace\_name)
+
+Description: The name of the workspace.
+
 ## Modules
 
 The following Modules are called:
@@ -767,7 +739,7 @@ Version: 0.1.4
 
 Source: Azure/avm-res-desktopvirtualization-workspace/azurerm
 
-Version: 0.1.5
+Version: 0.1.6
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

@@ -29,7 +29,7 @@ module "naming" {
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
   location = "centralus"
-  name     = "RG-AVDdemo"
+  name     = "RG-JS-AVDdemo4"
   tags     = var.tags
 }
 
@@ -37,6 +37,27 @@ resource "azurerm_user_assigned_identity" "this" {
   location            = azurerm_resource_group.this.location
   name                = "uai-avd-dcr"
   resource_group_name = azurerm_resource_group.this.name
+}
+
+locals {
+  endpoint = toset(["wvd", "wvd-global"])
+}
+
+resource "azurerm_private_dns_zone" "this" {
+  for_each = local.endpoint
+
+  name                = "privatelink.${each.value}.microsoft.com"
+  resource_group_name = azurerm_resource_group.this.name
+  tags                = var.tags
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "private_links" {
+  for_each = azurerm_private_dns_zone.this
+
+  name                  = "${each.key}_${azurerm_virtual_network.this.name}-link"
+  private_dns_zone_name = azurerm_private_dns_zone.this[each.key].name
+  resource_group_name   = azurerm_resource_group.this.name
+  virtual_network_id    = azurerm_virtual_network.this.id
 }
 
 module "avd" {
@@ -92,18 +113,18 @@ module "avd" {
 }
 
 # Deploy an vnet and subnet for AVD session hosts
-resource "azurerm_virtual_network" "this_vnet" {
+resource "azurerm_virtual_network" "this" {
   address_space       = ["10.1.6.0/26"]
   location            = azurerm_resource_group.this.location
   name                = module.naming.virtual_network.name_unique
   resource_group_name = azurerm_resource_group.this.name
 }
 
-resource "azurerm_subnet" "this_subnet_1" {
+resource "azurerm_subnet" "this" {
   address_prefixes     = ["10.1.6.0/27"]
   name                 = "${module.naming.subnet.name_unique}-1"
   resource_group_name  = azurerm_resource_group.this.name
-  virtual_network_name = azurerm_virtual_network.this_vnet.name
+  virtual_network_name = azurerm_virtual_network.this.name
 }
 
 # Deploy a single AVD session host using marketplace image
@@ -118,9 +139,64 @@ resource "azurerm_network_interface" "this" {
   ip_configuration {
     name                          = "internal"
     private_ip_address_allocation = "Dynamic"
-    subnet_id                     = azurerm_subnet.this_subnet_1.id
+    subnet_id                     = azurerm_subnet.this.id
   }
 }
+
+resource "azurerm_private_endpoint" "hostpool" {
+  location            = azurerm_resource_group.this.location
+  name                = "pe-${module.avd.virtual_desktop_host_pool_name}"
+  resource_group_name = azurerm_resource_group.this.name
+  subnet_id           = azurerm_subnet.this.id
+  tags                = var.tags
+
+  private_service_connection {
+    is_manual_connection           = false
+    name                           = "psc-${module.avd.virtual_desktop_host_pool_name}"
+    private_connection_resource_id = module.avd.hostpool_id
+    subresource_names              = ["connection"]
+  }
+  private_dns_zone_group {
+    name                 = "dns-${module.avd.virtual_desktop_host_pool_name}"
+    private_dns_zone_ids = [azurerm_private_dns_zone.this["wvd"].id]
+  }
+}
+
+resource "azurerm_private_endpoint" "workspace_feed" {
+  location            = azurerm_resource_group.this.location
+  name                = "pe-${module.avd.workspace_name}"
+  resource_group_name = azurerm_resource_group.this.name
+  subnet_id           = azurerm_subnet.this.id
+  tags                = var.tags
+
+  private_service_connection {
+    is_manual_connection           = false
+    name                           = "psc-${module.avd.workspace_name}"
+    private_connection_resource_id = module.avd.workspace_id
+    subresource_names              = ["feed"]
+  }
+  private_dns_zone_group {
+    name                 = "dns-${module.avd.workspace_name}"
+    private_dns_zone_ids = [azurerm_private_dns_zone.this["wvd"].id]
+  }
+}
+
+/*
+# Create Key Vault for storing secrets
+resource "azurerm_key_vault" "kv" {
+  location                    = azurerm_resource_group.this.location
+  name                        = module.naming.key_vault.name_unique
+  resource_group_name         = azurerm_resource_group.this.name
+  sku_name                    = "standard"
+  tenant_id                   = data.azurerm_client_config.current.tenant_id
+  enable_rbac_authorization   = true
+  enabled_for_deployment      = true
+  enabled_for_disk_encryption = true
+  purge_protection_enabled    = true
+  soft_delete_retention_days  = 7
+  tags                        = var.tags
+}
+*/
 
 # Generate VM local password
 resource "random_password" "vmpass" {
@@ -128,6 +204,26 @@ resource "random_password" "vmpass" {
   special = true
 }
 
+/*
+# Create Key Vault Secret
+resource "azurerm_key_vault_secret" "localpassword" {
+  key_vault_id = azurerm_key_vault.kv.id
+  name         = "vmlocalpassword"
+  value        = random_password.vmpass.result
+  content_type = "Password"
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
+}
+
+# Assign Key Vault Administrator role to the current user
+resource "azurerm_role_assignment" "keystor" {
+  principal_id         = data.azurerm_client_config.current.object_id
+  scope                = azurerm_key_vault.kv.id
+  role_definition_name = "Key Vault Administrator"
+}
+*/
 resource "azurerm_windows_virtual_machine" "this" {
   count = var.vm_count
 
@@ -174,14 +270,14 @@ resource "azurerm_virtual_machine_extension" "ama" {
   depends_on = [module.avd]
 }
 
-# Virtual Machine Extension for AAD Join
+# Virtual Machine Extension for Entra ID Join
 resource "azurerm_virtual_machine_extension" "aadjoin" {
   count = var.vm_count
 
   name                       = "${var.avd_vm_name}-${count.index}-aadJoin"
   publisher                  = "Microsoft.Azure.ActiveDirectory"
   type                       = "AADLoginForWindows"
-  type_handler_version       = "1.0"
+  type_handler_version       = "2.0"
   virtual_machine_id         = azurerm_windows_virtual_machine.this[count.index].id
   auto_upgrade_minor_version = true
 }
@@ -193,7 +289,7 @@ resource "azurerm_virtual_machine_extension" "vmext_dsc" {
   name                       = "${var.avd_vm_name}-${count.index}-avd_dsc"
   publisher                  = "Microsoft.Powershell"
   type                       = "DSC"
-  type_handler_version       = "2.73"
+  type_handler_version       = "2.83"
   virtual_machine_id         = azurerm_windows_virtual_machine.this[count.index].id
   auto_upgrade_minor_version = true
   protected_settings         = <<PROTECTED_SETTINGS
