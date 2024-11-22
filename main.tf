@@ -20,12 +20,6 @@ module "avm_res_desktopvirtualization_hostpool" {
       hour_of_day = 0
     }])
   }
-  diagnostic_settings = {
-    to_law = {
-      name                  = "to-law"
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
-    }
-  }
 }
 
 # Registration information for the host pool.
@@ -68,12 +62,6 @@ module "avm_res_desktopvirtualization_workspace" {
   virtual_desktop_workspace_name                = var.virtual_desktop_workspace_name
   virtual_desktop_workspace_friendly_name       = var.virtual_desktop_workspace_friendly_name
   tags                                          = local.tags
-  diagnostic_settings = {
-    to_law = {
-      name                  = "to-law"
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
-    }
-  }
 }
 
 resource "azurerm_virtual_desktop_workspace_application_group_association" "workappgrassoc" {
