@@ -73,33 +73,6 @@ module "avd" {
       off_peak_load_balancing_algorithm    = "DepthFirst"
     }
   ]
-  enable_telemetry                   = var.enable_telemetry
-  resource_group_name                = azurerm_resource_group.this.name
-  virtual_desktop_workspace_name     = var.virtual_desktop_workspace_name
-  virtual_desktop_workspace_location = var.virtual_desktop_workspace_location
-  public_network_access_enabled      = false
-  virtual_desktop_scaling_plan_schedule = [
-    {
-      name                                 = "Weekends"
-      days_of_week                         = ["Saturday", "Sunday"]
-      ramp_up_start_time                   = "06:00"
-      ramp_up_load_balancing_algorithm     = "BreadthFirst"
-      ramp_up_minimum_hosts_percent        = 20
-      ramp_up_capacity_threshold_percent   = 10
-      peak_start_time                      = "10:00"
-      peak_load_balancing_algorithm        = "BreadthFirst"
-      ramp_down_start_time                 = "18:00"
-      ramp_down_load_balancing_algorithm   = "DepthFirst"
-      ramp_down_minimum_hosts_percent      = 10
-      ramp_down_force_logoff_users         = false
-      ramp_down_wait_time_minutes          = 45
-      ramp_down_notification_message       = "Please log off in the next 45 minutes..."
-      ramp_down_capacity_threshold_percent = 5
-      ramp_down_stop_hosts_when            = "ZeroSessions"
-      off_peak_start_time                  = "22:00"
-      off_peak_load_balancing_algorithm    = "DepthFirst"
-    }
-  ]
   virtual_desktop_scaling_plan_time_zone             = var.virtual_desktop_scaling_plan_time_zone
   virtual_desktop_scaling_plan_name                  = var.virtual_desktop_scaling_plan_name
   virtual_desktop_scaling_plan_location              = var.virtual_desktop_scaling_plan_location
@@ -118,14 +91,12 @@ module "avd" {
 # Deploy an vnet and subnet for AVD session hosts
 resource "azurerm_virtual_network" "this_vnet" {
   address_space       = ["10.1.6.0/26"]
-  address_space       = ["10.1.6.0/26"]
   location            = azurerm_resource_group.this.location
   name                = module.naming.virtual_network.name_unique
   resource_group_name = azurerm_resource_group.this.name
 }
 
 resource "azurerm_subnet" "this_subnet_1" {
-  address_prefixes     = ["10.1.6.0/27"]
   address_prefixes     = ["10.1.6.0/27"]
   name                 = "${module.naming.subnet.name_unique}-1"
   resource_group_name  = azurerm_resource_group.this.name
@@ -158,7 +129,6 @@ resource "azurerm_windows_virtual_machine" "this" {
   count = var.vm_count
 
   admin_password             = random_password.vmpass.result
-  admin_username             = "adminuser"
   admin_username             = "adminuser"
   location                   = azurerm_resource_group.this.location
   name                       = "${var.avd_vm_name}-${count.index}"

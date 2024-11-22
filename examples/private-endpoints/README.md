@@ -118,7 +118,6 @@ module "avd" {
   virtual_desktop_application_group_name             = var.virtual_desktop_application_group_name
   virtual_desktop_application_group_location         = var.virtual_desktop_application_group_location
   virtual_desktop_host_pool_friendly_name            = var.virtual_desktop_host_pool_friendly_name
-  workspace_resource_id                              = azurerm_log_analytics_workspace.this.id
 }
 
 # Deploy an vnet and subnet for AVD session hosts

@@ -67,7 +67,6 @@ module "avm_res_desktopvirtualization_workspace" {
   resource_group_name                           = var.resource_group_name
   virtual_desktop_workspace_name                = var.virtual_desktop_workspace_name
   virtual_desktop_workspace_friendly_name       = var.virtual_desktop_workspace_friendly_name
-  virtual_desktop_workspace_friendly_name       = var.virtual_desktop_workspace_friendly_name
   tags                                          = local.tags
   diagnostic_settings = {
     to_law = {
@@ -103,7 +102,6 @@ module "avm_res_desktopvirtualization_scaling_plan" {
       }
     ]
   )
-  virtual_desktop_scaling_plan_schedule = var.virtual_desktop_scaling_plan_schedule
   virtual_desktop_scaling_plan_schedule = var.virtual_desktop_scaling_plan_schedule
 }
 
