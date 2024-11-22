@@ -280,16 +280,6 @@ resource "azurerm_monitor_data_collection_rule_association" "example" {
   name                    = "${var.avd_vm_name}-association-${count.index}"
 }
 
-
-# Creates an association between an Azure Monitor data collection rule and a virtual machine.
-resource "azurerm_monitor_data_collection_rule_association" "example" {
-  count = var.vm_count
-
-  target_resource_id      = azurerm_windows_virtual_machine.this[count.index].id
-  data_collection_rule_id = module.avm_ptn_avd_lza_insights.resource.id
-  name                    = "${var.avd_vm_name}-association-${count.index}"
-}
-
 # Create resources for Azure Virtual Desktop Insights data collection rules
 module "avm_ptn_avd_lza_insights" {
   source                                = "Azure/avm-ptn-avd-lza-insights/azurerm"
