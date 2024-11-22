@@ -54,6 +54,12 @@ resource "azurerm_user_assigned_identity" "this" {
   resource_group_name = azurerm_resource_group.this.name
 }
 
+resource "azurerm_log_analytics_workspace" "this" {
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.log_analytics_workspace.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+}
+
 locals {
   endpoint = toset(["wvd", "wvd-global"])
 }
@@ -291,7 +297,7 @@ resource "azurerm_monitor_data_collection_rule_association" "example" {
   count = var.vm_count
 
   target_resource_id      = azurerm_windows_virtual_machine.this[count.index].id
-  data_collection_rule_id = module.avd.dcr_resource_id.id
+  data_collection_rule_id = module.avm_ptn_avd_lza_insights.resource_id
   name                    = "${var.avd_vm_name}-association-${count.index}"
 }
 
@@ -357,6 +363,7 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
+- [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
 - [azurerm_monitor_data_collection_rule_association.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_data_collection_rule_association) (resource)
 - [azurerm_network_interface.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface) (resource)
 - [azurerm_private_dns_zone.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone) (resource)
