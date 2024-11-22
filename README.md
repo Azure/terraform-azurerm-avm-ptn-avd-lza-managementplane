@@ -8,7 +8,6 @@ This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
 - Azure Virtual Desktop Application Group
 - Azure Virtual Desktop Workspace includes Diagnostic log settings
 - Azure Virtual Desktop Scaling
-- Azure Virtual Desktop Insights with Log Analytics workspace
 
 <!-- markdownlint-disable MD033 -->
 ## Requirements
@@ -27,7 +26,6 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
-- [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
 - [azurerm_virtual_desktop_host_pool_registration_info.registrationinfo](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_desktop_host_pool_registration_info) (resource)
 - [azurerm_virtual_desktop_workspace_application_group_association.workappgrassoc](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_desktop_workspace_application_group_association) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/resources/telemetry) (resource)
@@ -40,36 +38,6 @@ The following resources are used by this module:
 ## Required Inputs
 
 The following input variables are required:
-
-### <a name="input_log_analytics_workspace_location"></a> [log\_analytics\_workspace\_location](#input\_log\_analytics\_workspace\_location)
-
-Description: The location of the Log Analytics Workspace to use for diagnostics.
-
-Type: `string`
-
-### <a name="input_log_analytics_workspace_name"></a> [log\_analytics\_workspace\_name](#input\_log\_analytics\_workspace\_name)
-
-Description: The name of the Log Analytics Workspace to use for diagnostics.
-
-Type: `string`
-
-### <a name="input_monitor_data_collection_rule_location"></a> [monitor\_data\_collection\_rule\_location](#input\_monitor\_data\_collection\_rule\_location)
-
-Description: (Optional) The Azure Region where the Data Collection Rule should exist. Changing this forces a new Data Collection Rule to be created.
-
-Type: `string`
-
-### <a name="input_monitor_data_collection_rule_name"></a> [monitor\_data\_collection\_rule\_name](#input\_monitor\_data\_collection\_rule\_name)
-
-Description: (Optional) The name which should be used for this Data Collection Rule. Changing this forces a new Data Collection Rule to be created.
-
-Type: `string`
-
-### <a name="input_monitor_data_collection_rule_resource_group_name"></a> [monitor\_data\_collection\_rule\_resource\_group\_name](#input\_monitor\_data\_collection\_rule\_resource\_group\_name)
-
-Description: The name of the Resource Group where the Data Collection Rule should exist. Changing this forces a new Data Collection Rule to be created.
-
-Type: `string`
 
 ### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
 
@@ -663,17 +631,9 @@ The following outputs are exported:
 
 Description: The ID of the application group.
 
-### <a name="output_dcr_resource_id"></a> [dcr\_resource\_id](#output\_dcr\_resource\_id)
-
-Description: The ID of the Monitor Data Collection Rule.
-
 ### <a name="output_hostpool_id"></a> [hostpool\_id](#output\_hostpool\_id)
 
 Description: The ID of the host pool.
-
-### <a name="output_log_analytics_workspace_id"></a> [log\_analytics\_workspace\_id](#output\_log\_analytics\_workspace\_id)
-
-Description: The ID of the Log Analytics workspace.
 
 ### <a name="output_private_endpoints_hostpool"></a> [private\_endpoints\_hostpool](#output\_private\_endpoints\_hostpool)
 
@@ -711,12 +671,6 @@ Description: The name of the workspace.
 
 The following Modules are called:
 
-### <a name="module_avm_ptn_avd_lza_insights"></a> [avm\_ptn\_avd\_lza\_insights](#module\_avm\_ptn\_avd\_lza\_insights)
-
-Source: Azure/avm-ptn-avd-lza-insights/azurerm
-
-Version: 0.1.3
-
 ### <a name="module_avm_res_desktopvirtualization_applicationgroup"></a> [avm\_res\_desktopvirtualization\_applicationgroup](#module\_avm\_res\_desktopvirtualization\_applicationgroup)
 
 Source: Azure/avm-res-desktopvirtualization-applicationgroup/azurerm
@@ -739,7 +693,7 @@ Version: 0.1.4
 
 Source: Azure/avm-res-desktopvirtualization-workspace/azurerm
 
-Version: 0.1.6
+Version: 0.1.7
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

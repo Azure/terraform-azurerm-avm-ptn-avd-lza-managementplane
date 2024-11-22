@@ -4,14 +4,13 @@
 This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
 
 ## Features
-- Azure Virtual Desktop Host Pool includes Diagnostic log settings
+- Azure Virtual Desktop Host Pool includes Diagnostic log settings and Private endpoint
 - Azure Virtual Desktop Desktop Application Group
-- Azure Virtual Desktop Workspace includes Diagnostic log settings
+- Azure Virtual Desktop Workspace includes Diagnostic log settings and Private endpoint
 - Azure Virtual Desktop Scaling
 - Azure Virtual Desktop Insights with Log Analytics workspace
 - An AVD session host joined to Entra ID
 - Azure Virtual Dekstop Spoke network resources: vnet, subnet
-- Azure Key Vault
 
 ```hcl
 terraform {
@@ -119,13 +118,7 @@ module "avd" {
   virtual_desktop_application_group_name             = var.virtual_desktop_application_group_name
   virtual_desktop_application_group_location         = var.virtual_desktop_application_group_location
   virtual_desktop_host_pool_friendly_name            = var.virtual_desktop_host_pool_friendly_name
-  monitor_data_collection_rule_name                  = "microsoft-avdi-eastus"
-  monitor_data_collection_rule_location              = var.monitor_data_collection_rule_location
-  monitor_data_collection_rule_resource_group_name   = var.monitor_data_collection_rule_resource_group_name
-  log_analytics_workspace_location                   = var.log_analytics_workspace_location
-  log_analytics_workspace_name                       = var.log_analytics_workspace_name
-  log_analytics_workspace_tags                       = var.tags
-
+  workspace_resource_id                              = azurerm_log_analytics_workspace.this.id
 }
 
 # Deploy an vnet and subnet for AVD session hosts
@@ -302,6 +295,62 @@ resource "azurerm_monitor_data_collection_rule_association" "example" {
   data_collection_rule_id = module.avd.dcr_resource_id.id
   name                    = "${var.avd_vm_name}-association-${count.index}"
 }
+
+
+# Creates an association between an Azure Monitor data collection rule and a virtual machine.
+resource "azurerm_monitor_data_collection_rule_association" "example" {
+  count = var.vm_count
+
+  target_resource_id      = azurerm_windows_virtual_machine.this[count.index].id
+  data_collection_rule_id = module.avm_ptn_avd_lza_insights.resource.id
+  name                    = "${var.avd_vm_name}-association-${count.index}"
+}
+
+# Create resources for Azure Virtual Desktop Insights data collection rules
+module "avm_ptn_avd_lza_insights" {
+  source                                = "Azure/avm-ptn-avd-lza-insights/azurerm"
+  version                               = "0.1.3"
+  enable_telemetry                      = var.enable_telemetry
+  monitor_data_collection_rule_location = azurerm_resource_group.this.location
+  monitor_data_collection_rule_kind     = "Windows"
+  monitor_data_collection_rule_name     = "microsoft-avdi-eastus"
+  monitor_data_collection_rule_data_flow = [
+    {
+      destinations = [azurerm_log_analytics_workspace.this.name]
+      streams      = ["Microsoft-Perf", "Microsoft-Event"]
+    }
+  ]
+  monitor_data_collection_rule_destinations = {
+    log_analytics = {
+      name                  = azurerm_log_analytics_workspace.this.name
+      workspace_resource_id = azurerm_log_analytics_workspace.this.id
+    }
+  }
+  monitor_data_collection_rule_data_sources = {
+    performance_counter = [
+      {
+        counter_specifiers            = ["\\LogicalDisk(C:)\\Avg. Disk Queue Length", "\\LogicalDisk(C:)\\Current Disk Queue Length", "\\Memory\\Available Mbytes", "\\Memory\\Page Faults/sec", "\\Memory\\Pages/sec", "\\Memory\\% Committed Bytes In Use", "\\PhysicalDisk(*)\\Avg. Disk Queue Length", "\\PhysicalDisk(*)\\Avg. Disk sec/Read", "\\PhysicalDisk(*)\\Avg. Disk sec/Transfer", "\\PhysicalDisk(*)\\Avg. Disk sec/Write", "\\Processor Information(_Total)\\% Processor Time", "\\User Input Delay per Process(*)\\Max Input Delay", "\\User Input Delay per Session(*)\\Max Input Delay", "\\RemoteFX Network(*)\\Current TCP RTT", "\\RemoteFX Network(*)\\Current UDP Bandwidth"]
+        name                          = "perfCounterDataSource10"
+        sampling_frequency_in_seconds = 30
+        streams                       = ["Microsoft-Perf"]
+      },
+      {
+        counter_specifiers            = ["\\LogicalDisk(C:)\\% Free Space", "\\LogicalDisk(C:)\\Avg. Disk sec/Transfer", "\\Terminal Services(*)\\Active Sessions", "\\Terminal Services(*)\\Inactive Sessions", "\\Terminal Services(*)\\Total Sessions"]
+        name                          = "perfCounterDataSource30"
+        sampling_frequency_in_seconds = 30
+        streams                       = ["Microsoft-Perf"]
+      }
+    ],
+    windows_event_log = [
+      {
+        name           = "eventLogsDataSource"
+        streams        = ["Microsoft-Event"]
+        x_path_queries = ["Microsoft-Windows-TerminalServices-RemoteConnectionManager/Admin!*[System[(Level=2 or Level=3 or Level=4 or Level=0)]]", "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational!*[System[(Level=2 or Level=3 or Level=4 or Level=0)]]", "System!*", "Microsoft-FSLogix-Apps/Operational!*[System[(Level=2 or Level=3 or Level=4 or Level=0)]]", "Application!*[System[(Level=2 or Level=3)]]", "Microsoft-FSLogix-Apps/Admin!*[System[(Level=2 or Level=3 or Level=4 or Level=0)]]"]
+      }
+    ]
+  }
+  monitor_data_collection_rule_resource_group_name = azurerm_resource_group.this.name
+}
 ```
 
 <!-- markdownlint-disable MD033 -->
@@ -361,38 +410,6 @@ If it is set to false, then no telemetry will be collected.
 Type: `bool`
 
 Default: `true`
-
-### <a name="input_log_analytics_workspace_location"></a> [log\_analytics\_workspace\_location](#input\_log\_analytics\_workspace\_location)
-
-Description: Location for the Log Analytics workspace
-
-Type: `string`
-
-Default: `"centralus"`
-
-### <a name="input_log_analytics_workspace_name"></a> [log\_analytics\_workspace\_name](#input\_log\_analytics\_workspace\_name)
-
-Description: The name of the Log Analytics workspace for Azure Virtual Desktop.
-
-Type: `string`
-
-Default: `"avd-log-analytics-workspace"`
-
-### <a name="input_monitor_data_collection_rule_location"></a> [monitor\_data\_collection\_rule\_location](#input\_monitor\_data\_collection\_rule\_location)
-
-Description: The location for the monitor data collection rule.
-
-Type: `string`
-
-Default: `"centralus"`
-
-### <a name="input_monitor_data_collection_rule_resource_group_name"></a> [monitor\_data\_collection\_rule\_resource\_group\_name](#input\_monitor\_data\_collection\_rule\_resource\_group\_name)
-
-Description: The resource group for the monitor data collection rule.
-
-Type: `string`
-
-Default: `"RG-JS-AVDdemo4"`
 
 ### <a name="input_tags"></a> [tags](#input\_tags)
 
@@ -549,6 +566,12 @@ The following Modules are called:
 Source: ../../
 
 Version:
+
+### <a name="module_avm_ptn_avd_lza_insights"></a> [avm\_ptn\_avd\_lza\_insights](#module\_avm\_ptn\_avd\_lza\_insights)
+
+Source: Azure/avm-ptn-avd-lza-insights/azurerm
+
+Version: 0.1.3
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 

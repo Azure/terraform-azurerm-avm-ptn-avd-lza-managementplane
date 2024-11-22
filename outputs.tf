@@ -3,19 +3,9 @@ output "application_group_id" {
   value       = module.avm_res_desktopvirtualization_applicationgroup.resource.id
 }
 
-output "dcr_resource_id" {
-  description = "The ID of the Monitor Data Collection Rule."
-  value       = module.avm_ptn_avd_lza_insights.resource_id
-}
-
 output "hostpool_id" {
   description = "The ID of the host pool."
   value       = module.avm_res_desktopvirtualization_hostpool.resource.id
-}
-
-output "log_analytics_workspace_id" {
-  description = "The ID of the Log Analytics workspace."
-  value       = azurerm_log_analytics_workspace.this.id
 }
 
 output "private_endpoints_hostpool" {

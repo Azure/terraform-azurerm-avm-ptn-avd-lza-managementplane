@@ -20,12 +20,6 @@ module "avm_res_desktopvirtualization_hostpool" {
       hour_of_day = 0
     }])
   }
-  diagnostic_settings = {
-    to_law = {
-      name                  = "to-law"
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
-    }
-  }
 }
 
 # Registration information for the host pool.
@@ -60,7 +54,7 @@ module "avm_res_desktopvirtualization_applicationgroup" {
 # Create Azure Virtual Desktop workspace
 module "avm_res_desktopvirtualization_workspace" {
   source                                        = "Azure/avm-res-desktopvirtualization-workspace/azurerm"
-  version                                       = "0.1.6"
+  version                                       = "0.1.7"
   virtual_desktop_workspace_location            = var.virtual_desktop_workspace_location
   virtual_desktop_workspace_description         = var.virtual_desktop_workspace_description
   virtual_desktop_workspace_resource_group_name = var.resource_group_name
@@ -68,12 +62,6 @@ module "avm_res_desktopvirtualization_workspace" {
   virtual_desktop_workspace_name                = var.virtual_desktop_workspace_name
   virtual_desktop_workspace_friendly_name       = var.virtual_desktop_workspace_friendly_name
   tags                                          = local.tags
-  diagnostic_settings = {
-    to_law = {
-      name                  = "to-law"
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
-    }
-  }
 }
 
 resource "azurerm_virtual_desktop_workspace_application_group_association" "workappgrassoc" {
