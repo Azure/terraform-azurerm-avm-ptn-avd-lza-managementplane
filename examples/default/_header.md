@@ -10,4 +10,3 @@ This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
 - Azure Virtual Desktop Insights with Log Analytics workspace
 - An AVD session host joined to Entra ID
 - Azure Virtual Dekstop Spoke network resources: vnet, subnet
-- Azure Key Vault

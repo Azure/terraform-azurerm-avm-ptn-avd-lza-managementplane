@@ -14,30 +14,6 @@ If it is set to false, then no telemetry will be collected.
 DESCRIPTION
 }
 
-variable "log_analytics_workspace_location" {
-  type        = string
-  default     = "centralus"
-  description = "Location for the Log Analytics workspace"
-}
-
-variable "log_analytics_workspace_name" {
-  type        = string
-  default     = "avd-log-analytics-workspace"
-  description = "The name of the Log Analytics workspace for Azure Virtual Desktop."
-}
-
-variable "monitor_data_collection_rule_location" {
-  type        = string
-  default     = "centralus"
-  description = "The location for the monitor data collection rule."
-}
-
-variable "monitor_data_collection_rule_resource_group_name" {
-  type        = string
-  default     = "RG-JS-AVDdemo4"
-  description = "The resource group for the monitor data collection rule."
-}
-
 variable "tags" {
   type        = map(string)
   default     = { "Owner.Email" : "name@microsoft.com" }
