@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.7.0, < 4.0.0"
+      version = ">= 3.71, < 5.0.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -18,6 +18,7 @@ provider "azurerm" {
       prevent_deletion_if_contains_resources = false
     }
   }
+  subscription_id = var.subscription_id
 }
 
 # This ensures we have unique CAF compliant names for our resources.
@@ -228,7 +229,7 @@ resource "azurerm_monitor_data_collection_rule_association" "example" {
 # Create resources for Azure Virtual Desktop Insights data collection rules
 module "avm_ptn_avd_lza_insights" {
   source                                = "Azure/avm-ptn-avd-lza-insights/azurerm"
-  version                               = "0.1.3"
+  version                               = "0.1.4"
   enable_telemetry                      = var.enable_telemetry
   monitor_data_collection_rule_location = azurerm_resource_group.this.location
   monitor_data_collection_rule_kind     = "Windows"

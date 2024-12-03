@@ -1,7 +1,7 @@
 # Create Azure Virtual Desktop host pool
 module "avm_res_desktopvirtualization_hostpool" {
   source                                             = "Azure/avm-res-desktopvirtualization-hostpool/azurerm"
-  version                                            = "0.2.1"
+  version                                            = "0.3.0"
   enable_telemetry                                   = var.enable_telemetry
   resource_group_name                                = var.resource_group_name
   virtual_desktop_host_pool_type                     = var.virtual_desktop_host_pool_type
@@ -38,7 +38,7 @@ resource "azurerm_virtual_desktop_host_pool_registration_info" "registrationinfo
 # Create Azure Virtual Desktop application group
 module "avm_res_desktopvirtualization_applicationgroup" {
   source                                                         = "Azure/avm-res-desktopvirtualization-applicationgroup/azurerm"
-  version                                                        = "0.1.5"
+  version                                                        = "0.2.0"
   enable_telemetry                                               = var.enable_telemetry
   virtual_desktop_application_group_name                         = var.virtual_desktop_application_group_name
   virtual_desktop_application_group_type                         = var.virtual_desktop_application_group_type
@@ -54,7 +54,7 @@ module "avm_res_desktopvirtualization_applicationgroup" {
 # Create Azure Virtual Desktop workspace
 module "avm_res_desktopvirtualization_workspace" {
   source                                        = "Azure/avm-res-desktopvirtualization-workspace/azurerm"
-  version                                       = "0.1.7"
+  version                                       = "0.2.0"
   virtual_desktop_workspace_location            = var.virtual_desktop_workspace_location
   virtual_desktop_workspace_description         = var.virtual_desktop_workspace_description
   virtual_desktop_workspace_resource_group_name = var.resource_group_name
@@ -75,7 +75,7 @@ resource "random_uuid" "example" {}
 module "avm_res_desktopvirtualization_scaling_plan" {
   source                                           = "Azure/avm-res-desktopvirtualization-scalingplan/azurerm"
   enable_telemetry                                 = var.enable_telemetry
-  version                                          = "0.1.4"
+  version                                          = "0.2.0"
   virtual_desktop_scaling_plan_name                = var.virtual_desktop_scaling_plan_name
   virtual_desktop_scaling_plan_location            = var.virtual_desktop_scaling_plan_location
   virtual_desktop_scaling_plan_resource_group_name = var.resource_group_name

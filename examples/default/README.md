@@ -18,7 +18,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.7.0, < 4.0.0"
+      version = ">= 3.71, < 5.0.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -33,6 +33,7 @@ provider "azurerm" {
       prevent_deletion_if_contains_resources = false
     }
   }
+  subscription_id = var.subscription_id
 }
 
 # This ensures we have unique CAF compliant names for our resources.
@@ -243,7 +244,7 @@ resource "azurerm_monitor_data_collection_rule_association" "example" {
 # Create resources for Azure Virtual Desktop Insights data collection rules
 module "avm_ptn_avd_lza_insights" {
   source                                = "Azure/avm-ptn-avd-lza-insights/azurerm"
-  version                               = "0.1.3"
+  version                               = "0.1.4"
   enable_telemetry                      = var.enable_telemetry
   monitor_data_collection_rule_location = azurerm_resource_group.this.location
   monitor_data_collection_rule_kind     = "Windows"
@@ -294,7 +295,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.6.6, < 2.0.0)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.7.0, < 4.0.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.71, < 5.0.0)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.6.0, <4.0.0)
 
@@ -318,7 +319,13 @@ The following resources are used by this module:
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
 
-No required inputs.
+The following input variables are required:
+
+### <a name="input_subscription_id"></a> [subscription\_id](#input\_subscription\_id)
+
+Description: The subscription ID for the Azure account.
+
+Type: `string`
 
 ## Optional Inputs
 
@@ -502,7 +509,7 @@ Version:
 
 Source: Azure/avm-ptn-avd-lza-insights/azurerm
 
-Version: 0.1.3
+Version: 0.1.4
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 
