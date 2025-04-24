@@ -17,10 +17,6 @@ This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
 terraform {
   required_version = ">= 1.9, < 2.0"
   required_providers {
-    azuread = {
-      source  = "hashicorp/azuread"
-      version = ">= 2.0.0, < 3.0.0"
-    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 3.71, < 5.0.0"
@@ -28,10 +24,6 @@ terraform {
     random = {
       source  = "hashicorp/random"
       version = ">= 3.6.0, <4.0.0"
-    }
-    time = {
-      source  = "hashicorp/time"
-      version = ">= 0.7.2"
     }
   }
 }
@@ -311,13 +303,9 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
 
-- <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) (>= 2.0.0, < 3.0.0)
-
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.71, < 5.0.0)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.6.0, <4.0.0)
-
-- <a name="requirement_time"></a> [time](#requirement\_time) (>= 0.7.2)
 
 ## Resources
 

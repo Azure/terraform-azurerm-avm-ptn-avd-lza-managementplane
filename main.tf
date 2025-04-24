@@ -76,12 +76,12 @@ resource "azurerm_virtual_desktop_workspace_application_group_association" "work
   workspace_id         = module.avm_res_desktopvirtualization_workspace.resource.id
 }
 
-// Lookup the AVD service principal
+# Lookup the AVD service principal
 data "azuread_service_principal" "avd_service" {
   display_name = "Azure Virtual Desktop"
 }
 
-// Grant it Reader access to your Host Pool
+# Grant it Reader access to your Host Pool
 resource "azurerm_role_assignment" "avd_service_hostpool_reader" {
   principal_id         = data.azuread_service_principal.avd_service.object_id
   scope                = module.avm_res_desktopvirtualization_hostpool.resource.id
