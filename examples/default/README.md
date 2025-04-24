@@ -4,6 +4,7 @@
 This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
 
 ## Features
+
 - Azure Virtual Desktop Host Pool includes Diagnostic log settings
 - Azure Virtual Desktop Desktop Application Group
 - Azure Virtual Desktop Workspace includes Diagnostic log settings
@@ -16,6 +17,10 @@ This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
 terraform {
   required_version = ">= 1.9, < 2.0"
   required_providers {
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = ">= 2.0.0, < 3.0.0"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 3.71, < 5.0.0"
@@ -23,6 +28,10 @@ terraform {
     random = {
       source  = "hashicorp/random"
       version = ">= 3.6.0, <4.0.0"
+    }
+    time = {
+      source  = "hashicorp/time"
+      version = ">= 0.7.2"
     }
   }
 }
@@ -36,6 +45,12 @@ provider "azurerm" {
   subscription_id = var.subscription_id
 }
 
+# This picks a random region from the list of regions.
+resource "random_integer" "region_index" {
+  max = length(local.azure_regions) - 1
+  min = 0
+}
+
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
@@ -43,10 +58,11 @@ module "naming" {
 }
 
 resource "azurerm_resource_group" "this" {
-  location = "centralus"
-  name     = "RG-JS-AVDdemo4"
+  location = local.azure_regions[random_integer.region_index.result]
+  name     = module.naming.resource_group.name_unique
   tags     = var.tags
 }
+
 resource "azurerm_user_assigned_identity" "this" {
   location            = azurerm_resource_group.this.location
   name                = "uai-avd-dcr"
@@ -150,7 +166,7 @@ resource "azurerm_windows_virtual_machine" "this" {
   name                       = "${var.avd_vm_name}-${count.index}"
   network_interface_ids      = [azurerm_network_interface.this[count.index].id]
   resource_group_name        = azurerm_resource_group.this.name
-  size                       = "Standard_D4s_v4"
+  size                       = "Standard_D2s_v4"
   computer_name              = "${var.avd_vm_name}-${count.index}"
   encryption_at_host_enabled = true
   secure_boot_enabled        = true
@@ -244,7 +260,7 @@ resource "azurerm_monitor_data_collection_rule_association" "example" {
 # Create resources for Azure Virtual Desktop Insights data collection rules
 module "avm_ptn_avd_lza_insights" {
   source                                = "Azure/avm-ptn-avd-lza-insights/azurerm"
-  version                               = "0.1.4"
+  version                               = ">= 0.1.4"
   enable_telemetry                      = var.enable_telemetry
   monitor_data_collection_rule_location = azurerm_resource_group.this.location
   monitor_data_collection_rule_kind     = "Windows"
@@ -295,9 +311,13 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
 
+- <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) (>= 2.0.0, < 3.0.0)
+
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.71, < 5.0.0)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.6.0, <4.0.0)
+
+- <a name="requirement_time"></a> [time](#requirement\_time) (>= 0.7.2)
 
 ## Resources
 
@@ -314,6 +334,7 @@ The following resources are used by this module:
 - [azurerm_virtual_machine_extension.vmext_dsc](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension) (resource)
 - [azurerm_virtual_network.this_vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) (resource)
 - [azurerm_windows_virtual_machine.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/windows_virtual_machine) (resource)
+- [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
 - [random_password.vmpass](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) (resource)
 
 <!-- markdownlint-disable MD013 -->
@@ -509,7 +530,7 @@ Version:
 
 Source: Azure/avm-ptn-avd-lza-insights/azurerm
 
-Version: 0.1.4
+Version: >= 0.1.4
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 
