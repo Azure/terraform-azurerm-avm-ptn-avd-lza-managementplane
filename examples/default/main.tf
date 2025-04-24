@@ -21,6 +21,12 @@ provider "azurerm" {
   subscription_id = var.subscription_id
 }
 
+# This picks a random region from the list of regions.
+resource "random_integer" "region_index" {
+  max = length(local.azure_regions) - 1
+  min = 0
+}
+
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
@@ -28,10 +34,11 @@ module "naming" {
 }
 
 resource "azurerm_resource_group" "this" {
-  location = "centralus"
-  name     = "RG-JS-AVDdemo4"
+  location = local.azure_regions[random_integer.region_index.result]
+  name     = module.naming.resource_group.name_unique
   tags     = var.tags
 }
+
 resource "azurerm_user_assigned_identity" "this" {
   location            = azurerm_resource_group.this.location
   name                = "uai-avd-dcr"
@@ -135,7 +142,7 @@ resource "azurerm_windows_virtual_machine" "this" {
   name                       = "${var.avd_vm_name}-${count.index}"
   network_interface_ids      = [azurerm_network_interface.this[count.index].id]
   resource_group_name        = azurerm_resource_group.this.name
-  size                       = "Standard_D4s_v4"
+  size                       = "Standard_D2s_v4"
   computer_name              = "${var.avd_vm_name}-${count.index}"
   encryption_at_host_enabled = true
   secure_boot_enabled        = true
@@ -229,7 +236,7 @@ resource "azurerm_monitor_data_collection_rule_association" "example" {
 # Create resources for Azure Virtual Desktop Insights data collection rules
 module "avm_ptn_avd_lza_insights" {
   source                                = "Azure/avm-ptn-avd-lza-insights/azurerm"
-  version                               = "0.1.4"
+  version                               = ">= 0.1.4"
   enable_telemetry                      = var.enable_telemetry
   monitor_data_collection_rule_location = azurerm_resource_group.this.location
   monitor_data_collection_rule_kind     = "Windows"

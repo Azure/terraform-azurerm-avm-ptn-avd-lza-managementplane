@@ -1,7 +1,7 @@
 # Create Azure Virtual Desktop host pool
 module "avm_res_desktopvirtualization_hostpool" {
   source                                             = "Azure/avm-res-desktopvirtualization-hostpool/azurerm"
-  version                                            = "0.3.0"
+  version                                            = ">=0.3.0"
   enable_telemetry                                   = var.enable_telemetry
   resource_group_name                                = var.resource_group_name
   virtual_desktop_host_pool_type                     = var.virtual_desktop_host_pool_type
@@ -22,6 +22,13 @@ module "avm_res_desktopvirtualization_hostpool" {
   }
 }
 
+
+resource "time_sleep" "wait_for_hostpool" {
+  create_duration = "30s"
+
+  depends_on = [module.avm_res_desktopvirtualization_hostpool]
+}
+
 # Registration information for the host pool.
 resource "azurerm_virtual_desktop_host_pool_registration_info" "registrationinfo" {
   expiration_date = timeadd(timestamp(), var.registration_expiration_period)
@@ -38,7 +45,7 @@ resource "azurerm_virtual_desktop_host_pool_registration_info" "registrationinfo
 # Create Azure Virtual Desktop application group
 module "avm_res_desktopvirtualization_applicationgroup" {
   source                                                         = "Azure/avm-res-desktopvirtualization-applicationgroup/azurerm"
-  version                                                        = "0.2.0"
+  version                                                        = ">=0.2.0"
   enable_telemetry                                               = var.enable_telemetry
   virtual_desktop_application_group_name                         = var.virtual_desktop_application_group_name
   virtual_desktop_application_group_type                         = var.virtual_desktop_application_group_type
@@ -54,7 +61,7 @@ module "avm_res_desktopvirtualization_applicationgroup" {
 # Create Azure Virtual Desktop workspace
 module "avm_res_desktopvirtualization_workspace" {
   source                                        = "Azure/avm-res-desktopvirtualization-workspace/azurerm"
-  version                                       = "0.2.0"
+  version                                       = ">=0.2.0"
   virtual_desktop_workspace_location            = var.virtual_desktop_workspace_location
   virtual_desktop_workspace_description         = var.virtual_desktop_workspace_description
   virtual_desktop_workspace_resource_group_name = var.resource_group_name
@@ -69,13 +76,26 @@ resource "azurerm_virtual_desktop_workspace_application_group_association" "work
   workspace_id         = module.avm_res_desktopvirtualization_workspace.resource.id
 }
 
+# Lookup the AVD service principal
+data "azuread_service_principal" "avd_service" {
+  display_name = "Azure Virtual Desktop"
+}
+
+# Grant it Reader access to your Host Pool
+resource "azurerm_role_assignment" "avd_service_hostpool_reader" {
+  principal_id         = data.azuread_service_principal.avd_service.object_id
+  scope                = module.avm_res_desktopvirtualization_hostpool.resource.id
+  role_definition_name = "Desktop Virtualization Power On Off Contributor"
+
+  depends_on = [module.avm_res_desktopvirtualization_hostpool]
+}
 
 resource "random_uuid" "example" {}
 # Create Azure Virtual Desktop scaling plan
 module "avm_res_desktopvirtualization_scaling_plan" {
   source                                           = "Azure/avm-res-desktopvirtualization-scalingplan/azurerm"
   enable_telemetry                                 = var.enable_telemetry
-  version                                          = "0.2.0"
+  version                                          = ">=0.2.0"
   virtual_desktop_scaling_plan_name                = var.virtual_desktop_scaling_plan_name
   virtual_desktop_scaling_plan_location            = var.virtual_desktop_scaling_plan_location
   virtual_desktop_scaling_plan_resource_group_name = var.resource_group_name
@@ -91,5 +111,8 @@ module "avm_res_desktopvirtualization_scaling_plan" {
     ]
   )
   virtual_desktop_scaling_plan_schedule = var.virtual_desktop_scaling_plan_schedule
+  depends_on = [
+    time_sleep.wait_for_hostpool
+  ]
 }
 
