@@ -69,12 +69,17 @@ resource "azurerm_log_analytics_workspace" "this" {
 
 module "avd" {
   source = "../../"
-  # source             = "Azure/avm-ptn-avd-lza-managementplane/azurerm"
-  enable_telemetry                   = var.enable_telemetry
-  resource_group_name                = azurerm_resource_group.this.name
-  virtual_desktop_workspace_name     = var.virtual_desktop_workspace_name
-  virtual_desktop_workspace_location = var.virtual_desktop_workspace_location
-  public_network_access_enabled      = false
+
+  resource_group_name                          = azurerm_resource_group.this.name
+  virtual_desktop_application_group_location   = var.virtual_desktop_application_group_location
+  virtual_desktop_application_group_name       = var.virtual_desktop_application_group_name
+  virtual_desktop_application_group_type       = var.virtual_desktop_application_group_type
+  virtual_desktop_host_pool_load_balancer_type = var.virtual_desktop_host_pool_load_balancer_type
+  virtual_desktop_host_pool_location           = var.virtual_desktop_host_pool_location
+  virtual_desktop_host_pool_name               = var.virtual_desktop_host_pool_name
+  virtual_desktop_host_pool_type               = var.virtual_desktop_host_pool_type
+  virtual_desktop_scaling_plan_location        = var.virtual_desktop_scaling_plan_location
+  virtual_desktop_scaling_plan_name            = var.virtual_desktop_scaling_plan_name
   virtual_desktop_scaling_plan_schedule = [
     {
       name                                 = "Weekends"
@@ -97,19 +102,15 @@ module "avd" {
       off_peak_load_balancing_algorithm    = "DepthFirst"
     }
   ]
-  virtual_desktop_scaling_plan_time_zone             = var.virtual_desktop_scaling_plan_time_zone
-  virtual_desktop_scaling_plan_name                  = var.virtual_desktop_scaling_plan_name
-  virtual_desktop_scaling_plan_location              = var.virtual_desktop_scaling_plan_location
-  virtual_desktop_host_pool_type                     = var.virtual_desktop_host_pool_type
-  virtual_desktop_host_pool_load_balancer_type       = var.virtual_desktop_host_pool_load_balancer_type
-  virtual_desktop_host_pool_name                     = var.virtual_desktop_host_pool_name
-  virtual_desktop_host_pool_location                 = var.virtual_desktop_host_pool_location
+  virtual_desktop_scaling_plan_time_zone = var.virtual_desktop_scaling_plan_time_zone
+  virtual_desktop_workspace_location     = var.virtual_desktop_workspace_location
+  virtual_desktop_workspace_name         = var.virtual_desktop_workspace_name
+  # source             = "Azure/avm-ptn-avd-lza-managementplane/azurerm"
+  enable_telemetry                                   = var.enable_telemetry
+  public_network_access_enabled                      = false
+  virtual_desktop_host_pool_friendly_name            = var.virtual_desktop_host_pool_friendly_name
   virtual_desktop_host_pool_maximum_sessions_allowed = var.virtual_desktop_host_pool_maximum_sessions_allowed
   virtual_desktop_host_pool_start_vm_on_connect      = var.virtual_desktop_host_pool_start_vm_on_connect
-  virtual_desktop_application_group_type             = var.virtual_desktop_application_group_type
-  virtual_desktop_application_group_name             = var.virtual_desktop_application_group_name
-  virtual_desktop_application_group_location         = var.virtual_desktop_application_group_location
-  virtual_desktop_host_pool_friendly_name            = var.virtual_desktop_host_pool_friendly_name
 }
 
 # Deploy an vnet and subnet for AVD session hosts
@@ -251,24 +252,19 @@ resource "azurerm_monitor_data_collection_rule_association" "example" {
 
 # Create resources for Azure Virtual Desktop Insights data collection rules
 module "avm_ptn_avd_lza_insights" {
-  source                                = "Azure/avm-ptn-avd-lza-insights/azurerm"
-  version                               = ">= 0.1.4"
-  enable_telemetry                      = var.enable_telemetry
-  monitor_data_collection_rule_location = azurerm_resource_group.this.location
-  monitor_data_collection_rule_kind     = "Windows"
-  monitor_data_collection_rule_name     = "microsoft-avdi-eastus"
+  source  = "Azure/avm-ptn-avd-lza-insights/azurerm"
+  version = ">= 0.1.4"
+
   monitor_data_collection_rule_data_flow = [
     {
       destinations = [azurerm_log_analytics_workspace.this.name]
       streams      = ["Microsoft-Perf", "Microsoft-Event"]
     }
   ]
-  monitor_data_collection_rule_destinations = {
-    log_analytics = {
-      name                  = azurerm_log_analytics_workspace.this.name
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
-    }
-  }
+  monitor_data_collection_rule_location            = azurerm_resource_group.this.location
+  monitor_data_collection_rule_name                = "microsoft-avdi-eastus"
+  monitor_data_collection_rule_resource_group_name = azurerm_resource_group.this.name
+  enable_telemetry                                 = var.enable_telemetry
   monitor_data_collection_rule_data_sources = {
     performance_counter = [
       {
@@ -292,7 +288,13 @@ module "avm_ptn_avd_lza_insights" {
       }
     ]
   }
-  monitor_data_collection_rule_resource_group_name = azurerm_resource_group.this.name
+  monitor_data_collection_rule_destinations = {
+    log_analytics = {
+      name                  = azurerm_log_analytics_workspace.this.name
+      workspace_resource_id = azurerm_log_analytics_workspace.this.id
+    }
+  }
+  monitor_data_collection_rule_kind = "Windows"
 }
 ```
 
