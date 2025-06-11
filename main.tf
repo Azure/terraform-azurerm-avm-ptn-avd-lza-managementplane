@@ -1,7 +1,7 @@
 # Create Azure Virtual Desktop host pool
 module "avm_res_desktopvirtualization_hostpool" {
   source  = "Azure/avm-res-desktopvirtualization-hostpool/azurerm"
-  version = ">=0.3.0"
+  version = ">=0.4.0"
 
   resource_group_name                                = var.resource_group_name
   virtual_desktop_host_pool_load_balancer_type       = var.virtual_desktop_host_pool_load_balancer_type
