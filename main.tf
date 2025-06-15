@@ -65,10 +65,10 @@ module "avm_res_desktopvirtualization_workspace" {
   source  = "Azure/avm-res-desktopvirtualization-workspace/azurerm"
   version = ">=0.2.1"
 
-  resource_group_name                           = var.resource_group_name
   virtual_desktop_workspace_location            = var.virtual_desktop_workspace_location
   virtual_desktop_workspace_name                = var.virtual_desktop_workspace_name
   virtual_desktop_workspace_resource_group_name = var.resource_group_name
+  resource_group_name                           = var.resource_group_name
   tags                                          = local.tags
   virtual_desktop_workspace_description         = var.virtual_desktop_workspace_description
   virtual_desktop_workspace_friendly_name       = var.virtual_desktop_workspace_friendly_name
