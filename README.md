@@ -18,13 +18,13 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) (>= 2.0.0, < 3.0.0)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.71, < 5.0.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.71.0, < 5.0.0)
 
 - <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
 
-- <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.6.0, <4.0.0)
+- <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.6.0, < 4.0.0)
 
-- <a name="requirement_time"></a> [time](#requirement\_time) (>= 0.7.2)
+- <a name="requirement_time"></a> [time](#requirement\_time) (~> 0.9)
 
 ## Resources
 
@@ -37,8 +37,8 @@ The following resources are used by this module:
 - [random_uuid.example](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [time_sleep.wait_for_hostpool](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
-- [azapi_client_config.telemetry](https://registry.terraform.io/providers/hashicorp/azapi/latest/docs/data-sources/client_config) (data source)
 - [azuread_service_principal.avd_service](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/service_principal) (data source)
+- [azurerm_client_config.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/data-sources/module_source) (data source)
 
 <!-- markdownlint-disable MD013 -->
@@ -393,11 +393,60 @@ Default: `null`
 
 ### <a name="input_virtual_desktop_host_pool_custom_rdp_properties"></a> [virtual\_desktop\_host\_pool\_custom\_rdp\_properties](#input\_virtual\_desktop\_host\_pool\_custom\_rdp\_properties)
 
-Description: (Optional) A valid custom RDP properties string for the Virtual Desktop Host Pool, available properties can be [found in this article](https://docs.microsoft.com/windows-server/remote/remote-desktop-services/clients/rdp-files).
+Description: (Optional) Custom RDP properties for the Virtual Desktop Host Pool.   
+Configure individual RDP settings or provide additional custom properties.  
+Available properties can be found in: https://docs.microsoft.com/windows-server/remote/remote-desktop-services/clients/rdp-files
 
-Type: `string`
+- drivestoredirect: Drive redirection (string, default: "*")
+- audiomode: Audio mode (number: 0=Both, 1=Local, 2=Remote, default: 0)
+- videoplaybackmode: Video playback mode (number: 0=Disabled, 1=Enabled, default: 1)
+- redirectclipboard: Clipboard redirection (number: 0=Disabled, 1=Enabled, default: 1)
+- redirectprinters: Printer redirection (number: 0=Disabled, 1=Enabled, default: 1)
+- devicestoredirect: Device redirection (string, default: "*")
+- redirectcomports: COM port redirection (number: 0=Disabled, 1=Enabled, default: 1)
+- redirectsmartcards: Smart card redirection (number: 0=Disabled, 1=Enabled, default: 1)
+- usbdevicestoredirect: USB device redirection (string, default: "*")
+- enablecredsspsupport: CredSSP support (number: 0=Disabled, 1=Enabled, default: 1)
+- use\_multimon: Multi-monitor support (number: 0=Disabled, 1=Enabled, default: 0)
+- custom\_properties: Additional custom RDP properties as key-value pairs
 
-Default: `"drivestoredirect:s:*;audiomode:i:0;videoplaybackmode:i:1;redirectclipboard:i:1;redirectprinters:i:1;devicestoredirect:s:*;redirectcomports:i:1;redirectsmartcards:i:1;usbdevicestoredirect:s:*;enablecredsspsupport:i:1;use multimon:i:0"`
+Type:
+
+```hcl
+object({
+    drivestoredirect     = optional(string, "*")
+    audiomode            = optional(number, 0)
+    videoplaybackmode    = optional(number, 1)
+    redirectclipboard    = optional(number, 1)
+    redirectprinters     = optional(number, 1)
+    devicestoredirect    = optional(string, "*")
+    redirectcomports     = optional(number, 1)
+    redirectsmartcards   = optional(number, 1)
+    usbdevicestoredirect = optional(string, "*")
+    enablecredsspsupport = optional(number, 1)
+    use_multimon         = optional(number, 0)
+    custom_properties    = optional(map(string), {})
+  })
+```
+
+Default:
+
+```json
+{
+  "audiomode": 0,
+  "custom_properties": {},
+  "devicestoredirect": "*",
+  "drivestoredirect": "*",
+  "enablecredsspsupport": 1,
+  "redirectclipboard": 1,
+  "redirectcomports": 1,
+  "redirectprinters": 1,
+  "redirectsmartcards": 1,
+  "usbdevicestoredirect": "*",
+  "use_multimon": 0,
+  "videoplaybackmode": 1
+}
+```
 
 ### <a name="input_virtual_desktop_host_pool_description"></a> [virtual\_desktop\_host\_pool\_description](#input\_virtual\_desktop\_host\_pool\_description)
 
@@ -682,25 +731,25 @@ The following Modules are called:
 
 Source: Azure/avm-res-desktopvirtualization-applicationgroup/azurerm
 
-Version: >=0.2.0
+Version: >=0.2.1
 
 ### <a name="module_avm_res_desktopvirtualization_hostpool"></a> [avm\_res\_desktopvirtualization\_hostpool](#module\_avm\_res\_desktopvirtualization\_hostpool)
 
 Source: Azure/avm-res-desktopvirtualization-hostpool/azurerm
 
-Version: >=0.3.0
+Version: >=0.4.0
 
 ### <a name="module_avm_res_desktopvirtualization_scaling_plan"></a> [avm\_res\_desktopvirtualization\_scaling\_plan](#module\_avm\_res\_desktopvirtualization\_scaling\_plan)
 
 Source: Azure/avm-res-desktopvirtualization-scalingplan/azurerm
 
-Version: >=0.2.0
+Version: >=0.2.1
 
 ### <a name="module_avm_res_desktopvirtualization_workspace"></a> [avm\_res\_desktopvirtualization\_workspace](#module\_avm\_res\_desktopvirtualization\_workspace)
 
 Source: Azure/avm-res-desktopvirtualization-workspace/azurerm
 
-Version: >=0.2.0
+Version: >=0.2.2
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection
