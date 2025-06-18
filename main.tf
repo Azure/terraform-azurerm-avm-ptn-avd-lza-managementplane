@@ -68,9 +68,9 @@ module "avm_res_desktopvirtualization_workspace" {
   virtual_desktop_workspace_location            = var.virtual_desktop_workspace_location
   virtual_desktop_workspace_name                = var.virtual_desktop_workspace_name
   virtual_desktop_workspace_resource_group_name = var.resource_group_name
-  virtual_desktop_workspace_timeouts            = local.tags
   virtual_desktop_workspace_description         = var.virtual_desktop_workspace_description
   virtual_desktop_workspace_friendly_name       = var.virtual_desktop_workspace_friendly_name
+  virtual_desktop_workspace_timeouts            = local.tags
 }
 
 resource "azurerm_virtual_desktop_workspace_application_group_association" "workappgrassoc" {
