@@ -1,6 +1,6 @@
 variable "resource_group_name" {
   type        = string
-  description = "The name of the resource group in which the AVD Private Endpoint should be created."
+  description = "The name of the resource group in which the resources should be created."
 }
 
 variable "virtual_desktop_application_group_location" {
@@ -48,6 +48,12 @@ variable "virtual_desktop_host_pool_name" {
   }
 }
 
+variable "virtual_desktop_host_pool_resource_group_name" {
+  type        = string
+  description = "(Required) The name of the resource group in which to create the Virtual Desktop Host Pool. Changing this forces a new resource to be created."
+  nullable    = false
+}
+
 variable "virtual_desktop_host_pool_type" {
   type        = string
   description = "(Required) The type of the Virtual Desktop Host Pool. Valid options are `Personal` or `Pooled`. Changing the type forces a new resource to be created."
@@ -62,6 +68,12 @@ variable "virtual_desktop_scaling_plan_location" {
 variable "virtual_desktop_scaling_plan_name" {
   type        = string
   description = "(Required) The name which should be used for this Virtual Desktop Scaling Plan . Changing this forces a new Virtual Desktop Scaling Plan to be created."
+  nullable    = false
+}
+
+variable "virtual_desktop_scaling_plan_resource_group_name" {
+  type        = string
+  description = "(Required) The name of the Resource Group where the Virtual Desktop Scaling Plan should exist. Changing this forces a new Virtual Desktop Scaling Plan to be created."
   nullable    = false
 }
 
@@ -253,14 +265,14 @@ variable "role_assignments" {
   default     = {}
   description = <<DESCRIPTION
   A map of role assignments to create on the resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-  
+
   - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
   - `principal_id` - The ID of the principal to assign the role to.
   - `description` - The description of the role assignment.
   - `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
   - `condition` - The condition which will be used to scope the role assignment.
   - `condition_version` - The version of the condition syntax. Leave as `null` if you are not using a condition, if you are then valid values are '2.0'.
-  
+
   > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
   DESCRIPTION
   nullable    = false
@@ -308,6 +320,12 @@ variable "virtual_desktop_application_group_friendly_name" {
   type        = string
   default     = null
   description = "(Optional) Option to set a friendly name for the Virtual Desktop Application Group."
+}
+
+variable "virtual_desktop_application_group_resource_group_name" {
+  type        = string
+  default     = false
+  description = "The name of the resource group in which the Virtual Desktop Application Group resources should be created. If not specified, the resource group of the Virtual Desktop Host Pool will be used."
 }
 
 # tflint-ignore: terraform_unused_declarations
@@ -364,10 +382,10 @@ variable "virtual_desktop_host_pool_custom_rdp_properties" {
     custom_properties    = {}
   }
   description = <<-DESCRIPTION
-    (Optional) Custom RDP properties for the Virtual Desktop Host Pool. 
+    (Optional) Custom RDP properties for the Virtual Desktop Host Pool.
     Configure individual RDP settings or provide additional custom properties.
     Available properties can be found in: https://docs.microsoft.com/windows-server/remote/remote-desktop-services/clients/rdp-files
-    
+
     - drivestoredirect: Drive redirection (string, default: "*")
     - audiomode: Audio mode (number: 0=Both, 1=Local, 2=Remote, default: 0)
     - videoplaybackmode: Video playback mode (number: 0=Disabled, 1=Enabled, default: 1)

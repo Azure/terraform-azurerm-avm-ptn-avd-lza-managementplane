@@ -87,10 +87,9 @@ module "avd" {
       off_peak_load_balancing_algorithm    = "DepthFirst"
     }
   ]
-  virtual_desktop_scaling_plan_time_zone = var.virtual_desktop_scaling_plan_time_zone
-  virtual_desktop_workspace_location     = var.virtual_desktop_workspace_location
-  virtual_desktop_workspace_name         = var.virtual_desktop_workspace_name
-  # source             = "Azure/avm-ptn-avd-lza-managementplane/azurerm"
+  virtual_desktop_scaling_plan_time_zone             = var.virtual_desktop_scaling_plan_time_zone
+  virtual_desktop_workspace_location                 = var.virtual_desktop_workspace_location
+  virtual_desktop_workspace_name                     = var.virtual_desktop_workspace_name
   enable_telemetry                                   = var.enable_telemetry
   public_network_access_enabled                      = false
   virtual_desktop_host_pool_friendly_name            = var.virtual_desktop_host_pool_friendly_name

@@ -48,7 +48,7 @@ The following input variables are required:
 
 ### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
 
-Description: The name of the resource group in which the AVD Private Endpoint should be created.
+Description: The name of the resource group in which the resources should be created.
 
 Type: `string`
 
@@ -88,6 +88,12 @@ Description: (Required) The name of the Virtual Desktop Host Pool. Changing this
 
 Type: `string`
 
+### <a name="input_virtual_desktop_host_pool_resource_group_name"></a> [virtual\_desktop\_host\_pool\_resource\_group\_name](#input\_virtual\_desktop\_host\_pool\_resource\_group\_name)
+
+Description: (Required) The name of the resource group in which to create the Virtual Desktop Host Pool. Changing this forces a new resource to be created.
+
+Type: `string`
+
 ### <a name="input_virtual_desktop_host_pool_type"></a> [virtual\_desktop\_host\_pool\_type](#input\_virtual\_desktop\_host\_pool\_type)
 
 Description: (Required) The type of the Virtual Desktop Host Pool. Valid options are `Personal` or `Pooled`. Changing the type forces a new resource to be created.
@@ -103,6 +109,12 @@ Type: `string`
 ### <a name="input_virtual_desktop_scaling_plan_name"></a> [virtual\_desktop\_scaling\_plan\_name](#input\_virtual\_desktop\_scaling\_plan\_name)
 
 Description: (Required) The name which should be used for this Virtual Desktop Scaling Plan . Changing this forces a new Virtual Desktop Scaling Plan to be created.
+
+Type: `string`
+
+### <a name="input_virtual_desktop_scaling_plan_resource_group_name"></a> [virtual\_desktop\_scaling\_plan\_resource\_group\_name](#input\_virtual\_desktop\_scaling\_plan\_resource\_group\_name)
+
+Description: (Required) The name of the Resource Group where the Virtual Desktop Scaling Plan should exist. Changing this forces a new Virtual Desktop Scaling Plan to be created.
 
 Type: `string`
 
@@ -363,6 +375,14 @@ Type: `string`
 
 Default: `null`
 
+### <a name="input_virtual_desktop_application_group_resource_group_name"></a> [virtual\_desktop\_application\_group\_resource\_group\_name](#input\_virtual\_desktop\_application\_group\_resource\_group\_name)
+
+Description: The name of the resource group in which the Virtual Desktop Application Group resources should be created. If not specified, the resource group of the Virtual Desktop Host Pool will be used.
+
+Type: `string`
+
+Default: `false`
+
 ### <a name="input_virtual_desktop_application_group_tags"></a> [virtual\_desktop\_application\_group\_tags](#input\_virtual\_desktop\_application\_group\_tags)
 
 Description: (Optional) A mapping of tags to assign to the resource.
@@ -393,7 +413,7 @@ Default: `null`
 
 ### <a name="input_virtual_desktop_host_pool_custom_rdp_properties"></a> [virtual\_desktop\_host\_pool\_custom\_rdp\_properties](#input\_virtual\_desktop\_host\_pool\_custom\_rdp\_properties)
 
-Description: (Optional) Custom RDP properties for the Virtual Desktop Host Pool.   
+Description: (Optional) Custom RDP properties for the Virtual Desktop Host Pool.  
 Configure individual RDP settings or provide additional custom properties.  
 Available properties can be found in: https://docs.microsoft.com/windows-server/remote/remote-desktop-services/clients/rdp-files
 

@@ -35,6 +35,7 @@ provider "azurerm" {
       prevent_deletion_if_contains_resources = false
     }
   }
+  subscription_id = var.subscription_id
 }
 
 # This picks a random region from the list of regions.
@@ -91,16 +92,18 @@ resource "azurerm_private_dns_zone_virtual_network_link" "private_links" {
 module "avd" {
   source = "../../"
 
-  resource_group_name                          = azurerm_resource_group.this.name
-  virtual_desktop_application_group_location   = var.virtual_desktop_application_group_location
-  virtual_desktop_application_group_name       = var.virtual_desktop_application_group_name
-  virtual_desktop_application_group_type       = var.virtual_desktop_application_group_type
-  virtual_desktop_host_pool_load_balancer_type = var.virtual_desktop_host_pool_load_balancer_type
-  virtual_desktop_host_pool_location           = var.virtual_desktop_host_pool_location
-  virtual_desktop_host_pool_name               = var.virtual_desktop_host_pool_name
-  virtual_desktop_host_pool_type               = var.virtual_desktop_host_pool_type
-  virtual_desktop_scaling_plan_location        = var.virtual_desktop_scaling_plan_location
-  virtual_desktop_scaling_plan_name            = var.virtual_desktop_scaling_plan_name
+  resource_group_name                              = azurerm_resource_group.this.name
+  virtual_desktop_application_group_location       = azurerm_resource_group.this.location
+  virtual_desktop_application_group_name           = var.virtual_desktop_application_group_name
+  virtual_desktop_application_group_type           = var.virtual_desktop_application_group_type
+  virtual_desktop_host_pool_load_balancer_type     = var.virtual_desktop_host_pool_load_balancer_type
+  virtual_desktop_host_pool_location               = azurerm_resource_group.this.location
+  virtual_desktop_host_pool_name                   = var.virtual_desktop_host_pool_name
+  virtual_desktop_host_pool_resource_group_name    = azurerm_resource_group.this.name
+  virtual_desktop_host_pool_type                   = var.virtual_desktop_host_pool_type
+  virtual_desktop_scaling_plan_location            = azurerm_resource_group.this.location
+  virtual_desktop_scaling_plan_name                = var.virtual_desktop_scaling_plan_name
+  virtual_desktop_scaling_plan_resource_group_name = azurerm_resource_group.this.name
   virtual_desktop_scaling_plan_schedule = [
     {
       name                                 = "Weekends"
@@ -123,15 +126,15 @@ module "avd" {
       off_peak_load_balancing_algorithm    = "DepthFirst"
     }
   ]
-  virtual_desktop_scaling_plan_time_zone = var.virtual_desktop_scaling_plan_time_zone
-  virtual_desktop_workspace_location     = var.virtual_desktop_workspace_location
-  virtual_desktop_workspace_name         = var.virtual_desktop_workspace_name
-  # source             = "Azure/avm-ptn-avd-lza-managementplane/azurerm"
-  enable_telemetry                                   = var.enable_telemetry
-  public_network_access_enabled                      = false
-  virtual_desktop_host_pool_friendly_name            = var.virtual_desktop_host_pool_friendly_name
-  virtual_desktop_host_pool_maximum_sessions_allowed = var.virtual_desktop_host_pool_maximum_sessions_allowed
-  virtual_desktop_host_pool_start_vm_on_connect      = var.virtual_desktop_host_pool_start_vm_on_connect
+  virtual_desktop_scaling_plan_time_zone                = var.virtual_desktop_scaling_plan_time_zone
+  virtual_desktop_workspace_location                    = azurerm_resource_group.this.location
+  virtual_desktop_workspace_name                        = var.virtual_desktop_workspace_name
+  enable_telemetry                                      = var.enable_telemetry
+  public_network_access_enabled                         = false
+  virtual_desktop_application_group_resource_group_name = azurerm_resource_group.this.name
+  virtual_desktop_host_pool_friendly_name               = var.virtual_desktop_host_pool_friendly_name
+  virtual_desktop_host_pool_maximum_sessions_allowed    = var.virtual_desktop_host_pool_maximum_sessions_allowed
+  virtual_desktop_host_pool_start_vm_on_connect         = var.virtual_desktop_host_pool_start_vm_on_connect
 }
 
 # Deploy an vnet and subnet for AVD session hosts
@@ -305,14 +308,14 @@ resource "azurerm_monitor_data_collection_rule_association" "example" {
   count = var.vm_count
 
   target_resource_id      = azurerm_windows_virtual_machine.this[count.index].id
-  data_collection_rule_id = module.avm_ptn_avd_lza_insights.resource_id
+  data_collection_rule_id = module.avm_ptn_avd_lza_insights.resource.id
   name                    = "${var.avd_vm_name}-association-${count.index}"
 }
 
 # Create resources for Azure Virtual Desktop Insights data collection rules
 module "avm_ptn_avd_lza_insights" {
   source  = "Azure/avm-ptn-avd-lza-insights/azurerm"
-  version = "0.1.4"
+  version = ">= 0.1.4"
 
   monitor_data_collection_rule_data_flow = [
     {
@@ -393,7 +396,13 @@ The following resources are used by this module:
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
 
-No required inputs.
+The following input variables are required:
+
+### <a name="input_subscription_id"></a> [subscription\_id](#input\_subscription\_id)
+
+Description: The subscription ID for the Azure account.
+
+Type: `string`
 
 ## Optional Inputs
 
@@ -431,14 +440,6 @@ Default:
 }
 ```
 
-### <a name="input_virtual_desktop_application_group_location"></a> [virtual\_desktop\_application\_group\_location](#input\_virtual\_desktop\_application\_group\_location)
-
-Description: Location for the virtual desktop application group
-
-Type: `string`
-
-Default: `"centralus"`
-
 ### <a name="input_virtual_desktop_application_group_name"></a> [virtual\_desktop\_application\_group\_name](#input\_virtual\_desktop\_application\_group\_name)
 
 Description: The name of the AVD Application Group.
@@ -446,6 +447,14 @@ Description: The name of the AVD Application Group.
 Type: `string`
 
 Default: `"vdag-avd-001"`
+
+### <a name="input_virtual_desktop_application_group_resource_group_name"></a> [virtual\_desktop\_application\_group\_resource\_group\_name](#input\_virtual\_desktop\_application\_group\_resource\_group\_name)
+
+Description: The name of the resource group in which the Virtual Desktop Application Group resources should be created. If not specified, the resource group of the Virtual Desktop Host Pool will be used.
+
+Type: `string`
+
+Default: `false`
 
 ### <a name="input_virtual_desktop_application_group_type"></a> [virtual\_desktop\_application\_group\_type](#input\_virtual\_desktop\_application\_group\_type)
 
@@ -470,14 +479,6 @@ Description: `BreadthFirst` load balancing distributes new user sessions across 
 Type: `string`
 
 Default: `"BreadthFirst"`
-
-### <a name="input_virtual_desktop_host_pool_location"></a> [virtual\_desktop\_host\_pool\_location](#input\_virtual\_desktop\_host\_pool\_location)
-
-Description: Location for the host pool
-
-Type: `string`
-
-Default: `"centralus"`
 
 ### <a name="input_virtual_desktop_host_pool_maximum_sessions_allowed"></a> [virtual\_desktop\_host\_pool\_maximum\_sessions\_allowed](#input\_virtual\_desktop\_host\_pool\_maximum\_sessions\_allowed)
 
@@ -511,14 +512,6 @@ Type: `string`
 
 Default: `"Pooled"`
 
-### <a name="input_virtual_desktop_scaling_plan_location"></a> [virtual\_desktop\_scaling\_plan\_location](#input\_virtual\_desktop\_scaling\_plan\_location)
-
-Description: Location for the scaling plan
-
-Type: `string`
-
-Default: `"centralus"`
-
 ### <a name="input_virtual_desktop_scaling_plan_name"></a> [virtual\_desktop\_scaling\_plan\_name](#input\_virtual\_desktop\_scaling\_plan\_name)
 
 Description: The scaling plan for the AVD Host Pool.
@@ -534,14 +527,6 @@ Description: Specifies the Time Zone which should be used by the Scaling Plan fo
 Type: `string`
 
 Default: `"GMT Standard Time"`
-
-### <a name="input_virtual_desktop_workspace_location"></a> [virtual\_desktop\_workspace\_location](#input\_virtual\_desktop\_workspace\_location)
-
-Description: Location for the virtual desktop workspace
-
-Type: `string`
-
-Default: `"centralus"`
 
 ### <a name="input_virtual_desktop_workspace_name"></a> [virtual\_desktop\_workspace\_name](#input\_virtual\_desktop\_workspace\_name)
 
@@ -577,7 +562,7 @@ Version:
 
 Source: Azure/avm-ptn-avd-lza-insights/azurerm
 
-Version: 0.1.4
+Version: >= 0.1.4
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 

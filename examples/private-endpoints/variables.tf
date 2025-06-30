@@ -1,3 +1,8 @@
+variable "subscription_id" {
+  type        = string
+  description = "The subscription ID for the Azure account."
+}
+
 variable "avd_vm_name" {
   type        = string
   default     = "vm-avd"
@@ -20,12 +25,6 @@ variable "tags" {
   description = "A map of tags to add to all resources"
 }
 
-variable "virtual_desktop_application_group_location" {
-  type        = string
-  default     = "centralus"
-  description = "Location for the virtual desktop application group"
-}
-
 variable "virtual_desktop_application_group_name" {
   type        = string
   default     = "vdag-avd-001"
@@ -35,6 +34,12 @@ variable "virtual_desktop_application_group_name" {
     condition     = can(regex("^[a-z0-9-]{3,24}$", var.virtual_desktop_application_group_name))
     error_message = "The name must be between 3 and 24 characters long and can only contain lowercase letters, numbers and dashes."
   }
+}
+
+variable "virtual_desktop_application_group_resource_group_name" {
+  type        = string
+  default     = false
+  description = "The name of the resource group in which the Virtual Desktop Application Group resources should be created. If not specified, the resource group of the Virtual Desktop Host Pool will be used."
 }
 
 variable "virtual_desktop_application_group_type" {
@@ -53,12 +58,6 @@ variable "virtual_desktop_host_pool_load_balancer_type" {
   type        = string
   default     = "BreadthFirst"
   description = "`BreadthFirst` load balancing distributes new user sessions across all available session hosts in the host pool. Possible values are `BreadthFirst`, `DepthFirst` and `Persistent`. `DepthFirst` load balancing distributes new user sessions to an available session host with the highest number of connections but has not reached its maximum session limit threshold. `Persistent` should be used if the host pool type is `Personal`"
-}
-
-variable "virtual_desktop_host_pool_location" {
-  type        = string
-  default     = "centralus"
-  description = "Location for the host pool"
 }
 
 variable "virtual_desktop_host_pool_maximum_sessions_allowed" {
@@ -85,12 +84,6 @@ variable "virtual_desktop_host_pool_type" {
   description = "The type of the AVD Host Pool. Valid values are 'Pooled' and 'Personal'."
 }
 
-variable "virtual_desktop_scaling_plan_location" {
-  type        = string
-  default     = "centralus"
-  description = "Location for the scaling plan"
-}
-
 variable "virtual_desktop_scaling_plan_name" {
   type        = string
   default     = "scp-avd-01"
@@ -101,12 +94,6 @@ variable "virtual_desktop_scaling_plan_time_zone" {
   type        = string
   default     = "GMT Standard Time"
   description = "Specifies the Time Zone which should be used by the Scaling Plan for time based events."
-}
-
-variable "virtual_desktop_workspace_location" {
-  type        = string
-  default     = "centralus"
-  description = "Location for the virtual desktop workspace"
 }
 
 variable "virtual_desktop_workspace_name" {

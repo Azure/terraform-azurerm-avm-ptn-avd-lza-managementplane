@@ -7,7 +7,7 @@ module "avm_res_desktopvirtualization_hostpool" {
   virtual_desktop_host_pool_load_balancer_type       = var.virtual_desktop_host_pool_load_balancer_type
   virtual_desktop_host_pool_location                 = var.virtual_desktop_host_pool_location
   virtual_desktop_host_pool_name                     = var.virtual_desktop_host_pool_name
-  virtual_desktop_host_pool_resource_group_name      = var.resource_group_name
+  virtual_desktop_host_pool_resource_group_name      = var.virtual_desktop_host_pool_resource_group_name
   virtual_desktop_host_pool_type                     = var.virtual_desktop_host_pool_type
   enable_telemetry                                   = var.enable_telemetry
   virtual_desktop_host_pool_custom_rdp_properties    = var.virtual_desktop_host_pool_custom_rdp_properties
@@ -51,7 +51,7 @@ module "avm_res_desktopvirtualization_applicationgroup" {
   virtual_desktop_application_group_host_pool_id                 = module.avm_res_desktopvirtualization_hostpool.resource.id
   virtual_desktop_application_group_location                     = var.virtual_desktop_application_group_location
   virtual_desktop_application_group_name                         = var.virtual_desktop_application_group_name
-  virtual_desktop_application_group_resource_group_name          = var.resource_group_name
+  virtual_desktop_application_group_resource_group_name          = var.virtual_desktop_application_group_resource_group_name
   virtual_desktop_application_group_type                         = var.virtual_desktop_application_group_type
   enable_telemetry                                               = var.enable_telemetry
   virtual_desktop_application_group_default_desktop_display_name = var.virtual_desktop_application_group_default_desktop_display_name
@@ -67,10 +67,10 @@ module "avm_res_desktopvirtualization_workspace" {
 
   virtual_desktop_workspace_location            = var.virtual_desktop_workspace_location
   virtual_desktop_workspace_name                = var.virtual_desktop_workspace_name
-  virtual_desktop_workspace_resource_group_name = var.resource_group_name
+  virtual_desktop_workspace_resource_group_name = var.virtual_desktop_host_pool_resource_group_name
   virtual_desktop_workspace_description         = var.virtual_desktop_workspace_description
   virtual_desktop_workspace_friendly_name       = var.virtual_desktop_workspace_friendly_name
-  virtual_desktop_workspace_timeouts            = local.tags
+  virtual_desktop_workspace_tags                = local.tags
 }
 
 resource "azurerm_virtual_desktop_workspace_application_group_association" "workappgrassoc" {
@@ -100,7 +100,7 @@ module "avm_res_desktopvirtualization_scaling_plan" {
 
   virtual_desktop_scaling_plan_location            = var.virtual_desktop_scaling_plan_location
   virtual_desktop_scaling_plan_name                = var.virtual_desktop_scaling_plan_name
-  virtual_desktop_scaling_plan_resource_group_name = var.resource_group_name
+  virtual_desktop_scaling_plan_resource_group_name = var.virtual_desktop_scaling_plan_resource_group_name
   virtual_desktop_scaling_plan_schedule            = var.virtual_desktop_scaling_plan_schedule
   virtual_desktop_scaling_plan_time_zone           = var.virtual_desktop_scaling_plan_time_zone
   enable_telemetry                                 = var.enable_telemetry
