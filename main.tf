@@ -1,7 +1,7 @@
 # Create Azure Virtual Desktop host pool
 module "avm_res_desktopvirtualization_hostpool" {
   source  = "Azure/avm-res-desktopvirtualization-hostpool/azurerm"
-  version = ">=0.3.0"
+  version = ">=0.4.0"
 
   resource_group_name                                = var.resource_group_name
   virtual_desktop_host_pool_load_balancer_type       = var.virtual_desktop_host_pool_load_balancer_type
@@ -46,7 +46,7 @@ resource "azurerm_virtual_desktop_host_pool_registration_info" "registrationinfo
 # Create Azure Virtual Desktop application group
 module "avm_res_desktopvirtualization_applicationgroup" {
   source  = "Azure/avm-res-desktopvirtualization-applicationgroup/azurerm"
-  version = ">=0.2.0"
+  version = ">=0.2.1"
 
   virtual_desktop_application_group_host_pool_id                 = module.avm_res_desktopvirtualization_hostpool.resource.id
   virtual_desktop_application_group_location                     = var.virtual_desktop_application_group_location
@@ -63,15 +63,14 @@ module "avm_res_desktopvirtualization_applicationgroup" {
 # Create Azure Virtual Desktop workspace
 module "avm_res_desktopvirtualization_workspace" {
   source  = "Azure/avm-res-desktopvirtualization-workspace/azurerm"
-  version = ">=0.2.0"
+  version = ">=0.2.2"
 
-  resource_group_name                           = var.resource_group_name
   virtual_desktop_workspace_location            = var.virtual_desktop_workspace_location
   virtual_desktop_workspace_name                = var.virtual_desktop_workspace_name
   virtual_desktop_workspace_resource_group_name = var.resource_group_name
-  tags                                          = local.tags
   virtual_desktop_workspace_description         = var.virtual_desktop_workspace_description
   virtual_desktop_workspace_friendly_name       = var.virtual_desktop_workspace_friendly_name
+  virtual_desktop_workspace_timeouts            = local.tags
 }
 
 resource "azurerm_virtual_desktop_workspace_application_group_association" "workappgrassoc" {
@@ -97,7 +96,7 @@ resource "random_uuid" "example" {}
 # Create Azure Virtual Desktop scaling plan
 module "avm_res_desktopvirtualization_scaling_plan" {
   source  = "Azure/avm-res-desktopvirtualization-scalingplan/azurerm"
-  version = ">=0.2.0"
+  version = ">=0.2.1"
 
   virtual_desktop_scaling_plan_location            = var.virtual_desktop_scaling_plan_location
   virtual_desktop_scaling_plan_name                = var.virtual_desktop_scaling_plan_name

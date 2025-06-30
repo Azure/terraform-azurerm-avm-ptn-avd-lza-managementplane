@@ -1,13 +1,14 @@
 terraform {
   required_version = ">= 1.9, < 2.0"
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.71, < 5.0.0"
+      version = ">= 4.0.0, < 5.0.0"
     }
     random = {
       source  = "hashicorp/random"
-      version = ">= 3.6.0, <4.0.0"
+      version = ">= 3.6.0, < 4.0.0"
     }
   }
 }
@@ -99,10 +100,10 @@ module "avd" {
 
 # Deploy an vnet and subnet for AVD session hosts
 resource "azurerm_virtual_network" "this_vnet" {
-  address_space       = ["10.1.6.0/26"]
   location            = azurerm_resource_group.this.location
   name                = module.naming.virtual_network.name_unique
   resource_group_name = azurerm_resource_group.this.name
+  address_space       = ["10.1.6.0/26"]
 }
 
 resource "azurerm_subnet" "this_subnet_1" {
@@ -216,7 +217,7 @@ PROTECTED_SETTINGS
       "properties": {
         "HostPoolName":"${module.avd.virtual_desktop_host_pool_name}"
     }
- } 
+ }
   SETTINGS
 
   depends_on = [
@@ -280,3 +281,4 @@ module "avm_ptn_avd_lza_insights" {
   }
   monitor_data_collection_rule_kind = "Windows"
 }
+
