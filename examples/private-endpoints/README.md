@@ -448,14 +448,6 @@ Type: `string`
 
 Default: `"vdag-avd-001"`
 
-### <a name="input_virtual_desktop_application_group_resource_group_name"></a> [virtual\_desktop\_application\_group\_resource\_group\_name](#input\_virtual\_desktop\_application\_group\_resource\_group\_name)
-
-Description: The name of the resource group in which the Virtual Desktop Application Group resources should be created. If not specified, the resource group of the Virtual Desktop Host Pool will be used.
-
-Type: `string`
-
-Default: `false`
-
 ### <a name="input_virtual_desktop_application_group_type"></a> [virtual\_desktop\_application\_group\_type](#input\_virtual\_desktop\_application\_group\_type)
 
 Description: The type of the AVD Application Group. Valid values are 'Desktop' and 'RemoteApp'.

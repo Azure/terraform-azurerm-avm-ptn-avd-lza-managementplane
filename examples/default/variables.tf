@@ -3,6 +3,21 @@ variable "subscription_id" {
   description = "The subscription ID for the Azure account."
 }
 
+variable "virtual_desktop_host_pool_location" {
+  type        = string
+  description = "Location for the host pool"
+}
+
+variable "virtual_desktop_scaling_plan_location" {
+  type        = string
+  description = "Location for the scaling plan"
+}
+
+variable "virtual_desktop_workspace_location" {
+  type        = string
+  description = "Location for the virtual desktop workspace"
+}
+
 variable "avd_vm_name" {
   type        = string
   default     = "vm-avd"
@@ -23,12 +38,6 @@ variable "tags" {
   type        = map(string)
   default     = { "Owner.Email" : "name@microsoft.com" }
   description = "A map of tags to add to all resources"
-}
-
-variable "virtual_desktop_application_group_location" {
-  type        = string
-  default     = "centralus"
-  description = "Location for the virtual desktop application group"
 }
 
 variable "virtual_desktop_application_group_name" {
@@ -60,12 +69,6 @@ variable "virtual_desktop_host_pool_load_balancer_type" {
   description = "`BreadthFirst` load balancing distributes new user sessions across all available session hosts in the host pool. Possible values are `BreadthFirst`, `DepthFirst` and `Persistent`. `DepthFirst` load balancing distributes new user sessions to an available session host with the highest number of connections but has not reached its maximum session limit threshold. `Persistent` should be used if the host pool type is `Personal`"
 }
 
-variable "virtual_desktop_host_pool_location" {
-  type        = string
-  default     = "centralus"
-  description = "Location for the host pool"
-}
-
 variable "virtual_desktop_host_pool_maximum_sessions_allowed" {
   type        = number
   default     = 16
@@ -90,12 +93,6 @@ variable "virtual_desktop_host_pool_type" {
   description = "The type of the AVD Host Pool. Valid values are 'Pooled' and 'Personal'."
 }
 
-variable "virtual_desktop_scaling_plan_location" {
-  type        = string
-  default     = "centralus"
-  description = "Location for the scaling plan"
-}
-
 variable "virtual_desktop_scaling_plan_name" {
   type        = string
   default     = "scp-avd-01"
@@ -106,12 +103,6 @@ variable "virtual_desktop_scaling_plan_time_zone" {
   type        = string
   default     = "GMT Standard Time"
   description = "Specifies the Time Zone which should be used by the Scaling Plan for time based events."
-}
-
-variable "virtual_desktop_workspace_location" {
-  type        = string
-  default     = "centralus"
-  description = "Location for the virtual desktop workspace"
 }
 
 variable "virtual_desktop_workspace_name" {

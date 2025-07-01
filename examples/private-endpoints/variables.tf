@@ -36,12 +36,6 @@ variable "virtual_desktop_application_group_name" {
   }
 }
 
-variable "virtual_desktop_application_group_resource_group_name" {
-  type        = string
-  default     = false
-  description = "The name of the resource group in which the Virtual Desktop Application Group resources should be created. If not specified, the resource group of the Virtual Desktop Host Pool will be used."
-}
-
 variable "virtual_desktop_application_group_type" {
   type        = string
   default     = "Desktop"
