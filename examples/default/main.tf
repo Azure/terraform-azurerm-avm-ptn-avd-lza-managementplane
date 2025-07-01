@@ -55,16 +55,19 @@ resource "azurerm_log_analytics_workspace" "this" {
 module "avd" {
   source = "../../"
 
-  resource_group_name                          = azurerm_resource_group.this.name
-  virtual_desktop_application_group_location   = var.virtual_desktop_application_group_location
-  virtual_desktop_application_group_name       = var.virtual_desktop_application_group_name
-  virtual_desktop_application_group_type       = var.virtual_desktop_application_group_type
-  virtual_desktop_host_pool_load_balancer_type = var.virtual_desktop_host_pool_load_balancer_type
-  virtual_desktop_host_pool_location           = var.virtual_desktop_host_pool_location
-  virtual_desktop_host_pool_name               = var.virtual_desktop_host_pool_name
-  virtual_desktop_host_pool_type               = var.virtual_desktop_host_pool_type
-  virtual_desktop_scaling_plan_location        = var.virtual_desktop_scaling_plan_location
-  virtual_desktop_scaling_plan_name            = var.virtual_desktop_scaling_plan_name
+  resource_group_name                             = azurerm_resource_group.this.name
+  virtual_desktop_application_group_location       = azurerm_resource_group.this.location
+  virtual_desktop_application_group_name           = var.virtual_desktop_application_group_name
+  virtual_desktop_application_group_resource_group_name = azurerm_resource_group.this.name
+  virtual_desktop_application_group_type          = var.virtual_desktop_application_group_type
+  virtual_desktop_host_pool_load_balancer_type    = var.virtual_desktop_host_pool_load_balancer_type
+  virtual_desktop_host_pool_location              = var.virtual_desktop_host_pool_location
+  virtual_desktop_host_pool_name                  = var.virtual_desktop_host_pool_name
+  virtual_desktop_host_pool_resource_group_name   = azurerm_resource_group.this.name
+  virtual_desktop_host_pool_type                  = var.virtual_desktop_host_pool_type
+  virtual_desktop_scaling_plan_location           = var.virtual_desktop_scaling_plan_location
+  virtual_desktop_scaling_plan_name               = var.virtual_desktop_scaling_plan_name
+  virtual_desktop_scaling_plan_resource_group_name = azurerm_resource_group.this.name
   virtual_desktop_scaling_plan_schedule = [
     {
       name                                 = "Weekends"
