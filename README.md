@@ -16,15 +16,17 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
 
-- <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) (>= 2.0.0, < 3.0.0)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.4)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.71, < 5.0.0)
+- <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) (3.4.0)
+
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.0.0, < 5.0.0)
 
 - <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
 
-- <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.6.0, <4.0.0)
+- <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.6.0, < 4.0.0)
 
-- <a name="requirement_time"></a> [time](#requirement\_time) (>= 0.7.2)
+- <a name="requirement_time"></a> [time](#requirement\_time) (0.13.1)
 
 ## Resources
 
@@ -36,9 +38,9 @@ The following resources are used by this module:
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.example](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
-- [time_sleep.wait_for_hostpool](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
-- [azapi_client_config.telemetry](https://registry.terraform.io/providers/hashicorp/azapi/latest/docs/data-sources/client_config) (data source)
-- [azuread_service_principal.avd_service](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/service_principal) (data source)
+- [time_sleep.wait_for_hostpool](https://registry.terraform.io/providers/hashicorp/time/0.13.1/docs/resources/sleep) (resource)
+- [azapi_client_config.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
+- [azuread_service_principal.avd_service](https://registry.terraform.io/providers/hashicorp/azuread/3.4.0/docs/data-sources/service_principal) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/data-sources/module_source) (data source)
 
 <!-- markdownlint-disable MD013 -->
@@ -48,7 +50,7 @@ The following input variables are required:
 
 ### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
 
-Description: The name of the resource group in which the AVD Private Endpoint should be created.
+Description: The name of the resource group in which the resources should be created.
 
 Type: `string`
 
@@ -88,6 +90,12 @@ Description: (Required) The name of the Virtual Desktop Host Pool. Changing this
 
 Type: `string`
 
+### <a name="input_virtual_desktop_host_pool_resource_group_name"></a> [virtual\_desktop\_host\_pool\_resource\_group\_name](#input\_virtual\_desktop\_host\_pool\_resource\_group\_name)
+
+Description: (Required) The name of the resource group in which to create the Virtual Desktop Host Pool. Changing this forces a new resource to be created.
+
+Type: `string`
+
 ### <a name="input_virtual_desktop_host_pool_type"></a> [virtual\_desktop\_host\_pool\_type](#input\_virtual\_desktop\_host\_pool\_type)
 
 Description: (Required) The type of the Virtual Desktop Host Pool. Valid options are `Personal` or `Pooled`. Changing the type forces a new resource to be created.
@@ -103,6 +111,12 @@ Type: `string`
 ### <a name="input_virtual_desktop_scaling_plan_name"></a> [virtual\_desktop\_scaling\_plan\_name](#input\_virtual\_desktop\_scaling\_plan\_name)
 
 Description: (Required) The name which should be used for this Virtual Desktop Scaling Plan . Changing this forces a new Virtual Desktop Scaling Plan to be created.
+
+Type: `string`
+
+### <a name="input_virtual_desktop_scaling_plan_resource_group_name"></a> [virtual\_desktop\_scaling\_plan\_resource\_group\_name](#input\_virtual\_desktop\_scaling\_plan\_resource\_group\_name)
+
+Description: (Required) The name of the Resource Group where the Virtual Desktop Scaling Plan should exist. Changing this forces a new Virtual Desktop Scaling Plan to be created.
 
 Type: `string`
 
@@ -176,10 +190,8 @@ The following input variables are optional (have default values):
 
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
-Description: This variable controls whether or not telemetry is enabled for the module.
-
-For more information see <https://aka.ms/avm/telemetryinfo>.
-
+Description: This variable controls whether or not telemetry is enabled for the module.  
+For more information see <https://aka.ms/avm/telemetryinfo>.  
 If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
@@ -363,6 +375,14 @@ Type: `string`
 
 Default: `null`
 
+### <a name="input_virtual_desktop_application_group_resource_group_name"></a> [virtual\_desktop\_application\_group\_resource\_group\_name](#input\_virtual\_desktop\_application\_group\_resource\_group\_name)
+
+Description: The name of the resource group in which the Virtual Desktop Application Group resources should be created. If not specified, the resource group of the Virtual Desktop Host Pool will be used.
+
+Type: `string`
+
+Default: `false`
+
 ### <a name="input_virtual_desktop_application_group_tags"></a> [virtual\_desktop\_application\_group\_tags](#input\_virtual\_desktop\_application\_group\_tags)
 
 Description: (Optional) A mapping of tags to assign to the resource.
@@ -393,11 +413,60 @@ Default: `null`
 
 ### <a name="input_virtual_desktop_host_pool_custom_rdp_properties"></a> [virtual\_desktop\_host\_pool\_custom\_rdp\_properties](#input\_virtual\_desktop\_host\_pool\_custom\_rdp\_properties)
 
-Description: (Optional) A valid custom RDP properties string for the Virtual Desktop Host Pool, available properties can be [found in this article](https://docs.microsoft.com/windows-server/remote/remote-desktop-services/clients/rdp-files).
+Description: (Optional) Custom RDP properties for the Virtual Desktop Host Pool.  
+Configure individual RDP settings or provide additional custom properties.  
+Available properties can be found in: https://docs.microsoft.com/windows-server/remote/remote-desktop-services/clients/rdp-files
 
-Type: `string`
+- drivestoredirect: Drive redirection (string, default: "*")
+- audiomode: Audio mode (number: 0=Both, 1=Local, 2=Remote, default: 0)
+- videoplaybackmode: Video playback mode (number: 0=Disabled, 1=Enabled, default: 1)
+- redirectclipboard: Clipboard redirection (number: 0=Disabled, 1=Enabled, default: 1)
+- redirectprinters: Printer redirection (number: 0=Disabled, 1=Enabled, default: 1)
+- devicestoredirect: Device redirection (string, default: "*")
+- redirectcomports: COM port redirection (number: 0=Disabled, 1=Enabled, default: 1)
+- redirectsmartcards: Smart card redirection (number: 0=Disabled, 1=Enabled, default: 1)
+- usbdevicestoredirect: USB device redirection (string, default: "*")
+- enablecredsspsupport: CredSSP support (number: 0=Disabled, 1=Enabled, default: 1)
+- use\_multimon: Multi-monitor support (number: 0=Disabled, 1=Enabled, default: 0)
+- custom\_properties: Additional custom RDP properties as key-value pairs
 
-Default: `"drivestoredirect:s:*;audiomode:i:0;videoplaybackmode:i:1;redirectclipboard:i:1;redirectprinters:i:1;devicestoredirect:s:*;redirectcomports:i:1;redirectsmartcards:i:1;usbdevicestoredirect:s:*;enablecredsspsupport:i:1;use multimon:i:0"`
+Type:
+
+```hcl
+object({
+    drivestoredirect     = optional(string, "*")
+    audiomode            = optional(number, 0)
+    videoplaybackmode    = optional(number, 1)
+    redirectclipboard    = optional(number, 1)
+    redirectprinters     = optional(number, 1)
+    devicestoredirect    = optional(string, "*")
+    redirectcomports     = optional(number, 1)
+    redirectsmartcards   = optional(number, 1)
+    usbdevicestoredirect = optional(string, "*")
+    enablecredsspsupport = optional(number, 1)
+    use_multimon         = optional(number, 0)
+    custom_properties    = optional(map(string), {})
+  })
+```
+
+Default:
+
+```json
+{
+  "audiomode": 0,
+  "custom_properties": {},
+  "devicestoredirect": "*",
+  "drivestoredirect": "*",
+  "enablecredsspsupport": 1,
+  "redirectclipboard": 1,
+  "redirectcomports": 1,
+  "redirectprinters": 1,
+  "redirectsmartcards": 1,
+  "usbdevicestoredirect": "*",
+  "use_multimon": 0,
+  "videoplaybackmode": 1
+}
+```
 
 ### <a name="input_virtual_desktop_host_pool_description"></a> [virtual\_desktop\_host\_pool\_description](#input\_virtual\_desktop\_host\_pool\_description)
 
@@ -682,25 +751,25 @@ The following Modules are called:
 
 Source: Azure/avm-res-desktopvirtualization-applicationgroup/azurerm
 
-Version: >=0.2.0
+Version: >=0.2.1
 
 ### <a name="module_avm_res_desktopvirtualization_hostpool"></a> [avm\_res\_desktopvirtualization\_hostpool](#module\_avm\_res\_desktopvirtualization\_hostpool)
 
 Source: Azure/avm-res-desktopvirtualization-hostpool/azurerm
 
-Version: >=0.3.0
+Version: >=0.4.0
 
 ### <a name="module_avm_res_desktopvirtualization_scaling_plan"></a> [avm\_res\_desktopvirtualization\_scaling\_plan](#module\_avm\_res\_desktopvirtualization\_scaling\_plan)
 
 Source: Azure/avm-res-desktopvirtualization-scalingplan/azurerm
 
-Version: >=0.2.0
+Version: >=0.2.1
 
 ### <a name="module_avm_res_desktopvirtualization_workspace"></a> [avm\_res\_desktopvirtualization\_workspace](#module\_avm\_res\_desktopvirtualization\_workspace)
 
 Source: Azure/avm-res-desktopvirtualization-workspace/azurerm
 
-Version: >=0.2.0
+Version: >=0.2.2
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

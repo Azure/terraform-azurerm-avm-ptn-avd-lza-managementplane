@@ -1,6 +1,6 @@
 variable "resource_group_name" {
   type        = string
-  description = "The name of the resource group in which the AVD Private Endpoint should be created."
+  description = "The name of the resource group in which the resources should be created."
 }
 
 variable "virtual_desktop_application_group_location" {
@@ -48,6 +48,12 @@ variable "virtual_desktop_host_pool_name" {
   }
 }
 
+variable "virtual_desktop_host_pool_resource_group_name" {
+  type        = string
+  description = "(Required) The name of the resource group in which to create the Virtual Desktop Host Pool. Changing this forces a new resource to be created."
+  nullable    = false
+}
+
 variable "virtual_desktop_host_pool_type" {
   type        = string
   description = "(Required) The type of the Virtual Desktop Host Pool. Valid options are `Personal` or `Pooled`. Changing the type forces a new resource to be created."
@@ -62,6 +68,12 @@ variable "virtual_desktop_scaling_plan_location" {
 variable "virtual_desktop_scaling_plan_name" {
   type        = string
   description = "(Required) The name which should be used for this Virtual Desktop Scaling Plan . Changing this forces a new Virtual Desktop Scaling Plan to be created."
+  nullable    = false
+}
+
+variable "virtual_desktop_scaling_plan_resource_group_name" {
+  type        = string
+  description = "(Required) The name of the Resource Group where the Virtual Desktop Scaling Plan should exist. Changing this forces a new Virtual Desktop Scaling Plan to be created."
   nullable    = false
 }
 
@@ -132,11 +144,10 @@ variable "enable_telemetry" {
   default     = true
   description = <<DESCRIPTION
 This variable controls whether or not telemetry is enabled for the module.
-
 For more information see <https://aka.ms/avm/telemetryinfo>.
-
 If it is set to false, then no telemetry will be collected.
 DESCRIPTION
+  nullable    = false
 }
 
 # tflint-ignore: terraform_unused_declarations
@@ -253,14 +264,14 @@ variable "role_assignments" {
   default     = {}
   description = <<DESCRIPTION
   A map of role assignments to create on the resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-  
+
   - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
   - `principal_id` - The ID of the principal to assign the role to.
   - `description` - The description of the role assignment.
   - `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
   - `condition` - The condition which will be used to scope the role assignment.
   - `condition_version` - The version of the condition syntax. Leave as `null` if you are not using a condition, if you are then valid values are '2.0'.
-  
+
   > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
   DESCRIPTION
   nullable    = false
@@ -310,6 +321,12 @@ variable "virtual_desktop_application_group_friendly_name" {
   description = "(Optional) Option to set a friendly name for the Virtual Desktop Application Group."
 }
 
+variable "virtual_desktop_application_group_resource_group_name" {
+  type        = string
+  default     = false
+  description = "The name of the resource group in which the Virtual Desktop Application Group resources should be created. If not specified, the resource group of the Virtual Desktop Host Pool will be used."
+}
+
 # tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_application_group_tags" {
   type        = map(string)
@@ -335,9 +352,52 @@ EOT
 }
 
 variable "virtual_desktop_host_pool_custom_rdp_properties" {
-  type        = string
-  default     = "drivestoredirect:s:*;audiomode:i:0;videoplaybackmode:i:1;redirectclipboard:i:1;redirectprinters:i:1;devicestoredirect:s:*;redirectcomports:i:1;redirectsmartcards:i:1;usbdevicestoredirect:s:*;enablecredsspsupport:i:1;use multimon:i:0"
-  description = "(Optional) A valid custom RDP properties string for the Virtual Desktop Host Pool, available properties can be [found in this article](https://docs.microsoft.com/windows-server/remote/remote-desktop-services/clients/rdp-files)."
+  type = object({
+    drivestoredirect     = optional(string, "*")
+    audiomode            = optional(number, 0)
+    videoplaybackmode    = optional(number, 1)
+    redirectclipboard    = optional(number, 1)
+    redirectprinters     = optional(number, 1)
+    devicestoredirect    = optional(string, "*")
+    redirectcomports     = optional(number, 1)
+    redirectsmartcards   = optional(number, 1)
+    usbdevicestoredirect = optional(string, "*")
+    enablecredsspsupport = optional(number, 1)
+    use_multimon         = optional(number, 0)
+    custom_properties    = optional(map(string), {})
+  })
+  default = {
+    drivestoredirect     = "*"
+    audiomode            = 0
+    videoplaybackmode    = 1
+    redirectclipboard    = 1
+    redirectprinters     = 1
+    devicestoredirect    = "*"
+    redirectcomports     = 1
+    redirectsmartcards   = 1
+    usbdevicestoredirect = "*"
+    enablecredsspsupport = 1
+    use_multimon         = 0
+    custom_properties    = {}
+  }
+  description = <<-DESCRIPTION
+    (Optional) Custom RDP properties for the Virtual Desktop Host Pool.
+    Configure individual RDP settings or provide additional custom properties.
+    Available properties can be found in: https://docs.microsoft.com/windows-server/remote/remote-desktop-services/clients/rdp-files
+
+    - drivestoredirect: Drive redirection (string, default: "*")
+    - audiomode: Audio mode (number: 0=Both, 1=Local, 2=Remote, default: 0)
+    - videoplaybackmode: Video playback mode (number: 0=Disabled, 1=Enabled, default: 1)
+    - redirectclipboard: Clipboard redirection (number: 0=Disabled, 1=Enabled, default: 1)
+    - redirectprinters: Printer redirection (number: 0=Disabled, 1=Enabled, default: 1)
+    - devicestoredirect: Device redirection (string, default: "*")
+    - redirectcomports: COM port redirection (number: 0=Disabled, 1=Enabled, default: 1)
+    - redirectsmartcards: Smart card redirection (number: 0=Disabled, 1=Enabled, default: 1)
+    - usbdevicestoredirect: USB device redirection (string, default: "*")
+    - enablecredsspsupport: CredSSP support (number: 0=Disabled, 1=Enabled, default: 1)
+    - use_multimon: Multi-monitor support (number: 0=Disabled, 1=Enabled, default: 0)
+    - custom_properties: Additional custom RDP properties as key-value pairs
+  DESCRIPTION
 }
 
 # tflint-ignore: terraform_unused_declarations
