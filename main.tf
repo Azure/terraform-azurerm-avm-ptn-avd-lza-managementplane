@@ -68,9 +68,9 @@ module "avm_res_desktopvirtualization_workspace" {
   virtual_desktop_workspace_location            = var.virtual_desktop_workspace_location
   virtual_desktop_workspace_name                = var.virtual_desktop_workspace_name
   virtual_desktop_workspace_resource_group_name = var.virtual_desktop_host_pool_resource_group_name
+  public_network_access_enabled                 = var.public_network_access_enabled
   virtual_desktop_workspace_description         = var.virtual_desktop_workspace_description
   virtual_desktop_workspace_friendly_name       = var.virtual_desktop_workspace_friendly_name
-  public_network_access_enabled                 = var.public_network_access_enabled
   virtual_desktop_workspace_tags                = local.tags
 }
 
