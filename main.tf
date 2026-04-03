@@ -21,6 +21,7 @@ module "avm_res_desktopvirtualization_hostpool" {
     }])
   }
   virtual_desktop_host_pool_start_vm_on_connect = var.virtual_desktop_host_pool_start_vm_on_connect
+  virtual_desktop_host_pool_tags                = var.virtual_desktop_host_pool_tags
 }
 
 
@@ -57,7 +58,7 @@ module "avm_res_desktopvirtualization_applicationgroup" {
   virtual_desktop_application_group_default_desktop_display_name = var.virtual_desktop_application_group_default_desktop_display_name
   virtual_desktop_application_group_description                  = var.virtual_desktop_application_group_description
   virtual_desktop_application_group_friendly_name                = var.virtual_desktop_application_group_friendly_name
-  virtual_desktop_application_group_tags                         = local.tags
+  virtual_desktop_application_group_tags                         = merge(local.tags, var.virtual_desktop_application_group_tags)
 }
 
 # Create Azure Virtual Desktop workspace
@@ -71,7 +72,7 @@ module "avm_res_desktopvirtualization_workspace" {
   public_network_access_enabled                 = var.public_network_access_enabled
   virtual_desktop_workspace_description         = var.virtual_desktop_workspace_description
   virtual_desktop_workspace_friendly_name       = var.virtual_desktop_workspace_friendly_name
-  virtual_desktop_workspace_tags                = local.tags
+  virtual_desktop_workspace_tags                = merge(local.tags, var.virtual_desktop_workspace_tags)
 }
 
 resource "azurerm_virtual_desktop_workspace_application_group_association" "workappgrassoc" {
@@ -114,7 +115,7 @@ module "avm_res_desktopvirtualization_scaling_plan" {
       }
     ]
   )
-  virtual_desktop_scaling_plan_tags = local.tags
+  virtual_desktop_scaling_plan_tags = merge(local.tags, var.virtual_desktop_scaling_plan_tags)
 
   depends_on = [
     time_sleep.wait_for_hostpool
