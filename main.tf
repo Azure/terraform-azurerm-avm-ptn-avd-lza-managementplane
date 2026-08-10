@@ -23,7 +23,6 @@ module "avm_res_desktopvirtualization_hostpool" {
   virtual_desktop_host_pool_start_vm_on_connect = var.virtual_desktop_host_pool_start_vm_on_connect
 }
 
-
 resource "time_sleep" "wait_for_hostpool" {
   create_duration = "30s"
 
@@ -94,6 +93,7 @@ resource "azurerm_role_assignment" "avd_service_hostpool_reader" {
 }
 
 resource "random_uuid" "example" {}
+
 # Create Azure Virtual Desktop scaling plan
 module "avm_res_desktopvirtualization_scaling_plan" {
   source  = "Azure/avm-res-desktopvirtualization-scalingplan/azurerm"
@@ -120,4 +120,3 @@ module "avm_res_desktopvirtualization_scaling_plan" {
     time_sleep.wait_for_hostpool
   ]
 }
-
