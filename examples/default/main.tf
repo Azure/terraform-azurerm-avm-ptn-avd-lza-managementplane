@@ -109,10 +109,10 @@ resource "azurerm_virtual_network" "this_vnet" {
 }
 
 resource "azurerm_subnet" "this_subnet_1" {
-  address_prefixes     = ["10.1.6.0/27"]
   name                 = "${module.naming.subnet.name_unique}-1"
   resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this_vnet.name
+  address_prefixes     = ["10.1.6.0/27"]
 }
 
 # Deploy a single AVD session host using marketplace image
@@ -140,13 +140,13 @@ resource "random_password" "vmpass" {
 resource "azurerm_windows_virtual_machine" "this" {
   count = var.vm_count
 
-  admin_password             = random_password.vmpass.result
-  admin_username             = "adminuser"
   location                   = azurerm_resource_group.this.location
   name                       = "${var.avd_vm_name}-${count.index}"
   network_interface_ids      = [azurerm_network_interface.this[count.index].id]
   resource_group_name        = azurerm_resource_group.this.name
   size                       = "Standard_D2s_v4"
+  admin_password             = random_password.vmpass.result
+  admin_username             = "adminuser"
   computer_name              = "${var.avd_vm_name}-${count.index}"
   encryption_at_host_enabled = true
   secure_boot_enabled        = true
@@ -157,10 +157,12 @@ resource "azurerm_windows_virtual_machine" "this" {
     storage_account_type = "Premium_LRS"
     name                 = "${var.avd_vm_name}-${count.index}-osdisk"
   }
+
   identity {
     type         = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.this.id]
   }
+
   source_image_reference {
     offer     = "windows-11"
     publisher = "microsoftwindowsdesktop"
@@ -283,4 +285,3 @@ module "avm_ptn_avd_lza_insights" {
   }
   monitor_data_collection_rule_kind = "Windows"
 }
-
