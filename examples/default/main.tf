@@ -92,7 +92,7 @@ module "avd" {
   virtual_desktop_scaling_plan_time_zone                = var.virtual_desktop_scaling_plan_time_zone
   virtual_desktop_workspace_location                    = var.virtual_desktop_workspace_location
   virtual_desktop_workspace_name                        = var.virtual_desktop_workspace_name
-  enable_telemetry                                      = false
+  enable_telemetry                                      = var.enable_telemetry
   public_network_access_enabled                         = false
   virtual_desktop_application_group_resource_group_name = azurerm_resource_group.this.name
   virtual_desktop_host_pool_friendly_name               = var.virtual_desktop_host_pool_friendly_name
@@ -253,7 +253,7 @@ module "avm_ptn_avd_lza_insights" {
   monitor_data_collection_rule_location            = azurerm_resource_group.this.location
   monitor_data_collection_rule_name                = "microsoft-avdi-eastus"
   monitor_data_collection_rule_resource_group_name = azurerm_resource_group.this.name
-  enable_telemetry                                 = false
+  enable_telemetry                                 = var.enable_telemetry
   monitor_data_collection_rule_data_sources = {
     performance_counter = [
       {
