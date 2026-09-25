@@ -49,6 +49,12 @@ The following resources are used by this module:
 
 The following input variables are required:
 
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The location reported for this pattern's telemetry. The application group, host pool, scaling plan, and workspace locations remain independently configurable.
+
+Type: `string`
+
 ### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
 
 Description: The name of the resource group in which the resources should be created.
