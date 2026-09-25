@@ -72,6 +72,7 @@ resource "azurerm_log_analytics_workspace" "this" {
 module "avd" {
   source = "../../"
 
+  location                                         = azurerm_resource_group.this.location
   resource_group_name                              = azurerm_resource_group.this.name
   virtual_desktop_application_group_location       = azurerm_resource_group.this.location
   virtual_desktop_application_group_name           = var.virtual_desktop_application_group_name
