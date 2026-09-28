@@ -5,17 +5,26 @@ variable "subscription_id" {
 
 variable "virtual_desktop_host_pool_location" {
   type        = string
-  description = "Location for the host pool"
+  default     = null
+  description = "Optional location for the host pool. When null or omitted, uses the resource group's location."
 }
 
 variable "virtual_desktop_scaling_plan_location" {
   type        = string
-  description = "Location for the scaling plan"
+  default     = null
+  description = "Optional location for the scaling plan. When null or omitted, uses the resource group's location."
 }
 
 variable "virtual_desktop_workspace_location" {
   type        = string
-  description = "Location for the virtual desktop workspace"
+  default     = null
+  description = "Optional location for the virtual desktop workspace. When null or omitted, uses the resource group's location."
+}
+
+variable "virtual_desktop_application_group_location" {
+  type        = string
+  default     = null
+  description = "Optional location for the application group. When null or omitted, uses the resource group's location."
 }
 
 variable "avd_vm_name" {

@@ -20,7 +20,7 @@ module "avm_res_desktopvirtualization_hostpool" {
     }])
   }
   virtual_desktop_host_pool_start_vm_on_connect = var.virtual_desktop_host_pool_start_vm_on_connect
-  location                                      = var.virtual_desktop_host_pool_location
+  location                                      = coalesce(var.virtual_desktop_host_pool_location, var.location)
 }
 
 resource "time_sleep" "wait_for_hostpool" {
@@ -56,7 +56,7 @@ module "avm_res_desktopvirtualization_applicationgroup" {
   virtual_desktop_application_group_description                  = var.virtual_desktop_application_group_description
   virtual_desktop_application_group_friendly_name                = var.virtual_desktop_application_group_friendly_name
   virtual_desktop_application_group_tags                         = local.tags
-  location                                                       = var.virtual_desktop_application_group_location
+  location                                                       = coalesce(var.virtual_desktop_application_group_location, var.location)
 }
 
 # Create Azure Virtual Desktop workspace
@@ -70,7 +70,7 @@ module "avm_res_desktopvirtualization_workspace" {
   virtual_desktop_workspace_description         = var.virtual_desktop_workspace_description
   virtual_desktop_workspace_friendly_name       = var.virtual_desktop_workspace_friendly_name
   virtual_desktop_workspace_tags                = local.tags
-  location                                      = var.virtual_desktop_workspace_location
+  location                                      = coalesce(var.virtual_desktop_workspace_location, var.location)
 }
 
 resource "azurerm_virtual_desktop_workspace_application_group_association" "workappgrassoc" {
@@ -114,7 +114,7 @@ module "avm_res_desktopvirtualization_scaling_plan" {
     ]
   )
   virtual_desktop_scaling_plan_tags = local.tags
-  location                          = var.virtual_desktop_scaling_plan_location
+  location                          = coalesce(var.virtual_desktop_scaling_plan_location, var.location)
 
   depends_on = [
     time_sleep.wait_for_hostpool
