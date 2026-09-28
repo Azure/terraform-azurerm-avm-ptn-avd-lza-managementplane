@@ -51,19 +51,13 @@ The following input variables are required:
 
 ### <a name="input_location"></a> [location](#input\_location)
 
-Description: The location reported for this pattern's telemetry. The application group, host pool, scaling plan, and workspace locations remain independently configurable.
+Description: The default location for the application group, host pool, scaling plan, and workspace, and the location reported for this pattern's telemetry. Each resource can override it independently.
 
 Type: `string`
 
 ### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
 
 Description: The name of the resource group in which the resources should be created.
-
-Type: `string`
-
-### <a name="input_virtual_desktop_application_group_location"></a> [virtual\_desktop\_application\_group\_location](#input\_virtual\_desktop\_application\_group\_location)
-
-Description: The location/region where the Virtual Desktop Application Group resources are located. Changing this forces a new resource to be created.
 
 Type: `string`
 
@@ -85,12 +79,6 @@ Description: (Required) `BreadthFirst` load balancing distributes new user sessi
 
 Type: `string`
 
-### <a name="input_virtual_desktop_host_pool_location"></a> [virtual\_desktop\_host\_pool\_location](#input\_virtual\_desktop\_host\_pool\_location)
-
-Description: Location for the host pool
-
-Type: `string`
-
 ### <a name="input_virtual_desktop_host_pool_name"></a> [virtual\_desktop\_host\_pool\_name](#input\_virtual\_desktop\_host\_pool\_name)
 
 Description: (Required) The name of the Virtual Desktop Host Pool. Changing this forces a new resource to be created.
@@ -106,12 +94,6 @@ Type: `string`
 ### <a name="input_virtual_desktop_host_pool_type"></a> [virtual\_desktop\_host\_pool\_type](#input\_virtual\_desktop\_host\_pool\_type)
 
 Description: (Required) The type of the Virtual Desktop Host Pool. Valid options are `Personal` or `Pooled`. Changing the type forces a new resource to be created.
-
-Type: `string`
-
-### <a name="input_virtual_desktop_scaling_plan_location"></a> [virtual\_desktop\_scaling\_plan\_location](#input\_virtual\_desktop\_scaling\_plan\_location)
-
-Description: Location for the scaling plan
 
 Type: `string`
 
@@ -176,12 +158,6 @@ list(object({
 ### <a name="input_virtual_desktop_scaling_plan_time_zone"></a> [virtual\_desktop\_scaling\_plan\_time\_zone](#input\_virtual\_desktop\_scaling\_plan\_time\_zone)
 
 Description: (Required) Specifies the Time Zone which should be used by the Scaling Plan for time based events, [the possible values are defined here](https://jackstromberg.com/2017/01/list-of-time-zones-consumed-by-azure/).
-
-Type: `string`
-
-### <a name="input_virtual_desktop_workspace_location"></a> [virtual\_desktop\_workspace\_location](#input\_virtual\_desktop\_workspace\_location)
-
-Description: Location for the virtual desktop workspace
 
 Type: `string`
 
@@ -382,6 +358,14 @@ Type: `string`
 
 Default: `null`
 
+### <a name="input_virtual_desktop_application_group_location"></a> [virtual\_desktop\_application\_group\_location](#input\_virtual\_desktop\_application\_group\_location)
+
+Description: The location for the Virtual Desktop Application Group. When null or omitted, uses var.location. Changing this forces a new resource to be created.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_virtual_desktop_application_group_resource_group_name"></a> [virtual\_desktop\_application\_group\_resource\_group\_name](#input\_virtual\_desktop\_application\_group\_resource\_group\_name)
 
 Description: The name of the resource group in which the Virtual Desktop Application Group resources should be created. If not specified, the resource group of the Virtual Desktop Host Pool will be used.
@@ -486,6 +470,14 @@ Default: `null`
 ### <a name="input_virtual_desktop_host_pool_friendly_name"></a> [virtual\_desktop\_host\_pool\_friendly\_name](#input\_virtual\_desktop\_host\_pool\_friendly\_name)
 
 Description: (Optional) A friendly name for the Virtual Desktop Host Pool.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_virtual_desktop_host_pool_location"></a> [virtual\_desktop\_host\_pool\_location](#input\_virtual\_desktop\_host\_pool\_location)
+
+Description: The location for the Virtual Desktop Host Pool. When null or omitted, uses var.location.
 
 Type: `string`
 
@@ -626,6 +618,14 @@ list(object({
 
 Default: `null`
 
+### <a name="input_virtual_desktop_scaling_plan_location"></a> [virtual\_desktop\_scaling\_plan\_location](#input\_virtual\_desktop\_scaling\_plan\_location)
+
+Description: The location for the Virtual Desktop Scaling Plan. When null or omitted, uses var.location.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_virtual_desktop_scaling_plan_tags"></a> [virtual\_desktop\_scaling\_plan\_tags](#input\_virtual\_desktop\_scaling\_plan\_tags)
 
 Description: (Optional) A mapping of tags which should be assigned to the Virtual Desktop Scaling Plan .
@@ -665,6 +665,14 @@ Default: `null`
 ### <a name="input_virtual_desktop_workspace_friendly_name"></a> [virtual\_desktop\_workspace\_friendly\_name](#input\_virtual\_desktop\_workspace\_friendly\_name)
 
 Description: (Optional) A friendly name for the Virtual Desktop Workspace.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_virtual_desktop_workspace_location"></a> [virtual\_desktop\_workspace\_location](#input\_virtual\_desktop\_workspace\_location)
+
+Description: The location for the Virtual Desktop Workspace. When null or omitted, uses var.location.
 
 Type: `string`
 

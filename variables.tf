@@ -1,18 +1,12 @@
 variable "location" {
   type        = string
-  description = "The location reported for this pattern's telemetry. The application group, host pool, scaling plan, and workspace locations remain independently configurable."
+  description = "The default location for the application group, host pool, scaling plan, and workspace, and the location reported for this pattern's telemetry. Each resource can override it independently."
   nullable    = false
 }
 
 variable "resource_group_name" {
   type        = string
   description = "The name of the resource group in which the resources should be created."
-}
-
-variable "virtual_desktop_application_group_location" {
-  type        = string
-  description = "The location/region where the Virtual Desktop Application Group resources are located. Changing this forces a new resource to be created."
-  nullable    = false
 }
 
 variable "virtual_desktop_application_group_name" {
@@ -38,11 +32,6 @@ variable "virtual_desktop_host_pool_load_balancer_type" {
   nullable    = false
 }
 
-variable "virtual_desktop_host_pool_location" {
-  type        = string
-  description = "Location for the host pool"
-}
-
 variable "virtual_desktop_host_pool_name" {
   type        = string
   description = "(Required) The name of the Virtual Desktop Host Pool. Changing this forces a new resource to be created."
@@ -64,11 +53,6 @@ variable "virtual_desktop_host_pool_type" {
   type        = string
   description = "(Required) The type of the Virtual Desktop Host Pool. Valid options are `Personal` or `Pooled`. Changing the type forces a new resource to be created."
   nullable    = false
-}
-
-variable "virtual_desktop_scaling_plan_location" {
-  type        = string
-  description = "Location for the scaling plan"
 }
 
 variable "virtual_desktop_scaling_plan_name" {
@@ -132,11 +116,6 @@ variable "virtual_desktop_scaling_plan_time_zone" {
   type        = string
   description = "(Required) Specifies the Time Zone which should be used by the Scaling Plan for time based events, [the possible values are defined here](https://jackstromberg.com/2017/01/list-of-time-zones-consumed-by-azure/)."
   nullable    = false
-}
-
-variable "virtual_desktop_workspace_location" {
-  type        = string
-  description = "Location for the virtual desktop workspace"
 }
 
 variable "virtual_desktop_workspace_name" {
@@ -327,6 +306,12 @@ variable "virtual_desktop_application_group_friendly_name" {
   description = "(Optional) Option to set a friendly name for the Virtual Desktop Application Group."
 }
 
+variable "virtual_desktop_application_group_location" {
+  type        = string
+  default     = null
+  description = "The location for the Virtual Desktop Application Group. When null or omitted, uses var.location. Changing this forces a new resource to be created."
+}
+
 variable "virtual_desktop_application_group_resource_group_name" {
   type        = string
   default     = false
@@ -418,6 +403,12 @@ variable "virtual_desktop_host_pool_friendly_name" {
   type        = string
   default     = null
   description = "(Optional) A friendly name for the Virtual Desktop Host Pool."
+}
+
+variable "virtual_desktop_host_pool_location" {
+  type        = string
+  default     = null
+  description = "The location for the Virtual Desktop Host Pool. When null or omitted, uses var.location."
 }
 
 variable "virtual_desktop_host_pool_maximum_sessions_allowed" {
@@ -535,6 +526,12 @@ variable "virtual_desktop_scaling_plan_host_pool" {
 EOT
 }
 
+variable "virtual_desktop_scaling_plan_location" {
+  type        = string
+  default     = null
+  description = "The location for the Virtual Desktop Scaling Plan. When null or omitted, uses var.location."
+}
+
 # tflint-ignore: terraform_unused_declarations
 variable "virtual_desktop_scaling_plan_tags" {
   type        = map(string)
@@ -571,6 +568,12 @@ variable "virtual_desktop_workspace_friendly_name" {
   type        = string
   default     = null
   description = "(Optional) A friendly name for the Virtual Desktop Workspace."
+}
+
+variable "virtual_desktop_workspace_location" {
+  type        = string
+  default     = null
+  description = "The location for the Virtual Desktop Workspace. When null or omitted, uses var.location."
 }
 
 # tflint-ignore: terraform_unused_declarations
