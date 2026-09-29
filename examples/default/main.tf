@@ -250,7 +250,6 @@ module "avm_ptn_avd_lza_insights" {
       streams      = ["Microsoft-Perf", "Microsoft-Event"]
     }
   ]
-  monitor_data_collection_rule_location            = azurerm_resource_group.this.location
   monitor_data_collection_rule_name                = "microsoft-avdi-eastus"
   monitor_data_collection_rule_resource_group_name = azurerm_resource_group.this.name
   enable_telemetry                                 = var.enable_telemetry
@@ -283,5 +282,6 @@ module "avm_ptn_avd_lza_insights" {
       workspace_resource_id = azurerm_log_analytics_workspace.this.id
     }
   }
-  monitor_data_collection_rule_kind = "Windows"
+  monitor_data_collection_rule_kind     = "Windows"
+  monitor_data_collection_rule_location = azurerm_resource_group.this.location
 }
