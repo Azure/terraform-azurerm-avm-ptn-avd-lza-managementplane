@@ -48,7 +48,7 @@ resource "random_integer" "region_index" {
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = ">= 0.3.0"
+  version = "0.3.0"
 }
 
 resource "azurerm_resource_group" "this" {
@@ -260,15 +260,15 @@ resource "azurerm_monitor_data_collection_rule_association" "example" {
 # Create resources for Azure Virtual Desktop Insights data collection rules
 module "avm_ptn_avd_lza_insights" {
   source  = "Azure/avm-ptn-avd-lza-insights/azurerm"
-  version = ">= 0.1.4"
+  version = "0.3.0"
 
+  location = azurerm_resource_group.this.location
   monitor_data_collection_rule_data_flow = [
     {
       destinations = [azurerm_log_analytics_workspace.this.name]
       streams      = ["Microsoft-Perf", "Microsoft-Event"]
     }
   ]
-  monitor_data_collection_rule_location            = azurerm_resource_group.this.location
   monitor_data_collection_rule_name                = "microsoft-avdi-eastus"
   monitor_data_collection_rule_resource_group_name = azurerm_resource_group.this.name
   enable_telemetry                                 = var.enable_telemetry
@@ -337,13 +337,7 @@ The following resources are used by this module:
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
 
-The following input variables are required:
-
-### <a name="input_subscription_id"></a> [subscription\_id](#input\_subscription\_id)
-
-Description: The subscription ID for the Azure account.
-
-Type: `string`
+No required inputs.
 
 ## Optional Inputs
 
@@ -366,6 +360,14 @@ If it is set to false, then no telemetry will be collected.
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_subscription_id"></a> [subscription\_id](#input\_subscription\_id)
+
+Description: The subscription ID for the Azure account. Uses ARM\_SUBSCRIPTION\_ID when omitted.
+
+Type: `string`
+
+Default: `null`
 
 ### <a name="input_tags"></a> [tags](#input\_tags)
 
@@ -527,13 +529,13 @@ Version:
 
 Source: Azure/avm-ptn-avd-lza-insights/azurerm
 
-Version: >= 0.1.4
+Version: 0.3.0
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 
 Source: Azure/naming/azurerm
 
-Version: >= 0.3.0
+Version: 0.3.0
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

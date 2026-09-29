@@ -1,6 +1,7 @@
 variable "subscription_id" {
   type        = string
-  description = "The subscription ID for the Azure account."
+  default     = null
+  description = "The subscription ID for the Azure account. Uses ARM_SUBSCRIPTION_ID when omitted."
 }
 
 variable "virtual_desktop_host_pool_location" {

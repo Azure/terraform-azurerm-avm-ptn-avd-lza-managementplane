@@ -59,11 +59,36 @@ BeforeAll {
 }
 
 Describe 'AVD child locations' {
+  It 'does not expose an unused private endpoints input' {
+    $variables | Should -Not -Match '(?m)^variable "private_endpoints"\s*\{'
+  }
+
   It 'keeps the common location required and uses it for telemetry' {
     $location = Get-VariableBlock 'location'
     $location | Should -Match '(?m)^\s*nullable\s*=\s*false\s*$'
     $location | Should -Not -Match '(?m)^\s*default\s*='
     $telemetry | Should -Match '(?m)^\s*main_location\s*=\s*var\.location\s*$'
+  }
+
+  It 'uses location with the updated Insights module in both examples' {
+    foreach ($name in @('default', 'private-endpoints')) {
+      $example = Get-Content -Raw -LiteralPath (Join-Path $moduleRoot 'examples' $name 'main.tf')
+      $call = [regex]::Match($example, '(?ms)^module "avm_ptn_avd_lza_insights" \{(?<body>.*?)^\}')
+      $call.Success | Should -BeTrue
+      $call.Groups['body'].Value | Should -Match '(?m)^\s*version\s*=\s*"0\.3\.0"\s*$'
+      $call.Groups['body'].Value | Should -Match '(?m)^\s*location\s*=\s*azurerm_resource_group\.this\.location\s*$'
+      $call.Groups['body'].Value | Should -Not -Match 'monitor_data_collection_rule_location'
+    }
+  }
+
+  It 'allows both examples to use the CI subscription without an input value' {
+    foreach ($name in @('default', 'private-endpoints')) {
+      $exampleRoot = Join-Path $moduleRoot 'examples' $name
+      $declaration = Get-Content -Raw -LiteralPath (Join-Path $exampleRoot 'variables.tf')
+      $provider = Get-Content -Raw -LiteralPath (Join-Path $exampleRoot 'main.tf')
+      $declaration | Should -Match '(?s)variable "subscription_id" \{[^}]*default\s*=\s*null'
+      $provider | Should -Match 'subscription_id\s*=\s*var\.subscription_id'
+    }
   }
 
   It 'makes all four overrides optional and forwards each to its own child' {
