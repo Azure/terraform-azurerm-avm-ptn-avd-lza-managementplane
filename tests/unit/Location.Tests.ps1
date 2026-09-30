@@ -20,14 +20,20 @@ BeforeAll {
     return $match.Value
   }
 
-  function Get-ChildLocationExpression {
+  function Get-ChildModuleBlock {
     param([string] $Module)
 
     $block = [regex]::Match($main, "(?ms)^module `"$([regex]::Escape($Module))`" \{.*?(?=^(?:module|resource|data) |\z)")
     if (-not $block.Success) {
       throw "Missing module $Module"
     }
-    $assignments = [regex]::Matches($block.Value, '(?m)^  location\s*=\s*(?<expression>[^\r\n]+)')
+    return $block.Value
+  }
+
+  function Get-ChildLocationExpression {
+    param([string] $Module)
+
+    $assignments = [regex]::Matches((Get-ChildModuleBlock $Module), '(?m)^  location\s*=\s*(?<expression>[^\r\n]+)')
     if ($assignments.Count -ne 1) {
       throw "Expected one location input for $Module, found $($assignments.Count)"
     }
@@ -98,6 +104,14 @@ Describe 'AVD child locations' {
       $variable | Should -Match '(?m)^\s*default\s*=\s*null\s*$'
       $variable | Should -Not -Match '(?m)^\s*nullable\s*=\s*false\s*$'
       (Get-ChildLocationExpression $child.Value) | Should -Be "coalesce(var.$($child.Key), var.location)"
+      (Get-ChildModuleBlock $child.Value) | Should -Not -Match "(?m)^\s+$([regex]::Escape($child.Key))\s*="
+    }
+  }
+
+  It 'passes the telemetry opt-out to all four resource modules' {
+    (Get-VariableBlock 'enable_telemetry') | Should -Match '(?m)^\s*default\s*=\s*true\s*$'
+    foreach ($child in $children.GetEnumerator()) {
+      (Get-ChildModuleBlock $child.Value) | Should -Match '(?m)^\s+enable_telemetry\s*=\s*var\.enable_telemetry\s*$'
     }
   }
 
