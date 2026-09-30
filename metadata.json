@@ -4,7 +4,6 @@
   "moduleDescription": "AVM Pattern Module for AVD Management Plane",
   "canonicalType": "avd-lza/management-plane",
   "owners": [
-    "jensheerin",
     "sihbher"
   ],
   "telemetryIdPrefix": "46d3xtrf.ptn.4d6a3bf",
