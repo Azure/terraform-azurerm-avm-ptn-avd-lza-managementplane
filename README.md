@@ -10,6 +10,10 @@ This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
 - Azure Virtual Desktop Workspace includes Diagnostic log settings
 - Azure Virtual Desktop Scaling
 
+## Upgrading existing deployments
+
+Earlier versions also tracked host-pool registration information at `azurerm_virtual_desktop_host_pool_registration_info.registrationinfo`. On upgrade, Terraform forgets this duplicate state entry without deleting the Azure registration information. The host-pool child continues to manage it and provide the registration token; no manual state migration is required.
+
 <!-- markdownlint-disable MD033 -->
 ## Requirements
 
@@ -34,7 +38,6 @@ The following requirements are needed by this module:
 The following resources are used by this module:
 
 - [azurerm_role_assignment.avd_service_hostpool_reader](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
-- [azurerm_virtual_desktop_host_pool_registration_info.registrationinfo](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_desktop_host_pool_registration_info) (resource)
 - [azurerm_virtual_desktop_workspace_application_group_association.workappgrassoc](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_desktop_workspace_application_group_association) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.example](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
@@ -49,15 +52,15 @@ The following resources are used by this module:
 
 The following input variables are required:
 
-### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
+### <a name="input_location"></a> [location](#input\_location)
 
-Description: The name of the resource group in which the resources should be created.
+Description: The default location for the application group, host pool, scaling plan, and workspace, and the location reported for this pattern's telemetry. Each resource can override it independently.
 
 Type: `string`
 
-### <a name="input_virtual_desktop_application_group_location"></a> [virtual\_desktop\_application\_group\_location](#input\_virtual\_desktop\_application\_group\_location)
+### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
 
-Description: The location/region where the Virtual Desktop Application Group resources are located. Changing this forces a new resource to be created.
+Description: The name of the resource group in which the resources should be created.
 
 Type: `string`
 
@@ -79,12 +82,6 @@ Description: (Required) `BreadthFirst` load balancing distributes new user sessi
 
 Type: `string`
 
-### <a name="input_virtual_desktop_host_pool_location"></a> [virtual\_desktop\_host\_pool\_location](#input\_virtual\_desktop\_host\_pool\_location)
-
-Description: Location for the host pool
-
-Type: `string`
-
 ### <a name="input_virtual_desktop_host_pool_name"></a> [virtual\_desktop\_host\_pool\_name](#input\_virtual\_desktop\_host\_pool\_name)
 
 Description: (Required) The name of the Virtual Desktop Host Pool. Changing this forces a new resource to be created.
@@ -100,12 +97,6 @@ Type: `string`
 ### <a name="input_virtual_desktop_host_pool_type"></a> [virtual\_desktop\_host\_pool\_type](#input\_virtual\_desktop\_host\_pool\_type)
 
 Description: (Required) The type of the Virtual Desktop Host Pool. Valid options are `Personal` or `Pooled`. Changing the type forces a new resource to be created.
-
-Type: `string`
-
-### <a name="input_virtual_desktop_scaling_plan_location"></a> [virtual\_desktop\_scaling\_plan\_location](#input\_virtual\_desktop\_scaling\_plan\_location)
-
-Description: Location for the scaling plan
 
 Type: `string`
 
@@ -173,12 +164,6 @@ Description: (Required) Specifies the Time Zone which should be used by the Scal
 
 Type: `string`
 
-### <a name="input_virtual_desktop_workspace_location"></a> [virtual\_desktop\_workspace\_location](#input\_virtual\_desktop\_workspace\_location)
-
-Description: Location for the virtual desktop workspace
-
-Type: `string`
-
 ### <a name="input_virtual_desktop_workspace_name"></a> [virtual\_desktop\_workspace\_name](#input\_virtual\_desktop\_workspace\_name)
 
 Description: (Required) The name of the Virtual Desktop Workspace. Changing this forces a new resource to be created.
@@ -221,63 +206,6 @@ object({
     system_assigned            = optional(bool, false)
     user_assigned_resource_ids = optional(set(string), [])
   })
-```
-
-Default: `{}`
-
-### <a name="input_private_endpoints"></a> [private\_endpoints](#input\_private\_endpoints)
-
-Description: A map of private endpoints to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-
-- `name` - (Optional) The name of the private endpoint. One will be generated if not set.
-- `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information.
-- `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
-- `tags` - (Optional) A mapping of tags to assign to the private endpoint.
-- `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
-- `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
-- `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
-- `application_security_group_resource_ids` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-- `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
-- `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
-- `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
-- `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of this resource.
-- `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-  - `name` - The name of the IP configuration.
-  - `private_ip_address` - The private IP address of the IP configuration.
-
-Type:
-
-```hcl
-map(object({
-    name = optional(string, null)
-    role_assignments = optional(map(object({
-      role_definition_id_or_name             = string
-      principal_id                           = string
-      description                            = optional(string, null)
-      skip_service_principal_aad_check       = optional(bool, false)
-      condition                              = optional(string, null)
-      condition_version                      = optional(string, null)
-      delegated_managed_identity_resource_id = optional(string, null)
-      principal_type                         = optional(string, null)
-    })), {})
-    lock = optional(object({
-      kind = string
-      name = optional(string, null)
-    }), null)
-    tags                                    = optional(map(string), null)
-    subnet_resource_id                      = string
-    private_dns_zone_group_name             = optional(string, "default")
-    private_dns_zone_resource_ids           = optional(set(string), [])
-    application_security_group_associations = optional(map(string), {})
-    private_service_connection_name         = optional(string, null)
-    network_interface_name                  = optional(string, null)
-    location                                = optional(string, null)
-    resource_group_name                     = optional(string, null)
-    ip_configurations = optional(map(object({
-      name               = string
-      private_ip_address = string
-    })), {})
-  }))
 ```
 
 Default: `{}`
@@ -371,6 +299,14 @@ Default: `null`
 ### <a name="input_virtual_desktop_application_group_friendly_name"></a> [virtual\_desktop\_application\_group\_friendly\_name](#input\_virtual\_desktop\_application\_group\_friendly\_name)
 
 Description: (Optional) Option to set a friendly name for the Virtual Desktop Application Group.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_virtual_desktop_application_group_location"></a> [virtual\_desktop\_application\_group\_location](#input\_virtual\_desktop\_application\_group\_location)
+
+Description: The location for the Virtual Desktop Application Group. When null or omitted, uses var.location. Changing this forces a new resource to be created.
 
 Type: `string`
 
@@ -480,6 +416,14 @@ Default: `null`
 ### <a name="input_virtual_desktop_host_pool_friendly_name"></a> [virtual\_desktop\_host\_pool\_friendly\_name](#input\_virtual\_desktop\_host\_pool\_friendly\_name)
 
 Description: (Optional) A friendly name for the Virtual Desktop Host Pool.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_virtual_desktop_host_pool_location"></a> [virtual\_desktop\_host\_pool\_location](#input\_virtual\_desktop\_host\_pool\_location)
+
+Description: The location for the Virtual Desktop Host Pool. When null or omitted, uses var.location.
 
 Type: `string`
 
@@ -620,6 +564,14 @@ list(object({
 
 Default: `null`
 
+### <a name="input_virtual_desktop_scaling_plan_location"></a> [virtual\_desktop\_scaling\_plan\_location](#input\_virtual\_desktop\_scaling\_plan\_location)
+
+Description: The location for the Virtual Desktop Scaling Plan. When null or omitted, uses var.location.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_virtual_desktop_scaling_plan_tags"></a> [virtual\_desktop\_scaling\_plan\_tags](#input\_virtual\_desktop\_scaling\_plan\_tags)
 
 Description: (Optional) A mapping of tags which should be assigned to the Virtual Desktop Scaling Plan .
@@ -659,6 +611,14 @@ Default: `null`
 ### <a name="input_virtual_desktop_workspace_friendly_name"></a> [virtual\_desktop\_workspace\_friendly\_name](#input\_virtual\_desktop\_workspace\_friendly\_name)
 
 Description: (Optional) A friendly name for the Virtual Desktop Workspace.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_virtual_desktop_workspace_location"></a> [virtual\_desktop\_workspace\_location](#input\_virtual\_desktop\_workspace\_location)
+
+Description: The location for the Virtual Desktop Workspace. When null or omitted, uses var.location.
 
 Type: `string`
 
@@ -714,7 +674,7 @@ Description: The ID of the host pool.
 
 ### <a name="output_private_endpoints_hostpool"></a> [private\_endpoints\_hostpool](#output\_private\_endpoints\_hostpool)
 
-Description: A map of private endpoints. The map key is the supplied input to var.private\_endpoints. The map value is the entire azurerm\_private\_endpoint resource.
+Description: A map of private endpoints reported by the host-pool module.
 
 ### <a name="output_registrationinfo_token"></a> [registrationinfo\_token](#output\_registrationinfo\_token)
 
@@ -752,25 +712,25 @@ The following Modules are called:
 
 Source: Azure/avm-res-desktopvirtualization-applicationgroup/azurerm
 
-Version: >=0.2.1
+Version: 0.3.0
 
 ### <a name="module_avm_res_desktopvirtualization_hostpool"></a> [avm\_res\_desktopvirtualization\_hostpool](#module\_avm\_res\_desktopvirtualization\_hostpool)
 
 Source: Azure/avm-res-desktopvirtualization-hostpool/azurerm
 
-Version: >=0.4.0
+Version: 0.5.0
 
 ### <a name="module_avm_res_desktopvirtualization_scaling_plan"></a> [avm\_res\_desktopvirtualization\_scaling\_plan](#module\_avm\_res\_desktopvirtualization\_scaling\_plan)
 
 Source: Azure/avm-res-desktopvirtualization-scalingplan/azurerm
 
-Version: >=0.2.1
+Version: 0.3.0
 
 ### <a name="module_avm_res_desktopvirtualization_workspace"></a> [avm\_res\_desktopvirtualization\_workspace](#module\_avm\_res\_desktopvirtualization\_workspace)
 
 Source: Azure/avm-res-desktopvirtualization-workspace/azurerm
 
-Version: >=0.2.2
+Version: 0.3.0
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

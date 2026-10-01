@@ -1,6 +1,7 @@
 variable "subscription_id" {
   type        = string
-  description = "The subscription ID for the Azure account."
+  default     = null
+  description = "The subscription ID for the Azure account. Uses ARM_SUBSCRIPTION_ID when omitted."
 }
 
 variable "avd_vm_name" {
@@ -50,7 +51,7 @@ variable "virtual_desktop_host_pool_friendly_name" {
 
 variable "virtual_desktop_host_pool_load_balancer_type" {
   type        = string
-  default     = "BreadthFirst"
+  default     = "DepthFirst"
   description = "`BreadthFirst` load balancing distributes new user sessions across all available session hosts in the host pool. Possible values are `BreadthFirst`, `DepthFirst` and `Persistent`. `DepthFirst` load balancing distributes new user sessions to an available session host with the highest number of connections but has not reached its maximum session limit threshold. `Persistent` should be used if the host pool type is `Personal`"
 }
 

@@ -1,21 +1,31 @@
 variable "subscription_id" {
   type        = string
-  description = "The subscription ID for the Azure account."
+  default     = null
+  description = "The subscription ID for the Azure account. Uses ARM_SUBSCRIPTION_ID when omitted."
 }
 
 variable "virtual_desktop_host_pool_location" {
   type        = string
-  description = "Location for the host pool"
+  default     = null
+  description = "Optional location for the host pool. When null or omitted, uses the resource group's location."
 }
 
 variable "virtual_desktop_scaling_plan_location" {
   type        = string
-  description = "Location for the scaling plan"
+  default     = null
+  description = "Optional location for the scaling plan. When null or omitted, uses the resource group's location."
 }
 
 variable "virtual_desktop_workspace_location" {
   type        = string
-  description = "Location for the virtual desktop workspace"
+  default     = null
+  description = "Optional location for the virtual desktop workspace. When null or omitted, uses the resource group's location."
+}
+
+variable "virtual_desktop_application_group_location" {
+  type        = string
+  default     = null
+  description = "Optional location for the application group. When null or omitted, uses the resource group's location."
 }
 
 variable "avd_vm_name" {
@@ -65,7 +75,7 @@ variable "virtual_desktop_host_pool_friendly_name" {
 
 variable "virtual_desktop_host_pool_load_balancer_type" {
   type        = string
-  default     = "BreadthFirst"
+  default     = "DepthFirst"
   description = "`BreadthFirst` load balancing distributes new user sessions across all available session hosts in the host pool. Possible values are `BreadthFirst`, `DepthFirst` and `Persistent`. `DepthFirst` load balancing distributes new user sessions to an available session host with the highest number of connections but has not reached its maximum session limit threshold. `Persistent` should be used if the host pool type is `Personal`"
 }
 

@@ -48,7 +48,7 @@ resource "random_integer" "region_index" {
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = ">= 0.3.0"
+  version = "0.3.0"
 }
 
 resource "azurerm_resource_group" "this" {
@@ -93,16 +93,14 @@ resource "azurerm_private_dns_zone_virtual_network_link" "private_links" {
 module "avd" {
   source = "../../"
 
+  location                                         = azurerm_resource_group.this.location
   resource_group_name                              = azurerm_resource_group.this.name
-  virtual_desktop_application_group_location       = azurerm_resource_group.this.location
   virtual_desktop_application_group_name           = var.virtual_desktop_application_group_name
   virtual_desktop_application_group_type           = var.virtual_desktop_application_group_type
   virtual_desktop_host_pool_load_balancer_type     = var.virtual_desktop_host_pool_load_balancer_type
-  virtual_desktop_host_pool_location               = azurerm_resource_group.this.location
   virtual_desktop_host_pool_name                   = var.virtual_desktop_host_pool_name
   virtual_desktop_host_pool_resource_group_name    = azurerm_resource_group.this.name
   virtual_desktop_host_pool_type                   = var.virtual_desktop_host_pool_type
-  virtual_desktop_scaling_plan_location            = azurerm_resource_group.this.location
   virtual_desktop_scaling_plan_name                = var.virtual_desktop_scaling_plan_name
   virtual_desktop_scaling_plan_resource_group_name = azurerm_resource_group.this.name
   virtual_desktop_scaling_plan_schedule = [
@@ -110,13 +108,13 @@ module "avd" {
       name                                 = "Weekends"
       days_of_week                         = ["Saturday", "Sunday"]
       ramp_up_start_time                   = "06:00"
-      ramp_up_load_balancing_algorithm     = "BreadthFirst"
+      ramp_up_load_balancing_algorithm     = var.virtual_desktop_host_pool_load_balancer_type
       ramp_up_minimum_hosts_percent        = 20
       ramp_up_capacity_threshold_percent   = 10
       peak_start_time                      = "10:00"
-      peak_load_balancing_algorithm        = "BreadthFirst"
+      peak_load_balancing_algorithm        = var.virtual_desktop_host_pool_load_balancer_type
       ramp_down_start_time                 = "18:00"
-      ramp_down_load_balancing_algorithm   = "DepthFirst"
+      ramp_down_load_balancing_algorithm   = var.virtual_desktop_host_pool_load_balancer_type
       ramp_down_minimum_hosts_percent      = 10
       ramp_down_force_logoff_users         = false
       ramp_down_wait_time_minutes          = 45
@@ -124,11 +122,10 @@ module "avd" {
       ramp_down_capacity_threshold_percent = 5
       ramp_down_stop_hosts_when            = "ZeroSessions"
       off_peak_start_time                  = "22:00"
-      off_peak_load_balancing_algorithm    = "DepthFirst"
+      off_peak_load_balancing_algorithm    = var.virtual_desktop_host_pool_load_balancer_type
     }
   ]
   virtual_desktop_scaling_plan_time_zone                = var.virtual_desktop_scaling_plan_time_zone
-  virtual_desktop_workspace_location                    = azurerm_resource_group.this.location
   virtual_desktop_workspace_name                        = var.virtual_desktop_workspace_name
   enable_telemetry                                      = var.enable_telemetry
   public_network_access_enabled                         = false
@@ -320,8 +317,9 @@ resource "azurerm_monitor_data_collection_rule_association" "example" {
 # Create resources for Azure Virtual Desktop Insights data collection rules
 module "avm_ptn_avd_lza_insights" {
   source  = "Azure/avm-ptn-avd-lza-insights/azurerm"
-  version = ">= 0.1.4"
+  version = "0.3.0"
 
+  location = azurerm_resource_group.this.location
   monitor_data_collection_rule_data_flow = [
     {
       destinations = [azurerm_log_analytics_workspace.this.name]
@@ -360,8 +358,7 @@ module "avm_ptn_avd_lza_insights" {
       workspace_resource_id = azurerm_log_analytics_workspace.this.id
     }
   }
-  monitor_data_collection_rule_kind     = "Windows"
-  monitor_data_collection_rule_location = azurerm_resource_group.this.location
+  monitor_data_collection_rule_kind = "Windows"
 }
 ```
 
@@ -401,13 +398,7 @@ The following resources are used by this module:
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
 
-The following input variables are required:
-
-### <a name="input_subscription_id"></a> [subscription\_id](#input\_subscription\_id)
-
-Description: The subscription ID for the Azure account.
-
-Type: `string`
+No required inputs.
 
 ## Optional Inputs
 
@@ -430,6 +421,14 @@ If it is set to false, then no telemetry will be collected.
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_subscription_id"></a> [subscription\_id](#input\_subscription\_id)
+
+Description: The subscription ID for the Azure account. Uses ARM\_SUBSCRIPTION\_ID when omitted.
+
+Type: `string`
+
+Default: `null`
 
 ### <a name="input_tags"></a> [tags](#input\_tags)
 
@@ -475,7 +474,7 @@ Description: `BreadthFirst` load balancing distributes new user sessions across 
 
 Type: `string`
 
-Default: `"BreadthFirst"`
+Default: `"DepthFirst"`
 
 ### <a name="input_virtual_desktop_host_pool_maximum_sessions_allowed"></a> [virtual\_desktop\_host\_pool\_maximum\_sessions\_allowed](#input\_virtual\_desktop\_host\_pool\_maximum\_sessions\_allowed)
 
@@ -559,13 +558,13 @@ Version:
 
 Source: Azure/avm-ptn-avd-lza-insights/azurerm
 
-Version: >= 0.1.4
+Version: 0.3.0
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 
 Source: Azure/naming/azurerm
 
-Version: >= 0.3.0
+Version: 0.3.0
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

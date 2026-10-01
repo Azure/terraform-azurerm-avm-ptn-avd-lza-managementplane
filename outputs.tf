@@ -9,7 +9,7 @@ output "hostpool_id" {
 }
 
 output "private_endpoints_hostpool" {
-  description = "A map of private endpoints. The map key is the supplied input to var.private_endpoints. The map value is the entire azurerm_private_endpoint resource."
+  description = "A map of private endpoints reported by the host-pool module."
   value       = module.avm_res_desktopvirtualization_hostpool.private_endpoints
 }
 
