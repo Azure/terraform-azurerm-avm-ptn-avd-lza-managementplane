@@ -5,7 +5,6 @@ module "avm_res_desktopvirtualization_hostpool" {
 
   resource_group_name                                = var.resource_group_name
   virtual_desktop_host_pool_load_balancer_type       = var.virtual_desktop_host_pool_load_balancer_type
-  virtual_desktop_host_pool_location                 = var.virtual_desktop_host_pool_location
   virtual_desktop_host_pool_name                     = var.virtual_desktop_host_pool_name
   virtual_desktop_host_pool_resource_group_name      = var.virtual_desktop_host_pool_resource_group_name
   virtual_desktop_host_pool_type                     = var.virtual_desktop_host_pool_type
@@ -22,8 +21,8 @@ module "avm_res_desktopvirtualization_hostpool" {
   }
   virtual_desktop_host_pool_start_vm_on_connect = var.virtual_desktop_host_pool_start_vm_on_connect
   virtual_desktop_host_pool_tags                = var.virtual_desktop_host_pool_tags
+  virtual_desktop_host_pool_location            = var.virtual_desktop_host_pool_location
 }
-
 
 resource "time_sleep" "wait_for_hostpool" {
   create_duration = "30s"
@@ -50,7 +49,6 @@ module "avm_res_desktopvirtualization_applicationgroup" {
   version = ">=0.2.1"
 
   virtual_desktop_application_group_host_pool_id                 = module.avm_res_desktopvirtualization_hostpool.resource.id
-  virtual_desktop_application_group_location                     = var.virtual_desktop_application_group_location
   virtual_desktop_application_group_name                         = var.virtual_desktop_application_group_name
   virtual_desktop_application_group_resource_group_name          = var.virtual_desktop_application_group_resource_group_name
   virtual_desktop_application_group_type                         = var.virtual_desktop_application_group_type
@@ -59,6 +57,7 @@ module "avm_res_desktopvirtualization_applicationgroup" {
   virtual_desktop_application_group_description                  = var.virtual_desktop_application_group_description
   virtual_desktop_application_group_friendly_name                = var.virtual_desktop_application_group_friendly_name
   virtual_desktop_application_group_tags                         = merge(local.tags, var.virtual_desktop_application_group_tags)
+  virtual_desktop_application_group_location                     = var.virtual_desktop_application_group_location
 }
 
 # Create Azure Virtual Desktop workspace
@@ -66,13 +65,13 @@ module "avm_res_desktopvirtualization_workspace" {
   source  = "Azure/avm-res-desktopvirtualization-workspace/azurerm"
   version = ">=0.2.2"
 
-  virtual_desktop_workspace_location            = var.virtual_desktop_workspace_location
   virtual_desktop_workspace_name                = var.virtual_desktop_workspace_name
   virtual_desktop_workspace_resource_group_name = var.virtual_desktop_host_pool_resource_group_name
   public_network_access_enabled                 = var.public_network_access_enabled
   virtual_desktop_workspace_description         = var.virtual_desktop_workspace_description
   virtual_desktop_workspace_friendly_name       = var.virtual_desktop_workspace_friendly_name
   virtual_desktop_workspace_tags                = merge(local.tags, var.virtual_desktop_workspace_tags)
+  virtual_desktop_workspace_location            = var.virtual_desktop_workspace_location
 }
 
 resource "azurerm_virtual_desktop_workspace_application_group_association" "workappgrassoc" {
@@ -95,12 +94,12 @@ resource "azurerm_role_assignment" "avd_service_hostpool_reader" {
 }
 
 resource "random_uuid" "example" {}
+
 # Create Azure Virtual Desktop scaling plan
 module "avm_res_desktopvirtualization_scaling_plan" {
   source  = "Azure/avm-res-desktopvirtualization-scalingplan/azurerm"
   version = ">=0.2.1"
 
-  virtual_desktop_scaling_plan_location            = var.virtual_desktop_scaling_plan_location
   virtual_desktop_scaling_plan_name                = var.virtual_desktop_scaling_plan_name
   virtual_desktop_scaling_plan_resource_group_name = var.virtual_desktop_scaling_plan_resource_group_name
   virtual_desktop_scaling_plan_schedule            = var.virtual_desktop_scaling_plan_schedule
@@ -115,10 +114,10 @@ module "avm_res_desktopvirtualization_scaling_plan" {
       }
     ]
   )
-  virtual_desktop_scaling_plan_tags = merge(local.tags, var.virtual_desktop_scaling_plan_tags)
+  virtual_desktop_scaling_plan_tags     = merge(local.tags, var.virtual_desktop_scaling_plan_tags)
+  virtual_desktop_scaling_plan_location = var.virtual_desktop_scaling_plan_location
 
   depends_on = [
     time_sleep.wait_for_hostpool
   ]
 }
-
