@@ -10,6 +10,7 @@ module "avm_res_desktopvirtualization_hostpool" {
   virtual_desktop_host_pool_resource_group_name      = var.virtual_desktop_host_pool_resource_group_name
   virtual_desktop_host_pool_type                     = var.virtual_desktop_host_pool_type
   enable_telemetry                                   = var.enable_telemetry
+  registration_expiration_period                     = var.registration_expiration_period
   virtual_desktop_host_pool_custom_rdp_properties    = var.virtual_desktop_host_pool_custom_rdp_properties
   virtual_desktop_host_pool_friendly_name            = var.virtual_desktop_host_pool_friendly_name
   virtual_desktop_host_pool_maximum_sessions_allowed = var.virtual_desktop_host_pool_maximum_sessions_allowed
@@ -29,16 +30,11 @@ resource "time_sleep" "wait_for_hostpool" {
   depends_on = [module.avm_res_desktopvirtualization_hostpool]
 }
 
-# Registration information for the host pool.
-resource "azurerm_virtual_desktop_host_pool_registration_info" "registrationinfo" {
-  expiration_date = timeadd(timestamp(), var.registration_expiration_period)
-  hostpool_id     = module.avm_res_desktopvirtualization_hostpool.resource.id
+removed {
+  from = azurerm_virtual_desktop_host_pool_registration_info.registrationinfo
 
   lifecycle {
-    ignore_changes = [
-      expiration_date,
-      hostpool_id,
-    ]
+    destroy = false
   }
 }
 

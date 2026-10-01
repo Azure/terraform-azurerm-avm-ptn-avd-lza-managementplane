@@ -10,6 +10,10 @@ This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
 - Azure Virtual Desktop Workspace includes Diagnostic log settings
 - Azure Virtual Desktop Scaling
 
+## Upgrading existing deployments
+
+Earlier versions also tracked host-pool registration information at `azurerm_virtual_desktop_host_pool_registration_info.registrationinfo`. On upgrade, Terraform forgets this duplicate state entry without deleting the Azure registration information. The host-pool child continues to manage it and provide the registration token; no manual state migration is required.
+
 <!-- markdownlint-disable MD033 -->
 ## Requirements
 
@@ -34,7 +38,6 @@ The following requirements are needed by this module:
 The following resources are used by this module:
 
 - [azurerm_role_assignment.avd_service_hostpool_reader](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
-- [azurerm_virtual_desktop_host_pool_registration_info.registrationinfo](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_desktop_host_pool_registration_info) (resource)
 - [azurerm_virtual_desktop_workspace_application_group_association.workappgrassoc](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_desktop_workspace_application_group_association) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.example](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
