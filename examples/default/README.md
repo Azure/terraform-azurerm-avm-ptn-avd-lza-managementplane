@@ -87,13 +87,13 @@ module "avd" {
       name                                 = "Weekends"
       days_of_week                         = ["Saturday", "Sunday"]
       ramp_up_start_time                   = "06:00"
-      ramp_up_load_balancing_algorithm     = "BreadthFirst"
+      ramp_up_load_balancing_algorithm     = var.virtual_desktop_host_pool_load_balancer_type
       ramp_up_minimum_hosts_percent        = 20
       ramp_up_capacity_threshold_percent   = 10
       peak_start_time                      = "10:00"
-      peak_load_balancing_algorithm        = "BreadthFirst"
+      peak_load_balancing_algorithm        = var.virtual_desktop_host_pool_load_balancer_type
       ramp_down_start_time                 = "18:00"
-      ramp_down_load_balancing_algorithm   = "DepthFirst"
+      ramp_down_load_balancing_algorithm   = var.virtual_desktop_host_pool_load_balancer_type
       ramp_down_minimum_hosts_percent      = 10
       ramp_down_force_logoff_users         = false
       ramp_down_wait_time_minutes          = 45
@@ -101,7 +101,7 @@ module "avd" {
       ramp_down_capacity_threshold_percent = 5
       ramp_down_stop_hosts_when            = "ZeroSessions"
       off_peak_start_time                  = "22:00"
-      off_peak_load_balancing_algorithm    = "DepthFirst"
+      off_peak_load_balancing_algorithm    = var.virtual_desktop_host_pool_load_balancer_type
     }
   ]
   virtual_desktop_scaling_plan_time_zone                = var.virtual_desktop_scaling_plan_time_zone
@@ -421,7 +421,7 @@ Description: `BreadthFirst` load balancing distributes new user sessions across 
 
 Type: `string`
 
-Default: `"BreadthFirst"`
+Default: `"DepthFirst"`
 
 ### <a name="input_virtual_desktop_host_pool_location"></a> [virtual\_desktop\_host\_pool\_location](#input\_virtual\_desktop\_host\_pool\_location)
 
