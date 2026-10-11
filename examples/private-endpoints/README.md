@@ -4,6 +4,8 @@
 
 This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
 
+Session hosts retrieve the current registration token after the host pool and its private endpoint finish provisioning. The token stays sensitive, and subsequent changes to extension settings remain detectable.
+
 ## Features
 
 - Azure Virtual Desktop Host Pool includes Diagnostic log settings and Private endpoint
@@ -19,6 +21,10 @@ terraform {
   required_version = ">= 1.9, < 2.0"
 
   required_providers {
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.12"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 4.0.0, < 5.0.0"
@@ -28,6 +34,10 @@ terraform {
       version = ">= 3.6.0, < 4.0.0"
     }
   }
+}
+
+provider "azapi" {
+  subscription_id = var.subscription_id
 }
 
 provider "azurerm" {
@@ -272,6 +282,22 @@ resource "azurerm_virtual_machine_extension" "aadjoin" {
   auto_upgrade_minor_version = true
 }
 
+data "azapi_resource_action" "registration_token" {
+  count = var.vm_count > 0 ? 1 : 0
+
+  action                           = "retrieveRegistrationToken"
+  method                           = "POST"
+  resource_id                      = module.avd.hostpool_id
+  type                             = "Microsoft.DesktopVirtualization/hostPools@2024-04-03"
+  response_export_values           = []
+  sensitive_response_export_values = ["token"]
+
+  depends_on = [
+    module.avd,
+    azurerm_private_endpoint.hostpool,
+  ]
+}
+
 # Virtual Machine Extension for AVD Agent
 resource "azurerm_virtual_machine_extension" "vmext_dsc" {
   count = var.vm_count
@@ -285,7 +311,7 @@ resource "azurerm_virtual_machine_extension" "vmext_dsc" {
   protected_settings         = <<PROTECTED_SETTINGS
   {
     "properties": {
-      "registrationInfoToken": "${module.avd.registrationinfo_token}"
+      "registrationInfoToken": "${data.azapi_resource_action.registration_token[0].sensitive_output.token}"
     }
   }
 PROTECTED_SETTINGS
@@ -369,6 +395,8 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
 
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.12)
+
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.0.0, < 5.0.0)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.6.0, < 4.0.0)
@@ -394,6 +422,7 @@ The following resources are used by this module:
 - [azurerm_windows_virtual_machine.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/windows_virtual_machine) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
 - [random_password.vmpass](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) (resource)
+- [azapi_resource_action.registration_token](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_action) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs

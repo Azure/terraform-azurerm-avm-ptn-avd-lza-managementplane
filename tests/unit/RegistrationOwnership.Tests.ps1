@@ -16,7 +16,32 @@ BeforeAll {
     if ($LASTEXITCODE -ne 0) {
       throw "Local terraform $($Arguments[0]) failed: $($result -join "`n")"
     }
+
     return ($result -join "`n")
+  }
+}
+
+Describe 'AVD example registration token retrieval' {
+  It 'reads the current token after provisioning without suppressing extension changes' {
+    foreach ($example in @('default', 'private-endpoints')) {
+      $main = Get-Content -Raw -LiteralPath (Join-Path $moduleRoot 'examples' $example 'main.tf')
+      $token = [regex]::Match($main, '(?ms)^data "azapi_resource_action" "registration_token" \{(?<body>.*?)^\}')
+      $extension = [regex]::Match($main, '(?ms)^resource "azurerm_virtual_machine_extension" "vmext_dsc" \{(?<body>.*?)^\}')
+      $token.Success | Should -BeTrue
+      $extension.Success | Should -BeTrue
+      $token.Groups['body'].Value | Should -Match '(?m)^\s*count\s*=\s*var\.vm_count\s*>\s*0\s*\?\s*1\s*:\s*0\s*$'
+      $token.Groups['body'].Value | Should -Match '(?m)^\s*action\s*=\s*"retrieveRegistrationToken"\s*$'
+      $token.Groups['body'].Value | Should -Match '(?m)^\s*resource_id\s*=\s*module\.avd\.hostpool_id\s*$'
+      $token.Groups['body'].Value | Should -Match '(?m)^\s*response_export_values\s*=\s*\[\s*\]\s*$'
+      $token.Groups['body'].Value | Should -Match '(?m)^\s*sensitive_response_export_values\s*=\s*\["token"\]\s*$'
+      $token.Groups['body'].Value | Should -Match '(?s)depends_on\s*=\s*\[[^\]]*module\.avd'
+      if ($example -eq 'private-endpoints') {
+        $token.Groups['body'].Value | Should -Match '(?s)depends_on\s*=\s*\[[^\]]*azurerm_private_endpoint\.hostpool'
+      }
+      $extension.Groups['body'].Value | Should -Match 'data\.azapi_resource_action\.registration_token\[0\]\.sensitive_output\.token'
+      $extension.Groups['body'].Value | Should -Not -Match 'module\.avd\.registrationinfo_token'
+      $extension.Groups['body'].Value | Should -Not -Match '(?s)ignore_changes\s*=\s*(all|\[[^\]]*protected_settings)'
+    }
   }
 }
 
