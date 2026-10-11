@@ -1,14 +1,16 @@
 # Create Azure Virtual Desktop host pool
 module "avm_res_desktopvirtualization_hostpool" {
   source  = "Azure/avm-res-desktopvirtualization-hostpool/azurerm"
-  version = ">=0.4.0"
+  version = "0.5.0"
 
+  location                                           = coalesce(var.virtual_desktop_host_pool_location, var.location)
   resource_group_name                                = var.resource_group_name
   virtual_desktop_host_pool_load_balancer_type       = var.virtual_desktop_host_pool_load_balancer_type
   virtual_desktop_host_pool_name                     = var.virtual_desktop_host_pool_name
   virtual_desktop_host_pool_resource_group_name      = var.virtual_desktop_host_pool_resource_group_name
   virtual_desktop_host_pool_type                     = var.virtual_desktop_host_pool_type
   enable_telemetry                                   = var.enable_telemetry
+  registration_expiration_period                     = var.registration_expiration_period
   virtual_desktop_host_pool_custom_rdp_properties    = var.virtual_desktop_host_pool_custom_rdp_properties
   virtual_desktop_host_pool_friendly_name            = var.virtual_desktop_host_pool_friendly_name
   virtual_desktop_host_pool_maximum_sessions_allowed = var.virtual_desktop_host_pool_maximum_sessions_allowed
@@ -20,7 +22,6 @@ module "avm_res_desktopvirtualization_hostpool" {
     }])
   }
   virtual_desktop_host_pool_start_vm_on_connect = var.virtual_desktop_host_pool_start_vm_on_connect
-  virtual_desktop_host_pool_location            = var.virtual_desktop_host_pool_location
 }
 
 resource "time_sleep" "wait_for_hostpool" {
@@ -29,24 +30,20 @@ resource "time_sleep" "wait_for_hostpool" {
   depends_on = [module.avm_res_desktopvirtualization_hostpool]
 }
 
-# Registration information for the host pool.
-resource "azurerm_virtual_desktop_host_pool_registration_info" "registrationinfo" {
-  expiration_date = timeadd(timestamp(), var.registration_expiration_period)
-  hostpool_id     = module.avm_res_desktopvirtualization_hostpool.resource.id
+removed {
+  from = azurerm_virtual_desktop_host_pool_registration_info.registrationinfo
 
   lifecycle {
-    ignore_changes = [
-      expiration_date,
-      hostpool_id,
-    ]
+    destroy = false
   }
 }
 
 # Create Azure Virtual Desktop application group
 module "avm_res_desktopvirtualization_applicationgroup" {
   source  = "Azure/avm-res-desktopvirtualization-applicationgroup/azurerm"
-  version = ">=0.2.1"
+  version = "0.3.0"
 
+  location                                                       = coalesce(var.virtual_desktop_application_group_location, var.location)
   virtual_desktop_application_group_host_pool_id                 = module.avm_res_desktopvirtualization_hostpool.resource.id
   virtual_desktop_application_group_name                         = var.virtual_desktop_application_group_name
   virtual_desktop_application_group_resource_group_name          = var.virtual_desktop_application_group_resource_group_name
@@ -56,21 +53,21 @@ module "avm_res_desktopvirtualization_applicationgroup" {
   virtual_desktop_application_group_description                  = var.virtual_desktop_application_group_description
   virtual_desktop_application_group_friendly_name                = var.virtual_desktop_application_group_friendly_name
   virtual_desktop_application_group_tags                         = local.tags
-  virtual_desktop_application_group_location                     = var.virtual_desktop_application_group_location
 }
 
 # Create Azure Virtual Desktop workspace
 module "avm_res_desktopvirtualization_workspace" {
   source  = "Azure/avm-res-desktopvirtualization-workspace/azurerm"
-  version = ">=0.2.2"
+  version = "0.3.0"
 
+  location                                      = coalesce(var.virtual_desktop_workspace_location, var.location)
   virtual_desktop_workspace_name                = var.virtual_desktop_workspace_name
   virtual_desktop_workspace_resource_group_name = var.virtual_desktop_host_pool_resource_group_name
+  enable_telemetry                              = var.enable_telemetry
   public_network_access_enabled                 = var.public_network_access_enabled
   virtual_desktop_workspace_description         = var.virtual_desktop_workspace_description
   virtual_desktop_workspace_friendly_name       = var.virtual_desktop_workspace_friendly_name
   virtual_desktop_workspace_tags                = local.tags
-  virtual_desktop_workspace_location            = var.virtual_desktop_workspace_location
 }
 
 resource "azurerm_virtual_desktop_workspace_application_group_association" "workappgrassoc" {
@@ -97,8 +94,9 @@ resource "random_uuid" "example" {}
 # Create Azure Virtual Desktop scaling plan
 module "avm_res_desktopvirtualization_scaling_plan" {
   source  = "Azure/avm-res-desktopvirtualization-scalingplan/azurerm"
-  version = ">=0.2.1"
+  version = "0.3.0"
 
+  location                                         = coalesce(var.virtual_desktop_scaling_plan_location, var.location)
   virtual_desktop_scaling_plan_name                = var.virtual_desktop_scaling_plan_name
   virtual_desktop_scaling_plan_resource_group_name = var.virtual_desktop_scaling_plan_resource_group_name
   virtual_desktop_scaling_plan_schedule            = var.virtual_desktop_scaling_plan_schedule
@@ -113,8 +111,7 @@ module "avm_res_desktopvirtualization_scaling_plan" {
       }
     ]
   )
-  virtual_desktop_scaling_plan_tags     = local.tags
-  virtual_desktop_scaling_plan_location = var.virtual_desktop_scaling_plan_location
+  virtual_desktop_scaling_plan_tags = local.tags
 
   depends_on = [
     time_sleep.wait_for_hostpool

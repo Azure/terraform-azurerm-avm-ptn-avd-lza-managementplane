@@ -2,6 +2,8 @@
 
 This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
 
+Session hosts retrieve the current registration token after the host pool and its private endpoint finish provisioning. The token stays sensitive, and subsequent changes to extension settings remain detectable.
+
 ## Features
 
 - Azure Virtual Desktop Host Pool includes Diagnostic log settings and Private endpoint
