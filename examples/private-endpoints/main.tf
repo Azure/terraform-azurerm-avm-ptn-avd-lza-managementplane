@@ -47,7 +47,7 @@ module "naming" {
 }
 
 resource "azurerm_resource_group" "this" {
-  location = local.azure_regions[random_integer.region_index.result]
+  location = coalesce(var.location, local.azure_regions[random_integer.region_index.result])
   name     = module.naming.resource_group.name_unique
   tags     = var.tags
 }
