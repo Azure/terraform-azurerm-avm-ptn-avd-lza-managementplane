@@ -29,6 +29,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 4.0.0, < 5.0.0"
     }
+    modtm = {
+      source  = "registry.terraform.io/azure/modtm"
+      version = "~> 0.3"
+    }
     random = {
       source  = "hashicorp/random"
       version = ">= 3.6.0, < 4.0.0"
@@ -80,7 +84,8 @@ resource "azurerm_log_analytics_workspace" "this" {
 }
 
 module "avd" {
-  source = "../../"
+  source    = "../../"
+  providers = { modtm = modtm }
 
   location                                         = azurerm_resource_group.this.location
   resource_group_name                              = azurerm_resource_group.this.name
@@ -282,8 +287,9 @@ resource "azurerm_monitor_data_collection_rule_association" "example" {
 
 # Create resources for Azure Virtual Desktop Insights data collection rules
 module "avm_ptn_avd_lza_insights" {
-  source  = "Azure/avm-ptn-avd-lza-insights/azurerm"
-  version = "0.3.0"
+  source    = "Azure/avm-ptn-avd-lza-insights/azurerm"
+  version   = "0.3.0"
+  providers = { modtm = modtm }
 
   location = azurerm_resource_group.this.location
   monitor_data_collection_rule_data_flow = [
@@ -339,6 +345,8 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.0.0, < 5.0.0)
 
+- <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
+
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.6.0, < 4.0.0)
 
 ## Resources
@@ -363,7 +371,13 @@ The following resources are used by this module:
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
 
-No required inputs.
+The following input variables are required:
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
+
+Type: `string`
 
 ## Optional Inputs
 

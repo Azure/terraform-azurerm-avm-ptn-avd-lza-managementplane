@@ -1,7 +1,8 @@
 # Create Azure Virtual Desktop host pool
 module "avm_res_desktopvirtualization_hostpool" {
-  source  = "Azure/avm-res-desktopvirtualization-hostpool/azurerm"
-  version = "0.5.0"
+  source    = "Azure/avm-res-desktopvirtualization-hostpool/azurerm"
+  version   = "0.5.0"
+  providers = { modtm = modtm }
 
   location                                           = coalesce(var.virtual_desktop_host_pool_location, var.location)
   resource_group_name                                = var.resource_group_name
@@ -40,8 +41,9 @@ removed {
 
 # Create Azure Virtual Desktop application group
 module "avm_res_desktopvirtualization_applicationgroup" {
-  source  = "Azure/avm-res-desktopvirtualization-applicationgroup/azurerm"
-  version = "0.3.0"
+  source    = "Azure/avm-res-desktopvirtualization-applicationgroup/azurerm"
+  version   = "0.3.0"
+  providers = { modtm = modtm }
 
   location                                                       = coalesce(var.virtual_desktop_application_group_location, var.location)
   virtual_desktop_application_group_host_pool_id                 = module.avm_res_desktopvirtualization_hostpool.resource.id
@@ -57,8 +59,9 @@ module "avm_res_desktopvirtualization_applicationgroup" {
 
 # Create Azure Virtual Desktop workspace
 module "avm_res_desktopvirtualization_workspace" {
-  source  = "Azure/avm-res-desktopvirtualization-workspace/azurerm"
-  version = "0.3.0"
+  source    = "Azure/avm-res-desktopvirtualization-workspace/azurerm"
+  version   = "0.3.0"
+  providers = { modtm = modtm }
 
   location                                      = coalesce(var.virtual_desktop_workspace_location, var.location)
   virtual_desktop_workspace_name                = var.virtual_desktop_workspace_name
@@ -93,8 +96,9 @@ resource "random_uuid" "example" {}
 
 # Create Azure Virtual Desktop scaling plan
 module "avm_res_desktopvirtualization_scaling_plan" {
-  source  = "Azure/avm-res-desktopvirtualization-scalingplan/azurerm"
-  version = "0.3.0"
+  source    = "Azure/avm-res-desktopvirtualization-scalingplan/azurerm"
+  version   = "0.3.0"
+  providers = { modtm = modtm }
 
   location                                         = coalesce(var.virtual_desktop_scaling_plan_location, var.location)
   virtual_desktop_scaling_plan_name                = var.virtual_desktop_scaling_plan_name

@@ -102,3 +102,9 @@ variable "vm_count" {
   default     = 1
   description = "Number of virtual machines to create"
 }
+
+variable "location" {
+  type        = string
+  description = "The Azure region for this module's resources or telemetry deployment."
+  nullable    = false
+}
