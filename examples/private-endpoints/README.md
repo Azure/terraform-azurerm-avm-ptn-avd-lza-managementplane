@@ -66,7 +66,7 @@ module "naming" {
 }
 
 resource "azurerm_resource_group" "this" {
-  location = local.azure_regions[random_integer.region_index.result]
+  location = coalesce(var.location, local.azure_regions[random_integer.region_index.result])
   name     = module.naming.resource_group.name_unique
   tags     = var.tags
 }
@@ -435,13 +435,7 @@ The following resources are used by this module:
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
 
-The following input variables are required:
-
-### <a name="input_location"></a> [location](#input\_location)
-
-Description: The Azure region for this module's resources or telemetry deployment.
-
-Type: `string`
+No required inputs.
 
 ## Optional Inputs
 
@@ -464,6 +458,14 @@ If it is set to false, then no telemetry will be collected.
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
+
+Type: `string`
+
+Default: `null`
 
 ### <a name="input_subscription_id"></a> [subscription\_id](#input\_subscription\_id)
 
