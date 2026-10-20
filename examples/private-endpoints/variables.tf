@@ -107,5 +107,4 @@ variable "location" {
   type        = string
   default     = null
   description = "The Azure region for this module's resources or telemetry deployment."
-  nullable    = true
 }
