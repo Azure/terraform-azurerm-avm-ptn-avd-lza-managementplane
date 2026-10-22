@@ -10,6 +10,11 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 4.0.0, < 5.0.0"
     }
+    # tflint-ignore: terraform_unused_required_providers
+    modtm = {
+      source  = "registry.terraform.io/azure/modtm"
+      version = "~> 0.3"
+    }
     random = {
       source  = "hashicorp/random"
       version = ">= 3.6.0, < 4.0.0"
@@ -38,12 +43,12 @@ resource "random_integer" "region_index" {
 
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
-  source  = "Azure/naming/azurerm"
-  version = "0.3.0"
+  source  = "Azure/avm-utl-naming/azure"
+  version = "0.2.0"
 }
 
 resource "azurerm_resource_group" "this" {
-  location = local.azure_regions[random_integer.region_index.result]
+  location = coalesce(var.location, local.azure_regions[random_integer.region_index.result])
   name     = module.naming.resource_group.name_unique
   tags     = var.tags
 }

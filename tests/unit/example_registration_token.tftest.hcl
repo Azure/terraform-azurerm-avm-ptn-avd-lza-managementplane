@@ -7,9 +7,15 @@ mock_provider "azapi" {
       }
     }
   }
+  mock_data "azapi_client_config" {
+    defaults = {
+      subscription_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000"
+    }
+  }
 }
 
 mock_provider "azuread" {}
+
 mock_provider "azurerm" {
   mock_resource "azurerm_resource_group" {
     defaults = {
@@ -59,7 +65,9 @@ mock_provider "azurerm" {
     }
   }
 }
+
 mock_provider "modtm" {}
+
 mock_provider "time" {}
 
 mock_provider "random" {
@@ -108,6 +116,7 @@ override_module {
 
 variables {
   enable_telemetry = false
+  location         = "westus2"
   subscription_id  = "00000000-0000-0000-0000-000000000000"
 }
 
@@ -118,6 +127,7 @@ run "default_token" {
     azapi   = azapi
     azuread = azuread
     azurerm = azurerm
+    modtm   = modtm
     random  = random
     time    = time
   }
@@ -155,6 +165,7 @@ run "default_no_hosts" {
     azapi   = azapi
     azuread = azuread
     azurerm = azurerm
+    modtm   = modtm
     random  = random
     time    = time
   }
@@ -183,6 +194,7 @@ run "private_token" {
     azapi   = azapi
     azuread = azuread
     azurerm = azurerm
+    modtm   = modtm
     random  = random
     time    = time
   }
@@ -220,6 +232,7 @@ run "private_no_hosts" {
     azapi   = azapi
     azuread = azuread
     azurerm = azurerm
+    modtm   = modtm
     random  = random
     time    = time
   }

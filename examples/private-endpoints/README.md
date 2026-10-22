@@ -29,6 +29,11 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 4.0.0, < 5.0.0"
     }
+    # tflint-ignore: terraform_unused_required_providers
+    modtm = {
+      source  = "registry.terraform.io/azure/modtm"
+      version = "~> 0.3"
+    }
     random = {
       source  = "hashicorp/random"
       version = ">= 3.6.0, < 4.0.0"
@@ -57,12 +62,12 @@ resource "random_integer" "region_index" {
 
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
-  source  = "Azure/naming/azurerm"
-  version = "0.3.0"
+  source  = "Azure/avm-utl-naming/azure"
+  version = "0.2.0"
 }
 
 resource "azurerm_resource_group" "this" {
-  location = local.azure_regions[random_integer.region_index.result]
+  location = coalesce(var.location, local.azure_regions[random_integer.region_index.result])
   name     = module.naming.resource_group.name_unique
   tags     = var.tags
 }
@@ -399,6 +404,8 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.0.0, < 5.0.0)
 
+- <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
+
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.6.0, < 4.0.0)
 
 ## Resources
@@ -450,6 +457,14 @@ If it is set to false, then no telemetry will be collected.
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
+
+Type: `string`
+
+Default: `null`
 
 ### <a name="input_subscription_id"></a> [subscription\_id](#input\_subscription\_id)
 
@@ -591,9 +606,9 @@ Version: 0.3.0
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 
-Source: Azure/naming/azurerm
+Source: Azure/avm-utl-naming/azure
 
-Version: 0.3.0
+Version: 0.2.0
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection
