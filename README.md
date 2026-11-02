@@ -23,7 +23,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.12)
 
-- <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) (3.4.0)
+- <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) (3.10.0)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.0.0, < 5.0.0)
 
@@ -31,7 +31,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.6.0, < 4.0.0)
 
-- <a name="requirement_time"></a> [time](#requirement\_time) (0.13.1)
+- <a name="requirement_time"></a> [time](#requirement\_time) (0.14.2)
 
 ## Resources
 
@@ -42,9 +42,9 @@ The following resources are used by this module:
 - [azurerm_virtual_desktop_workspace_application_group_association.workappgrassoc](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_desktop_workspace_application_group_association) (resource)
 - [random_uuid.example](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [terraform_data.telemetry](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) (resource)
-- [time_sleep.wait_for_hostpool](https://registry.terraform.io/providers/hashicorp/time/0.13.1/docs/resources/sleep) (resource)
+- [time_sleep.wait_for_hostpool](https://registry.terraform.io/providers/hashicorp/time/0.14.2/docs/resources/sleep) (resource)
 - [azapi_client_config.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
-- [azuread_service_principal.avd_service](https://registry.terraform.io/providers/hashicorp/azuread/3.4.0/docs/data-sources/service_principal) (data source)
+- [azuread_service_principal.avd_service](https://registry.terraform.io/providers/hashicorp/azuread/3.10.0/docs/data-sources/service_principal) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -717,13 +717,13 @@ Version: 0.3.0
 
 Source: Azure/avm-res-desktopvirtualization-hostpool/azurerm
 
-Version: 0.5.0
+Version: 0.6.0
 
 ### <a name="module_avm_res_desktopvirtualization_scaling_plan"></a> [avm\_res\_desktopvirtualization\_scaling\_plan](#module\_avm\_res\_desktopvirtualization\_scaling\_plan)
 
 Source: Azure/avm-res-desktopvirtualization-scalingplan/azurerm
 
-Version: 0.3.0
+Version: 0.4.0
 
 ### <a name="module_avm_res_desktopvirtualization_workspace"></a> [avm\_res\_desktopvirtualization\_workspace](#module\_avm\_res\_desktopvirtualization\_workspace)
 
