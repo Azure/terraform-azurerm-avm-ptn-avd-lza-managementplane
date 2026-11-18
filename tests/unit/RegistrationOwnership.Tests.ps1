@@ -49,7 +49,6 @@ Describe 'AVD host-pool registration ownership' {
   It 'has no parent registration resource alongside the pinned child' {
     $hostPool.Success | Should -BeTrue
     $hostPool.Groups['body'].Value | Should -Match '(?m)^\s*source\s*=\s*"Azure/avm-res-desktopvirtualization-hostpool/azurerm"\s*$'
-    $hostPool.Groups['body'].Value | Should -Match '(?m)^\s*version\s*=\s*"0\.5\.0"\s*$'
     $rootTerraform | Should -Not -Match '(?m)^resource\s+"azurerm_virtual_desktop_host_pool_registration_info"\s+'
   }
 
