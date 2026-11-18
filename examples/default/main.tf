@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.9, < 2.0"
+  required_version = ">= 1.11.0, < 2.0"
 
   required_providers {
     azapi = {
@@ -9,11 +9,6 @@ terraform {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 4.0.0, < 5.0.0"
-    }
-    # tflint-ignore: terraform_unused_required_providers
-    modtm = {
-      source  = "registry.terraform.io/azure/modtm"
-      version = "~> 0.3"
     }
     random = {
       source  = "hashicorp/random"
@@ -262,27 +257,26 @@ resource "azurerm_monitor_data_collection_rule_association" "example" {
   count = var.vm_count
 
   target_resource_id      = azurerm_windows_virtual_machine.this[count.index].id
-  data_collection_rule_id = module.avm_ptn_avd_lza_insights.resource.id
+  data_collection_rule_id = module.avm_ptn_avd_lza_insights.resource_id
   name                    = "${var.avd_vm_name}-association-${count.index}"
 }
 
 # Create resources for Azure Virtual Desktop Insights data collection rules
 module "avm_ptn_avd_lza_insights" {
   source  = "Azure/avm-ptn-avd-lza-insights/azurerm"
-  version = "0.3.0"
+  version = "0.5.0"
 
-  location = azurerm_resource_group.this.location
-  monitor_data_collection_rule_data_flow = [
+  data_flows = [
     {
       destinations = [azurerm_log_analytics_workspace.this.name]
       streams      = ["Microsoft-Perf", "Microsoft-Event"]
     }
   ]
-  monitor_data_collection_rule_name                = "microsoft-avdi-eastus"
-  monitor_data_collection_rule_resource_group_name = azurerm_resource_group.this.name
-  enable_telemetry                                 = var.enable_telemetry
-  monitor_data_collection_rule_data_sources = {
-    performance_counter = [
+  location  = azurerm_resource_group.this.location
+  name      = "microsoft-avdi-eastus"
+  parent_id = azurerm_resource_group.this.id
+  data_sources = {
+    performance_counters = [
       {
         counter_specifiers            = ["\\LogicalDisk(C:)\\Avg. Disk Queue Length", "\\LogicalDisk(C:)\\Current Disk Queue Length", "\\Memory\\Available Mbytes", "\\Memory\\Page Faults/sec", "\\Memory\\Pages/sec", "\\Memory\\% Committed Bytes In Use", "\\PhysicalDisk(*)\\Avg. Disk Queue Length", "\\PhysicalDisk(*)\\Avg. Disk sec/Read", "\\PhysicalDisk(*)\\Avg. Disk sec/Transfer", "\\PhysicalDisk(*)\\Avg. Disk sec/Write", "\\Processor Information(_Total)\\% Processor Time", "\\User Input Delay per Process(*)\\Max Input Delay", "\\User Input Delay per Session(*)\\Max Input Delay", "\\RemoteFX Network(*)\\Current TCP RTT", "\\RemoteFX Network(*)\\Current UDP Bandwidth"]
         name                          = "perfCounterDataSource10"
@@ -296,7 +290,7 @@ module "avm_ptn_avd_lza_insights" {
         streams                       = ["Microsoft-Perf"]
       }
     ],
-    windows_event_log = [
+    windows_event_logs = [
       {
         name           = "eventLogsDataSource"
         streams        = ["Microsoft-Event"]
@@ -304,11 +298,12 @@ module "avm_ptn_avd_lza_insights" {
       }
     ]
   }
-  monitor_data_collection_rule_destinations = {
-    log_analytics = {
+  destinations = {
+    log_analytics = [{
       name                  = azurerm_log_analytics_workspace.this.name
       workspace_resource_id = azurerm_log_analytics_workspace.this.id
-    }
+    }]
   }
-  monitor_data_collection_rule_kind = "Windows"
+  enable_telemetry = var.enable_telemetry
+  kind             = "Windows"
 }

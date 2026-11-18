@@ -58,7 +58,7 @@ module "avm_res_desktopvirtualization_applicationgroup" {
 # Create Azure Virtual Desktop workspace
 module "avm_res_desktopvirtualization_workspace" {
   source  = "Azure/avm-res-desktopvirtualization-workspace/azurerm"
-  version = "0.3.0"
+  version = "0.4.0"
 
   location                                      = coalesce(var.virtual_desktop_workspace_location, var.location)
   virtual_desktop_workspace_name                = var.virtual_desktop_workspace_name
