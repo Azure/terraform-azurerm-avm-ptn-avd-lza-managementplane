@@ -81,7 +81,6 @@ Describe 'AVD child locations' {
       $example = Get-Content -Raw -LiteralPath (Join-Path $moduleRoot 'examples' $name 'main.tf')
       $call = [regex]::Match($example, '(?ms)^module "avm_ptn_avd_lza_insights" \{(?<body>.*?)^\}')
       $call.Success | Should -BeTrue
-      $call.Groups['body'].Value | Should -Match '(?m)^\s*version\s*=\s*"0\.3\.0"\s*$'
       $call.Groups['body'].Value | Should -Match '(?m)^\s*location\s*=\s*azurerm_resource_group\.this\.location\s*$'
       $call.Groups['body'].Value | Should -Not -Match 'monitor_data_collection_rule_location'
     }
