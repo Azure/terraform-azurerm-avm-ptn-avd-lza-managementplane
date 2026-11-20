@@ -1,4 +1,4 @@
-# Default example
+# Defaults example
 
 This is a repo for Terraform Azure Verified Module for Azure Virtual Desktop
 

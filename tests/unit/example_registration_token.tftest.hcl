@@ -128,7 +128,7 @@ run "default_token" {
   }
 
   module {
-    source = "./examples/default"
+    source = "./examples/defaults"
   }
 
   variables {
@@ -165,7 +165,7 @@ run "default_no_hosts" {
   }
 
   module {
-    source = "./examples/default"
+    source = "./examples/defaults"
   }
 
   variables {
